@@ -5,10 +5,9 @@ Local Regression, Likelihood and Density Estimation.
 }
 \usage{
 locfit.raw(x, y, weights=1, cens=NULL, base=0,
-  scale=F, alpha=0.7, deg=2, kern="tcub", kt="sph", acri="none", basis=list(NULL),
-  deriv=numeric(0), dc=FALSE,
-  family, link="default",
-  xlim, renorm=FALSE,
+  scale=FALSE, alpha=0.7, deg=2, kern="tricube", kt="sph", acri="none",
+  basis=list(NULL), deriv=numeric(0), dc=FALSE,
+  family, link="default", xlim, renorm=FALSE,
   ev="tree", flim, mg=10, cut=0.8,
   maxk=100, itype="default", mint=20, maxit=20, debug=0,
   geth=FALSE, sty=rep(1,d))

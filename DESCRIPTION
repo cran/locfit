@@ -1,7 +1,7 @@
 Package: locfit
-Version: 1.1-6
+Version: 1.1-7
 Title: Local Regression, Likelihood and Density Estimation.
-Date: 18/09/2003
+Date: 02/02/2004
 Author: Catherine Loader <catherine@laplace.stat.cwru.edu>
 Maintainer: Andy Liaw <andy_liaw@merck.com>
 Description: Local Regression, Likelihood and density estimation.

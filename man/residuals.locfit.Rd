@@ -4,8 +4,7 @@
 Fitted values for a `"locfit"' object.
 }
 \usage{
-\method{residuals}{locfit}(object, data, type="dev",
-                  ...)
+\method{residuals}{locfit}(object, data=NULL, type="deviance", ...)
 }
 \arguments{
 \item{object}{
