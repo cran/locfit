@@ -4,14 +4,14 @@
 Summary method for a gcvplot structure.
 }
 \usage{
-\method{summary}{locfit}(object, ...)
+\method{summary}{gcvplot}(object, ...)
 }
 \description{
   Computes a short summary for a generalized cross-validation plot structure
 }
 \arguments{
-  \item{object}{A "gcvplot" structure produced by a call to
-    \code{\link{gcvplot}}, \code{\link{cpplot}} e.t.c.
+  \item{object}{A \code{gcvplot} structure produced by a call to
+    \code{\link{gcvplot}}, \code{\link{cpplot}} etc.
 }
   \item{...}{currently ignored.}
 }
@@ -25,7 +25,7 @@ Summary method for a gcvplot structure.
 
 \examples{
 data(ethanol)
-summary(gcvplot(NOx~E,data=ethanol,alpha=seq(0.2,1.0,by=0.05)))
+summary(gcvplot(NOx ~ E, data=ethanol, alpha=seq(0.2, 1.0, by=0.05)))
 }
 
 \seealso{

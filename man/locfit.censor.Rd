@@ -4,7 +4,7 @@
 Censored Local Regression
 }
 \usage{
-locfit.censor(x, y, cens, ..., iter=3, km=F)
+locfit.censor(x, y, cens, ..., iter=3, km=FALSE)
 %locfit(y~x, cens=cens, lfproc=locfit.censor)
 %locfit.censor(y~x, cens, ..., iter=3, km=F)
 }
