@@ -136,7 +136,8 @@ function(x, y, weights = 1, cens = NULL, base = 0, scale = FALSE, alpha = 0.7, d
       ncm = integer(1),
       vc = integer(1),
       dp = as.numeric(dp),
-      mi = as.integer(mi))
+      mi = as.integer(mi),
+               PACKAGE="locfit")
   if(is.character(deriv))
     deriv <- match(deriv, vnames)
   nvm <- size$nvm
@@ -183,7 +184,8 @@ function(x, y, weights = 1, cens = NULL, base = 0, scale = FALSE, alpha = 0.7, d
     deriv = as.integer(deriv),
     nd = as.integer(length(deriv)),
     sty = as.integer(sty),
-    basis = list(basis, lfbas))
+    basis = list(basis, lfbas),
+          PACKAGE="locfit")
   nvc <- z$nvc
   names(nvc) <- c("nvm", "ncm", "nnl", "nv", "nc")
   nvm <- nvc["nvm"]
@@ -355,7 +357,8 @@ function(object, data = NULL, what = "coef", cv = FALSE, studentize = FALSE, typ
     nd = as.integer(length(object$deriv)),
     sty = as.integer(object$sty),
     what = as.character(c(what, type)),
-    basis = list(eval(object$call$basis)))
+    basis = list(eval(object$call$basis)),
+             PACKAGE="locfit")
   tr(pred$fit)
 }
 
@@ -621,7 +624,8 @@ function(object, newdata, where, what, band, ...)
     sty = as.integer(object$sty),
     wh = as.integer(wh),
     what = c(what, band),
-    bs = list(eval(object$call$basis)))
+    bs = list(eval(object$call$basis)),
+     PACKAGE="locfit")
 }
 
 "print.preplot.locfit"<-
@@ -976,7 +980,8 @@ function(x, add = FALSE, text = FALSE, ...)
       as.numeric(x$dp),
       nt = integer(1),
       term = integer(600),
-      box = x$box)
+      box = x$box,
+             PACKAGE="locfit")
     ce <- zz$term + 1
   }
   else ce <- x$cell$ce + 1
@@ -1043,7 +1048,8 @@ function(x, h0 = 0.01 * sd, h1 = sd, meth = c("AIC", "LCV", "LSCV", "BCV",
     meth = as.integer(match(meth, c("AIC", "LCV", "LSCV", "BCV", "SJPI", "GKK")
       )),
     nmeth = as.integer(length(meth)),
-    kern = pmatch(kern, c("rect", "epan", "bisq", "tcub", "trwt", "gauss")))
+    kern = pmatch(kern, c("rect", "epan", "bisq", "tcub", "trwt", "gauss")),
+          PACKAGE="locfit")
   band <- z$band
   names(band) <- meth
   band
@@ -1550,7 +1556,7 @@ function(x, alpha, ...)
     x = as.numeric(x),
     n = as.integer(length(x)),
     h = as.numeric(alpha),
-    ret = numeric(2))$ret
+    ret = numeric(2), PACKAGE="locfit")$ret
   ret
 }
 
@@ -1693,7 +1699,7 @@ function(fit, const = c(0, 1), d = 1, cov = 0.95, rdf = 0)
     cov = as.numeric(z$cov),
     m = as.integer(length(z$const)),
     rdf = as.numeric(z$rdf),
-    x = numeric(1))$x
+    x = numeric(1), PACKAGE="locfit")$x
   z
 }
 
