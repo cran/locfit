@@ -1,0 +1,56 @@
+aic                      Compute Akaike's Information Criterion.
+aicplot                  Compute an AIC plot.
+border                   Australian Institute of Sport Dataset
+border                   Cricket Batting Dataset
+cltest                   Test dataset for classification
+cltrain                  Training dataset for classification
+cp                       Compute Mallow's Cp for local regression models.
+cpplot                   Compute a Cp plot.
+crit                     Compute critical values for confidence
+                         intervals.
+crit<-                   Substitute critical values on "locfit" object.
+ethanol                  Exhaust emissions
+expit                    Inverse logistic link function
+fitted.locfit            Fitted values for a `"locfit"' object.
+gcv                      Compute generalized cross-validation statistic.
+gcvplot                  Compute a generalized cross-validation plot.
+geyser                   Old Faithful Geyser Dataset
+hatmatrix                Weight diagrams and the hat matrix for a local
+                         regression model.
+heart                    Survival Times of Heart Transplant Recipients
+iris                     Fisher's Iris Data (subset)
+kappa0                   Critical Values for Simultaneous Confidence
+                         Bands.
+lcv                      Compute Likelihood Cross Validation Statistic.
+lcvplot                  Compute the likelihood cross-validation plot.
+lfmarg                   Generate grid margins.
+lines.locfit             Add `locfit' line to existing plot
+locfit                   Local Regression, Likelihood and Density
+                         Estimation.
+locfit.raw               Local Regression, Likelihood and Density
+                         Estimation.
+lscv                     Least Squares Cross Validation Statistic.
+lscvplot                 Compute the LSCV plot.
+mcyc                     Acc(De?)celeration of a Motorcycle Hitting a
+                         Wall
+mine                     Fracture Counts in Coal Mines
+morths                   Henderson and Sheppard Mortality Dataset
+penny                    Penny Thickness Dataset
+plot.gcvplot             Produce a cross-validation plot.
+plot.locfit.1d           Plot a one dimensional "preplot.locfit" object.
+plot.locfit.2d           Plot a two-dimensional "preplot.locfit" object.
+plot.locfit.3d           Plot a high-dimensional "preplot.locfit" object
+                         using trellis displays.
+plot.locfit              Plot an object of class locfit.
+plot.preplot.locfit      Plot a "preplot.locfit" object.
+plotbyfactor             x-y scatterplot, colored by levels of a factor.
+points.locfit            Add `locfit' points to existing plot
+predict.locfit           Prediction from a Locfit object.
+preplot.locfit           Prediction from a Locfit object.
+print.locfit             Prints a short summary of a "locfit" object.
+residuals.locfit         Fitted values for a `"locfit"' object.
+rv                       Residual variance from a "locfit" object.
+rv<-                     Substitute variance estimate on a "locfit"
+                         object.
+spencer                  Spencer's Mortality Dataset
+summary.locfit           Prints a short summary of a "locfit" object.
