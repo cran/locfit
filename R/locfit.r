@@ -869,8 +869,10 @@ function(x, y, subscripts, z, xyz.labs, xyz.axes, xyz.mid, xyz.minmax,
   }
   else {
     panel.xyplot(x, y)
+    browser()
     args <- list(...)
-    args <- args[-length(args)]
+    ## This is a super-ugly fix--- I don't really know what else to do here.
+    args <- args[substr(names(args), 1, 5) != "panel"]
     args <- c(list(x=x), list(y=y), args)
     llines.locfit(do.call("locfit.raw", args))
   }
