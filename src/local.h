@@ -18,9 +18,9 @@
  *   DIRSEP: '/' for unix; '\\' for DOS
  */
 #ifdef DOS
-#define DIRSEP '\\'
+  #define DIRSEP '\\'
 #else
-#define DIRSEP '/'
+  #define DIRSEP '/'
 #endif
 
 
@@ -35,11 +35,11 @@
    math libraries don't include these functions.
  */
 #ifdef DOS
-#define LGAMMA(arg) lflgamma(arg)
-#define erf(x) lferf(x)
-#define erfc(x) lferfc(x)
+  #define LGAMMA(arg) lflgamma(arg)
+  #define erf(x) lferf(x)
+  #define erfc(x) lferfc(x)
 #else
-#define LGAMMA(arg) lgamma(arg)
+  #define LGAMMA(arg) lgamma(arg)
 #endif
 #define daws(x) lfdaws(x)
 
@@ -67,6 +67,7 @@
 #ifndef SWINVERSION
 
 #ifdef RVERSION
+#include "R.h"
 typedef int INT;
 #else
 #ifdef SVERSION
@@ -114,12 +115,18 @@ extern int printe(const char *format, ...);
 #define printe printf
 #endif
 
+#ifdef RVERSION
+#define printf Rprintf
+#undef printe
+#define printe REprintf
+#endif
+
 #ifdef INTERFACE
 #define printe printf
 #endif
 
-#define ERROR(args) printe("Error: "), printe args , printe("\n"), lf_error=1
-#define WARN(args)  printe("Warning: "),printe args, printe("\n")
+#define lfERROR(args) printe("Error: "), printe args , printe("\n"), lf_error=1
+#define lfWARN(args)  printe("Warning: "),printe args, printe("\n")
 
 #define MAX(a,b) (((a)>(b)) ? (a) : (b))
 #define MIN(a,b) (((a)<(b)) ? (a) : (b))

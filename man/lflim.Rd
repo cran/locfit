@@ -27,4 +27,4 @@ Vector with length 2*dim.
 \seealso{
 \code{\link{locfit}}
 }
-\keyword{locfit}
+\keyword{smooth}

@@ -4,7 +4,7 @@
 Print method for preplot.locfit objects.
 }
 \usage{
-print.preplot.locfit(x, ...)
+\method{print}{preplot.locfit}(x, ...)
 }
 \description{
   Print method for objects created by the
@@ -12,6 +12,7 @@ print.preplot.locfit(x, ...)
 }
 \arguments{
 \item{x}{ \code{"preplot.locfit"} object.  }
+\item{...}{not used.}
 }
 \seealso{
 \code{\link{preplot.locfit}},

@@ -168,7 +168,7 @@ double *kap;
   d = mi[MDIM];
   if (lf_error) return(0);
   if ((lf->mi[MKER] != WPARM) && (lf->dp[DALP]>0))
-    WARN(("constants are approximate for varying h"));
+    lfWARN(("constants are approximate for varying h"));
   mi[MP] = calcp(mi,mi[MDEG]);
   deschk(des,mi[MN],mi[MP]);
   preproc(des,lf,mi[MKER]!=WPARM);
@@ -310,11 +310,11 @@ double *k0, al, nu;
 INT m, d, it, s;
 { double c, cn, c0, c1, tp, td;
   INT j;
-  if (m<0) ERROR(("critval: no terms?"));
+  if (m<0) lfERROR(("critval: no terms?"));
   if (m>d+1) m = d+1;
-  if ((al<=0) | (al>=1)) ERROR(("critval: invalid alpha %8.5f",al));
+  if ((al<=0) | (al>=1)) lfERROR(("critval: invalid alpha %8.5f",al));
   if (lf_error) return(0.0);
-  if (al>0.5) WARN(("critval: A mighty large tail probability al=%8.5f",al));
+  if (al>0.5) lfWARN(("critval: A mighty large tail probability al=%8.5f",al));
   if (s==1) al = 2*al;
   if (m==0) { d = 0; k0[0] = 1; m = 1; }
   c = 2.0; c0 = 0.0; c1 = 0.0;

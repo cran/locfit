@@ -26,5 +26,5 @@ gam.lf(x, y, w, xeval, ...)
   \code{gam}
 }
 
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

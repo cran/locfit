@@ -44,7 +44,7 @@ char *z;
   f = pmatch(z,famil,fvals,16,-1);
   if ((z[0]=='o') | (z[0]=='a')) robu = 0;
   if (f==-1)
-  { WARN(("unknown family %s",z));
+  { lfWARN(("unknown family %s",z));
     f = TGAUS;
   }
   if (quasi) f += 64;
@@ -119,7 +119,7 @@ char *z;
       return;
   }
 
-  WARN(("setstrval: invalid value %d",v));
+  lfWARN(("setstrval: invalid value %d",v));
   return;
 }
 
@@ -136,7 +136,7 @@ char *z;
 { int val;
   
   val = pmatch(z, rtype, rvals, 8, -1);
-  if (val==-1) ERROR(("Unknown type = %s",z));
+  if (val==-1) lfERROR(("Unknown type = %s",z));
   return((INT)val);
 }
 
@@ -145,6 +145,6 @@ char *z;
 { int val;
   
   val = pmatch(z, whtyp, whval, 8, -1);
-  if (val==-1) ERROR(("Unknown what = %s",z));
+  if (val==-1) lfERROR(("Unknown what = %s",z));
   return((INT)val);
 }

@@ -4,7 +4,7 @@
 Print the Locfit Evaluation Points.
 }
 \usage{
-print.lfeval(x)
+print.lfeval(x, ...)
 }
 \description{
   Prints a matrix of the evaluation points from a \code{"locfit"}
@@ -12,6 +12,7 @@ print.lfeval(x)
 }
 \arguments{
   \item{x}{A \code{"lfeval"} or \code{"locfit"} object}
+  \item{...}{not used.}
 }
 
 \value{
@@ -24,4 +25,4 @@ print.lfeval(x)
   \code{\link{plot.lfeval}}
 }
 
-\keyword{locfit}
+\keyword{smooth}

@@ -50,7 +50,7 @@ INT n, d;
   dp[DCUT] = 0.8;
 
   if (d<=0)
-    ERROR(("must set MDIM before calling fitdefault"));
+    lfERROR(("must set MDIM before calling fitdefault"));
   for (i=0; i<d; i++)
   { lf->sca[i] = 1.0;
     lf->xl[i] = lf->xl[i+d] = 0.0;
@@ -128,7 +128,7 @@ INT nopc;
   d = lf->mi[MDIM]; n = lf->mi[MN];
   lf->mi[MLINK] = defaultlink(lf->mi[MLINK],lf->mi[MTG]);
   if (!validlinks(lf->mi[MLINK],lf->mi[MTG]))
-  { ERROR(("Invalid family/link combination"));
+  { lfERROR(("Invalid family/link combination"));
     return;
   }
   compparcomp(des,lf,nopc);
@@ -195,7 +195,7 @@ INT (*vfun)(), nopc;
 #ifdef CVERSION
     case 100: do_scbsim(des,lf); break;
 #endif
-    default: ERROR(("startlf: Invalid evaluation structure"));
+    default: lfERROR(("startlf: Invalid evaluation structure"));
   }
 
   /* renormalize for family=density */
@@ -230,7 +230,7 @@ INT *dv, *mi;
   nd = readilist(dv,key,0,mi[MDEG],0);
   for (i=0; i<nd; i++)
   { if ((dv[i]<1) | (dv[i]>mi[MDIM]))
-      ERROR(("drl: Invalid derivatives %s",key));
+      lfERROR(("drl: Invalid derivatives %s",key));
     dv[i]--;
   }
   return(nd);
@@ -246,7 +246,7 @@ INT re;
 
   re &= (!nofit());
   i0 = getarg(vc,"formula",1);
-  if ((!re) && (i0==0)) { ERROR(("no formula")); return; }
+  if ((!re) && (i0==0)) { lfERROR(("no formula")); return; }
   i1 = getarg(vc,"data",1);
   if (i1>0) doreaddata(argval(vc,i1),(INT)0);
   if (re)
@@ -264,7 +264,7 @@ INT re;
     n = -1;
     i0 = i1 = 0; d = 0;
     while ((i0<strlen(key)) && (key[i0]!='~')) i0++;
-    if (key[i0] != '~') { ERROR(("invalid formula %s",key)); return; }
+    if (key[i0] != '~') { lfERROR(("invalid formula %s",key)); return; }
     if (i0>0)
     { key[i0] = '\0';
       lf->y = vdptr(findvar(key,1,&n));

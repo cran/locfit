@@ -4,10 +4,13 @@
 Save S functions.
 }
 \usage{
-store()
+store(data=FALSE, grand=FALSE)
 }
 \description{
   I've gotta keep track of this mess somehow!
 }
-
-\keyword{locfit}
+\arguments{
+  \item{data}{should the data sets be dumped to file?}
+  \item{grand}{should the whole shebang be dumped to file?}
+}
+\keyword{internal}

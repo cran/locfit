@@ -4,7 +4,8 @@
 Angular Term for a Locfit model.
 }
 \usage{
-locfit(y~ang(x), scale=1/(2*pi))
+ang(x)
+%locfit(y ~ ang(x), scale = 1/(2*pi))
 }
 \description{
   The \code{ang()} function is used in a locfit model formula

@@ -26,4 +26,4 @@ This function is usually called by \code{\link{plot.locfit}}.
 \seealso{
 \code{\link{locfit}}, \code{\link{plot.locfit}}
 }
-\keyword{locfit}
+\keyword{smooth}

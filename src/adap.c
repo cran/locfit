@@ -88,7 +88,7 @@ lfit   *lf;
       return(lf_status);
     case AOK: return(lf_status);
   }
-  ERROR(("aband1: unknown criterion"));
+  lfERROR(("aband1: unknown criterion"));
   return(LF_ERR);
 }
 
@@ -110,7 +110,7 @@ double h0;
   inc = 0; ncp = 0.0;
   while ((!done) & (nu1<(n-p)*0.95))
   { h = nbhd(lf,des,0,(1+0.3/d)*h,1);
-    if (locfit(lf,des,h,1)>0) WARN(("aband2: failed fit"));
+    if (locfit(lf,des,h,1)>0) lfWARN(("aband2: failed fit"));
     local_df(lf,des,t);
     nu1 = t[0]-t[2]; /* tr(A) */
     switch(lf->mi[MACRI])
@@ -164,7 +164,7 @@ double h0;
   { if (i==0) i++;
     h = h0*(1+0.1*i/lf->mi[MDIM]);
     h = nbhd(lf,des,0,h,1);
-    if (locfit(lf,des,h,1)>0) WARN(("aband3: failed fit"));
+    if (locfit(lf,des,h,1)>0) lfWARN(("aband3: failed fit"));
     local_df(lf,des,t);
     switch (lf->mi[MACRI])
     { case AKAT:

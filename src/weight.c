@@ -33,7 +33,7 @@ INT ker;
     case WGAUS: return(exp(-SQR(GFACT*u)/2.0));
     case WEXPL: return(exp(-EFACT*u));
     case WMACL: return(1/((u+1.0e-100)*(u+1.0e-100)));
-    case WMINM: ERROR(("WMINM in W"));
+    case WMINM: lfERROR(("WMINM in W"));
                 return(0.0);
     case WPARM: return(1.0);
   }
@@ -105,7 +105,7 @@ INT hasdi;
   { case KPROD: return(weightprod(lf,u,h));
     case KSPH:  return(weightsph(lf,u,h,hasdi,di));
   }
-  ERROR(("weight: unknown kernel type %d",lf->mi[MKT]));
+  lfERROR(("weight: unknown kernel type %d",lf->mi[MKT]));
   return(1.0);
 }
 
@@ -132,7 +132,7 @@ INT ker;
     case WTCUB: return(-9*sgn(u)*u*u/(1-u*u*fabs(u)+eps));
     case WEXPL: return((u>0) ? -EFACT : EFACT);
   }
-  ERROR(("WdW: invalid kernel"));
+  lfERROR(("WdW: invalid kernel"));
   return(0.0);
 }
 
@@ -185,7 +185,7 @@ INT ker;
                 return(-9*v*v*u);
     case WTRWT: v = 1-u*u;
                 return(-6*v*v);
-    default: ERROR(("Invalid kernel %d in Wd",ker));
+    default: lfERROR(("Invalid kernel %d in Wd",ker));
   }
   return(0.0);
 }
@@ -204,7 +204,7 @@ INT ker;
     case WTCUB: v = 1-u*u*u;
                 return(-9*u*v*v+54*u*u*u*u*v);
     case WTRWT: return(24*u*u*(1-u*u));
-    default: ERROR(("Invalid kernel %d in Wdd",ker));
+    default: lfERROR(("Invalid kernel %d in Wdd",ker));
   }
   return(0.0);
 }
@@ -241,7 +241,7 @@ INT d, *j, nj, ker;
                   }
                 return(I);
     case WEXPL: I = factorial(dj-1)/ipower(EFACT,dj); break;
-    default: ERROR(("Unknown kernel %d in exacint",ker));
+    default: lfERROR(("Unknown kernel %d in exacint",ker));
   }
   if ((d==1) && (nj==0)) return(2*I); /* common case quick */
   z = (d-nj)*LOGPI/2-LGAMMA(dj/2.0);
@@ -320,7 +320,7 @@ INT ker;
       f[18]= 1;
       return(19);
   }
-  ERROR(("Invalid kernel %d in wtaylor",ker));
+  lfERROR(("Invalid kernel %d in wtaylor",ker));
   return(0);
 }
 
@@ -347,7 +347,7 @@ INT ker;
       v2 = 2-v;
       return(v2*v2*v2*v2*v2*(16+v*(40+v*(36+v*(10+v))))/630);
   }
-  ERROR(("Wconv not implemented for kernel %d",ker));
+  lfERROR(("Wconv not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -373,7 +373,7 @@ INT ker;
       v2 = 2-v;
       return(-v2*v2*v2*v2*(32+v*(64+v*(24+v*3)))/210);
   }
-  ERROR(("Wconv1 not implemented for kernel %d",ker));
+  lfERROR(("Wconv1 not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -389,7 +389,7 @@ INT ker;
       gv = GFACT*v;
       return(exp(-SQR(gv)/4)*GFACT*GFACT*GFACT*(12-gv*gv*(12-gv*gv))*SQRPI/16);
   }
-  ERROR(("Wconv4 not implemented for kernel %d",ker));
+  lfERROR(("Wconv4 not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -405,7 +405,7 @@ INT ker;
       gv = GFACT*v;
       return(-exp(-SQR(gv)/4)*GFACT*GFACT*GFACT*GFACT*gv*(60-gv*gv*(20-gv*gv))*SQRPI/32);
   }
-  ERROR(("Wconv5 not implemented for kernel %d",ker));
+  lfERROR(("Wconv5 not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -424,7 +424,7 @@ INT ker;
       gv = GFACT*GFACT;
       return(z*gv*gv*GFACT);
   }
-  ERROR(("Wconv6 not implemented for kernel %d",ker));
+  lfERROR(("Wconv6 not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -456,6 +456,6 @@ INT ker, deg;
         case WTRWT: return(254371.7647);
       }
   }
-  ERROR(("Wikk not implemented for kernel %d",ker));
+  lfERROR(("Wikk not implemented for kernel %d",ker));
   return(0.0);
 }

@@ -157,7 +157,7 @@ design *des;
       des->cf[0] = asin(sqrt(s1/s0))-sb/s0;
       return(LF_OK);
     default:
-      ERROR(("reginit: invalid link %d",lf->mi[MLINK]));
+      lfERROR(("reginit: invalid link %d",lf->mi[MLINK]));
       return(LF_ERR);
   }
 }
@@ -199,13 +199,13 @@ design *des;
   switch(err)
   { case NR_OK: return;
     case NR_NCON:
-      WARN(("max_nr not converged"));
+      lfWARN(("max_nr not converged"));
       return;
     case NR_NDIV:
-      WARN(("max_nr reduction problem"));
+      lfWARN(("max_nr reduction problem"));
       return;
   }
-  WARN(("max_nr return status %d",err));
+  lfWARN(("max_nr return status %d",err));
 }
 
 int use_robust_scale(int tg)
@@ -253,7 +253,7 @@ int noit;
       case LIDENT:
         multmatscal(des->cf,1.0/lf->dp[DSWT],des->p);
         break;
-      default: ERROR(("Density adjustment; invalid link"));
+      default: lfERROR(("Density adjustment; invalid link"));
     }
   }
 

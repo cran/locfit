@@ -140,7 +140,7 @@ INT *ce;
     triang_descend(tr,xa,ce);
     return;
   }
-  if (d==1) { ERROR(("weights sum to < 1")); }
+  if (d==1) { lfERROR(("weights sum to < 1")); }
   if (d==2) /* center */
   { ce[0] = pv[5]; xa[0] = 1-2*xa[0];
     ce[1] = pv[2]; xa[1] = 1-2*xa[1];

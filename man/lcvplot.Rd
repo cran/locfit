@@ -43,5 +43,5 @@ plot(lcvplot(NOx~E,data=ethanol,alpha=seq(0.2,1.0,by=0.05)))
   \code{\link{plot.gcvplot}}
 }
 
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

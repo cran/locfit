@@ -44,7 +44,7 @@ double y, w, th, *res;
     case RLDDT: return(res[ZDDLL]);
     case RFIT:  return(th);
     case RMEAN: return(res[ZMEAN]);
-    default: ERROR(("resid: unknown residual type %d",ty));
+    default: lfERROR(("resid: unknown residual type %d",ty));
   }
   return(0.0);
 }

@@ -4,7 +4,7 @@
 Summary method for a preplot.locfit object.
 }
 \usage{
-summary(object, \dots)
+\method{summary}{preplot.locfit}(object, ...)
 }
 \description{
 Prints a short summary of a \code{"preplot.locfit"} object.
@@ -13,6 +13,7 @@ Prints a short summary of a \code{"preplot.locfit"} object.
 \item{object}{
 \code{"preplot.locfit"} object.
 }
+\item{...}{currently not used.}
 }
 
 \value{
@@ -20,4 +21,4 @@ The fitted values from a
 \code{"preplot.locfit"} object.
 }
 
-\keyword{locfit}
+\keyword{smooth}

@@ -19,4 +19,4 @@ rv(fit) <- 1.2345
 \seealso{
 \link{locfit}(), \link{rv}(), \link{plot.locfit}()
 }
-\keyword{locfit}
+\keyword{smooth}

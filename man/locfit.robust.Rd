@@ -4,9 +4,9 @@
 Robust Local Regression
 }
 \usage{
-locfit.robust(x, y, ..., iter=3)
-locfit(y~x, lfproc=locfit.robust)
-locfit.robust(y~x, ..., iter=3)
+locfit.robust(x, y, weights, ..., iter=3)
+%locfit(y~x, lfproc=locfit.robust)
+%locfit.robust(y~x, ..., iter=3)
 }
 \description{
   \code{locfit.robust} implements a robust local regression where
@@ -31,6 +31,8 @@ locfit.robust(y~x, ..., iter=3)
 \item{y}{
   If \code{x} is numeric, \code{y} gives the response variable.
 }
+\item{weights}{Prior weights (or sample sizes) for individual observations. This is
+typically used where observations have unequal variance.}
 \item{...}{
   Other arguments to \code{\link{locfit.raw}}
 }

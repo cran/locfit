@@ -4,10 +4,10 @@
 Plot a "preplot.locfit" object.
 }
 \usage{
-plot(object, ...)
+\method{plot}{preplot.locfit}(x, ...)
 }
 \arguments{
-\item{object}{
+\item{x}{
 A \code{"preplot.locfit"} object, produced by
 \code{\link{preplot.locfit}()}.
 }
@@ -26,4 +26,4 @@ need to call \code{plot.locfitpred()} directly.
 \code{\link{preplot.locfit}}, \code{\link{plot.locfit.1d}},
 \code{\link{plot.locfit.2d}}, \code{\link{plot.locfit.3d}}.
 }
-\keyword{locfit}
+\keyword{smooth}

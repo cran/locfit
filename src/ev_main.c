@@ -57,7 +57,7 @@ int *nvm, *ncm, *vc, *mi;
       /* preset -- leave everything unchanged. */
       return;
     default:
-      ERROR(("guessnv: I don't know this evaluation structure."));
+      lfERROR(("guessnv: I don't know this evaluation structure."));
   }
   return;
 }
@@ -94,7 +94,7 @@ INT nvm, ncm, d, p, vc;
   tr->deg = z; z += nvm;
   tr->sv  = z; z += ncm;
   if (z != (double *)vdptr(tr->tw)+rw)
-    WARN(("trchck: double assign problem"));
+    lfWARN(("trchck: double assign problem"));
 
   rw = lfit_reqi(nvm,ncm,vc);
   tr->iw = checkvarlen(tr->iw,rw,"_lfiwork",VINT);
@@ -104,7 +104,7 @@ INT nvm, ncm, d, p, vc;
   tr->lo = k; k += MAX(ncm,nvm);
   tr->hi = k; k += MAX(ncm,nvm);
   if (k != (INT *)vdptr(tr->iw)+rw)
-    WARN(("trchck: int assign problem"));
+    lfWARN(("trchck: int assign problem"));
 
   tr->nvm = nvm; tr->ncm = ncm; tr->mi[MDIM] = d; tr->mi[MP] = p; tr->vc = vc;
 }
@@ -261,7 +261,7 @@ INT i0, i1, pv;
 #ifdef CVERSION
     reassign(lf);
 #else
-    ERROR(("newsplit: out of vertex space"));
+    lfERROR(("newsplit: out of vertex space"));
     return(-1);
 #endif
   }

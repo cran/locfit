@@ -1,14 +1,15 @@
 \name{formula.locfit}
 \alias{formula.locfit}
 \title{
-Formula from a Locfit object.
+Formula method for a Locfit object.
 }
 \usage{
-formula(object)
+\method{formula}{locfit}(x, ...)
 }
 \description{Extract the model formula from a locfit object.}
 \arguments{
-\item{object}{ \code{"locfit"} object.}
+\item{x}{ \code{"locfit"} object.}
+\item{...}{currently not used.}
 }
 \value{
 Returns the formula from the locfit object.

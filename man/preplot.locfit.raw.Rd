@@ -4,7 +4,7 @@
 Prediction from a Locfit object.
 }
 \usage{
-preplot.locfit.raw(object, newdata, where, what, band)
+preplot.locfit.raw(object, newdata, where, what, band, ...)
 }
 \arguments{
 \item{object}{
@@ -23,6 +23,7 @@ What to compute predicted values of.
   Compute standard errors for the fit and include confidence bands on
   the returned object.
 }
+\item{...}{not used.}
 }
 \value{
 A list containing raw output from the internal prediction routines.
@@ -35,5 +36,5 @@ A list containing raw output from the internal prediction routines.
 \seealso{
 \code{\link{locfit}}, \code{\link{predict.locfit}}, \code{\link{preplot.locfit}}.
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

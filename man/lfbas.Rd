@@ -3,9 +3,9 @@
 \title{
 User-specified basis functions for Locfit.
 }
-\usage{
-locfit(...,basis)
-}
+%\usage{
+%locfit(...,basis)
+%}
 \description{
   By default, Locfit uses a polynomial basis as the fitting functions.
   An alternative set of basis functions can be specified through
@@ -53,7 +53,7 @@ my.basis <- function(x,t)
 fit <- locfit(NOx~E+C, data=ethanol, scale=0, basis=my.basis)
 # With this basis, Locfit's standard interpolation and plot methods
 # should be reasonable.
-plot(fit,get.data=T)
+plot(fit,get.data=TRUE)
 
 # Estimation of change points. This provides an alternative to using
 # left() and right(), and can easily be modified to detecting
@@ -83,11 +83,11 @@ my.basis <- function(x,t)
   ret
 }
 fit <- locfit(thickness~year, data=penny, alpha=c(0,10), ev=xev, basis=my.basis)
-plot(preplot(fit,where="fitp", get.data=T))
+plot(preplot(fit,where="fitp", get.data=TRUE))
 }
 \seealso{
   \code{\link{locfit}},
   \code{\link{locfit.raw}}
 }
 
-\keyword{locfit}
+\keyword{smooth}

@@ -160,7 +160,7 @@ INT v;
   }
   if (type >= 2)
   { if (lf->mi[MKER] != WPARM)
-      WARN(("nonparametric fit; correction is invalid"));
+      lfWARN(("nonparametric fit; correction is invalid"));
     cumulant(lf,des,sd);
   }
   lf->mi[MPC] = tmp;
@@ -188,7 +188,7 @@ INT v;
       hi[v] = thhat;
       return;
   }
-  ERROR(("procvscb2: invalid type"));
+  lfERROR(("procvscb2: invalid type"));
 }
 
 void scb(des,lf)
@@ -243,7 +243,7 @@ double x;
 
   if (type>=2)
   { if (lf_sim->mi[MKER] != WPARM)
-      WARN(("nonparametric fit; correction is invalid"));
+      lfWARN(("nonparametric fit; correction is invalid"));
     cumulant(lf_sim,des_sim,lf_sim->nlx[0]);
   }
 
@@ -305,7 +305,7 @@ vari *v;
 
   i = getarg(v,"mean",1);
   if (i==0)
-  { WARN(("cscbsim: no mean function; setting = 0"));
+  { lfWARN(("cscbsim: no mean function; setting = 0"));
     aru = arbuild("0",0,0,NULL,0,1);
   }
   else

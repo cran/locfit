@@ -4,7 +4,7 @@
 Least Squares Cross Validation Statistic.
 }
 \usage{
-lscv(x, \dots, exact=F)
+lscv(x, ..., exact=FALSE)
 }
 \description{
   The calling sequence for \code{lscv} matches those for the
@@ -35,7 +35,7 @@ data(geyser)
 lscv(~geyser, alpha=cbind(0,1), ev="grid", mg=100, deg=0,
   flim=c(1,6), kern="gauss")
 # same computation, exact
-lscv(geyser,alpha=1,exact=T)
+lscv(geyser,alpha=1,exact=TRUE)
 }
 \seealso{
   \code{\link{locfit}},
@@ -44,5 +44,5 @@ lscv(geyser,alpha=1,exact=T)
   \code{\link{lscvplot}}
 }
 
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

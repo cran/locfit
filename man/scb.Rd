@@ -4,7 +4,7 @@
 Simultaneous Confidence Bands
 }
 \usage{
-scb(x, ..., mg, flim, type)
+scb(x, ..., type=1)
 }
 \description{
   \code{scb} is implemented as a front-end to \code{\link{locfit}},
@@ -19,17 +19,8 @@ scb(x, ..., mg, flim, type)
 A numeric vector or matrix of predictors (as in \code{\link{locfit.raw}}),
 or a model formula (as in \code{\link{locfit}}).
 }
-\item{...}{Additional arguments to \code{\link{locfit.raw}}.}
-\item{mg}{
-  The \code{scb()} function evaluates the confidence bands on a grid
-  of points, rather than the default structures used by \code{\link{locfit}}.
-  \code{mg} controls the number of grid points. Default 10.
-}
-\item{flim}{
-As in  \code{\link{locfit.raw}}, this defaults to the interval
-(or bounding box, in more than one dimension)  covering
-the data. The confidence bands are simultaneous over this interval.
-}
+\item{...}{Additional arguments to \code{\link{locfit.raw}}; e.g.,
+  \code{mg}, \code{flim}, etc.}
 \item{type}{
 Type of confidence bands. \code{type=0} computes pointwise 95\% bands.
 \code{type=1} computes basic simultaneous bands with no corrections.

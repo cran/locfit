@@ -4,7 +4,7 @@
 Summary method for a gcvplot structure.
 }
 \usage{
-summary(object)
+\method{summary}{locfit}(object, ...)
 }
 \description{
   Computes a short summary for a generalized cross-validation plot structure
@@ -13,6 +13,7 @@ summary(object)
   \item{object}{A "gcvplot" structure produced by a call to
     \code{\link{gcvplot}}, \code{\link{cpplot}} e.t.c.
 }
+  \item{...}{currently ignored.}
 }
 
 \value{
@@ -33,5 +34,5 @@ summary(gcvplot(NOx~E,data=ethanol,alpha=seq(0.2,1.0,by=0.05)))
   \code{\link{gcvplot}}
 }
 
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

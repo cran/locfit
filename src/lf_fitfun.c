@@ -37,7 +37,7 @@ INT *mi, deg;
     case KPROD: return(mi[MDIM]*deg+1);
     case KLM: return(mi[MDIM]);
   }
-  ERROR(("calcp: invalid kt %d",mi[MKT]));
+  lfERROR(("calcp: invalid kt %d",mi[MKT]));
   return(0);
 }
 
@@ -63,7 +63,7 @@ INT *deriv, nd, kt, d, deg;
   }
   if (deg==2) return(-1);
 
-  ERROR(("coefnumber not programmed for nd>=3"));
+  lfERROR(("coefnumber not programmed for nd>=3"));
   return(-1);
 }
 
@@ -95,7 +95,7 @@ void fitfunangl(dx,ff,sca,cd,deg)
 double dx, *ff, sca;
 INT deg, cd;
 {
-  if (deg>=3) WARN(("Can't handle angular model with deg>=3"));
+  if (deg>=3) lfWARN(("Can't handle angular model with deg>=3"));
 
   switch(cd)
   { case 0:
@@ -113,7 +113,7 @@ INT deg, cd;
       ff[1] = -sin(dx/sca)/sca;
       ff[2] = cos(dx/sca);
       return;
-    default: WARN(("Can't handle angular model with >2 derivs"));
+    default: lfWARN(("Can't handle angular model with >2 derivs"));
   }
 }
 
@@ -126,7 +126,7 @@ INT *deriv, nd;
 
 #ifdef SVERSION
   if (lf->mi[MUBAS])
-  { if (nd>0) WARN(("User basis does not take derivatives"));
+  { if (nd>0) lfWARN(("User basis does not take derivatives"));
     basis(x,t,f,lf->mi[MDIM],lf->mi[MP]);
     return;
   }
@@ -214,7 +214,7 @@ INT *deriv, nd;
   }
   if (deg==3) return;
 
-  ERROR(("fitfun: can't handle deg=%d for spherical kernels",deg));
+  lfERROR(("fitfun: can't handle deg=%d for spherical kernels",deg));
 }
 
 /*
@@ -236,7 +236,7 @@ design *des;
 #ifdef SVERSION
     vbasis(lf->x,des->xev,lf->mi[MN],lf->mi[MDIM],des->ind,des->n,p,X);
 #else
-    ERROR(("user basis in S version only\n"));
+    lfERROR(("user basis in S version only\n"));
 #endif
     return;
   }

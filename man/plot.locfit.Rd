@@ -4,8 +4,8 @@
 Plot an object of class locfit.
 }
 \usage{
-plot.locfit(x, xlim, pv, tv, m, mtv, band, deriv, se.fit, tr,
-        what, get.data, f3d, \dots)
+\method{plot}{locfit}(x, xlim, pv, tv, m, mtv, band, tr,
+        what, get.data, f3d, ...)
 }
 \arguments{
 \item{x}{
@@ -46,6 +46,9 @@ Number of points for trellis variables; default 6.
   the critical value stored on the fit must be changed. See the
   \code{\link{kappa0}} and \code{\link{crit}} functions.
 }
+%\item{deriv}{derivative estimation (see \code{\link{locfit.raw}}). }
+%\item{se.fit}{If \code{TRUE}, standard errors are plotted along with the
+%              fitted values.}
 \item{tr}{
 Transformation function to use for plotting. Default is the inverse
 link function, or the identity function if derivatives are requested.
@@ -83,4 +86,4 @@ plot(locfit(~x),type="persp")
 \code{\link{lines.locfit}}, \code{\link{predict.locfit}},
 \code{\link{preplot.locfit}}
 }
-\keyword{locfit}
+\keyword{smooth}

@@ -37,7 +37,7 @@ the corresponding estimate is 0.
 \examples{
 # censored regression using the Kaplan-Meier estimate.
 data(heart)
-fit <- locfit.censor(log10(surv+0.5)~age, cens=cens, data=heart, km=T)
+fit <- locfit.censor(log10(surv+0.5)~age, cens=cens, data=heart, km=TRUE)
 plotbyfactor(heart$age, 0.5+heart$surv, heart$cens, ylim=c(0.5,16000), log="y")
 lines(fit, tr=function(x)10^x)
 }
@@ -50,5 +50,5 @@ Loader, C. (1999). Local Regression and Likelihood. Springer, NY (Section 7.2).
 \seealso{
 \code{\link{locfit.censor}}
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

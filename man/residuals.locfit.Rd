@@ -4,7 +4,8 @@
 Fitted values for a `"locfit"' object.
 }
 \usage{
-residuals(object, data, cv=F, studentize=F, type="dev")
+\method{residuals}{locfit}(object, data, type="dev",
+                  ...)
 }
 \arguments{
 \item{object}{
@@ -12,12 +13,6 @@ residuals(object, data, cv=F, studentize=F, type="dev")
 }
 \item{data}{
 The data frame for the original fit. Usually, shouldn't be needed.
-}
-\item{cv}{
-If \code{TRUE}, leave-one-out cross validated residuals are approximated.
-}
-\item{studentize}{
-If \code{TRUE}, residuals are studentized.
 }
 \item{type}{
   Type of fit or residuals to compute. The default is \code{"fit"} for
@@ -28,6 +23,8 @@ If \code{TRUE}, residuals are studentized.
   likelihood second derivative. Generally, \code{type} should only be
   used when \code{what="coef"}.
 }
+\item{...}{other arguments to \code{\link{fitted.locfit}}; e.g.,
+           \code{cv} and \code{studentize}.}
 }
 \description{\code{residuals.locfit} is implemented as a front-end to
   \code{\link{fitted.locfit}}, with the \code{type} argument set.
@@ -35,5 +32,5 @@ If \code{TRUE}, residuals are studentized.
 \value{
 A numeric vector of the residuals.
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

@@ -79,19 +79,19 @@ INT nopc;
   if (lf_error) return;
   switch(k)
   { case LF_NOPT:
-      ERROR(("compparcomp: no points in dataset?"));
+      lfERROR(("compparcomp: no points in dataset?"));
       return;
     case LF_INFA:
-      ERROR(("compparcomp: infinite parameters in param. component"));
+      lfERROR(("compparcomp: infinite parameters in param. component"));
       return;
     case LF_NCON:
-      ERROR(("compparcom: not converged"));
+      lfERROR(("compparcom: not converged"));
       return;
     case LF_OOB:
-      ERROR(("compparcomp: parameters out of bounds"));
+      lfERROR(("compparcomp: parameters out of bounds"));
       return;
     case LF_PF:
-      WARN(("compparcomp: perfect fit"));
+      lfWARN(("compparcomp: perfect fit"));
     case LF_OK:
       for (i=0; i<lf->mi[MP]; i++)
       { pc->coef[i] = des->cf[i];
@@ -106,7 +106,7 @@ INT nopc;
       pc->xtwx.st = des->xtwx.st;
       return;
     default:
-      ERROR(("compparcomp: locfit unknown return status %d",k));
+      lfERROR(("compparcomp: locfit unknown return status %d",k));
       return;
   }
 }

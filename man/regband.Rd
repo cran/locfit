@@ -26,4 +26,4 @@ desirable estimates are entirely coincidental.
 \value{
 Vector of selected bandwidths.
 }
-\keyword{locfit}
+\keyword{smooth}

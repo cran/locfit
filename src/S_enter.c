@@ -41,7 +41,8 @@ INT dim, p;
   CALL_S_MODE mode[2];
   CALL_S_NRES nres;
   CALL_S_VALS values[1];
-  double z0[1], z1[1], *vptr;
+  /*  double z0[1], z1[1], *vptr; */
+  double *vptr;
   int i;
 
   args[0] = (CALL_S_ARGS)x;
@@ -221,7 +222,7 @@ INT *ce, d, ev, *nvc;
     case EDATA:
     case EPRES:
     case ENONE: break;
-    default: ERROR(("spreplot: Invalid ev"));
+    default: lfERROR(("spreplot: Invalid ev"));
   }
   lf.vc = vc;
   lf.ce = ce; ce += nvc[4]*vc;
@@ -235,7 +236,7 @@ double *xev, *coef, *sv, *x, *res, *se, *wpc, *sca, *dp;
 INT *ce, *m, *nvc, *mi, *mg, *deriv, *nd, *sty, *where;
 char **what;
 void **bs;
-{ INT p, i, vc;
+{ INT p, i; /* vc; */
   double *xx[MXDIM];
   vari v3, vxev;
   if (mi[MUBAS]) bsfunc = bs[0];
@@ -271,7 +272,7 @@ void **bs;
     case 4: /* fit points, need nothing! */
       break;
     default:
-      ERROR(("unknown where in spreplot"));
+      lfERROR(("unknown where in spreplot"));
   }
 
   lf.nd = *nd;
@@ -316,7 +317,7 @@ void **bs;
 void triterm(xev,h,ce,lo,hi,sca,nvc,mi,dp,nt,term,box)
 double *xev, *h, *sca, *dp, *box;
 INT *ce, *lo, *hi, *nvc, *mi, *nt, *term;
-{ INT d, i, t;
+{ INT d, i; /* t; */
   vari vxev;
   lf_error = 0;
   lf.nv = lf.nvm = nvc[3];

@@ -23,11 +23,16 @@ gcv(x, \dots)
   this extension.
 }
 
+\arguments{
+   \item{x}{either a numeric vector or a data frame (same as the
+   arguments to \code{\link{locfit}}).}
+   \item{...}{other argument to \code{\link{locfit}}.}
+}
 \seealso{
   \code{\link{locfit}},
   \code{\link{locfit.raw}},
   \code{\link{gcvplot}}
 }
 
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

@@ -50,5 +50,5 @@ density.lf(geyser, window="tria")
 # the same result with density, except less precision.
 density(geyser, window="tria")
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

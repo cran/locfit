@@ -35,7 +35,7 @@ INT link, family;
       case TPROB:
       case TPOIS: return(LLOG);
       case TGEOM:
-        WARN(("Canonical link unavaialable for geometric family; using inverse"));
+        lfWARN(("Canonical link unavaialable for geometric family; using inverse"));
       case TGAMM: return(LINVER);
       case TCIRC:
       case TGAUS:
@@ -72,7 +72,7 @@ INT link, family;
     case TPROB:
       return((link==LLOG) | (link==LSQRT) | (link==LIDENT));
   }
-  ERROR(("Unknown family %d in validlinks",family));
+  lfERROR(("Unknown family %d in validlinks",family));
   return(0);
 }
 
@@ -99,7 +99,7 @@ INT link, cens;
   z = y-mean;
   if (cens)
   { if (link!=LIDENT)
-    { ERROR(("Link invalid for censored Gaussian family"));
+    { lfERROR(("Link invalid for censored Gaussian family"));
       return(LF_LNK);
     }
     pz = pnorm(-z,0.0,1.0);
@@ -124,7 +124,7 @@ INT link, cens;
       res[ZDDLL]= w*mean*mean*(1-mean)*(1-mean);
       break;
     default:
-      ERROR(("Invalid link for Gaussian family"));
+      lfERROR(("Invalid link for Gaussian family"));
       return(LF_LNK);
   }
   return(LF_OK);
@@ -161,7 +161,7 @@ double y, p, th, *res, w, rs;
 INT link, cens;
 { double z;
   if (link!=LIDENT)
-  { ERROR(("Invalid link in famcauc"));
+  { lfERROR(("Invalid link in famcauc"));
     return(LF_LNK);
   }
   z = w*(y-th)/rs;
@@ -252,7 +252,7 @@ INT link, cens;
     res[ZDDLL] = 4*w;
     return(LF_OK);
   }
-  ERROR(("link %d invalid for binomial family",link));
+  lfERROR(("link %d invalid for binomial family",link));
   return(LF_LNK);
 }
 
@@ -323,7 +323,7 @@ INT link, cens;
     }
     return(LF_OK);
   }
-  ERROR(("link %d invalid for Poisson family",link));
+  lfERROR(("link %d invalid for Poisson family",link));
   return(LF_LNK);
 }
 
@@ -359,7 +359,7 @@ INT link, cens;
     }
   }
   else
-  { if (y<0) WARN(("Negative Gamma observation"));
+  { if (y<0) lfWARN(("Negative Gamma observation"));
     if (link==LLOG)
     { res[ZLIK] = -y/mean+w*(1-th);
       if (y>0) res[ZLIK] += w*log(y/w);
@@ -382,7 +382,7 @@ INT link, cens;
       return(LF_OK);
     }
   }
-  ERROR(("link %d invalid for Gamma family",link));
+  lfERROR(("link %d invalid for Gamma family",link));
   return(LF_LNK);
 }
 
@@ -423,7 +423,7 @@ INT link, cens;
       return(LF_OK);
     }
   }
-  ERROR(("link %d invalid for geometric family",link));
+  lfERROR(("link %d invalid for geometric family",link));
   return(LF_LNK);
 }
 
@@ -484,7 +484,7 @@ INT lin;
     case LSQRT:  return(sqrt(fabs(y)));
     case LASIN:  return(asin(sqrt(y)));
   }
-  ERROR(("link: unknown link %d",lin));
+  lfERROR(("link: unknown link %d",lin));
   return(0.0);
 }
 
@@ -500,7 +500,7 @@ INT lin;
     case LASIN:  return(sin(th)*sin(th));
     case LINIT:  return(0.0);
   }
-  ERROR(("invlink: unknown link %d",lin));
+  lfERROR(("invlink: unknown link %d",lin));
   return(0.0);
 }
 
@@ -536,7 +536,7 @@ INT fam, lin;
     case TROBT: return(famrobu(y,mean,th,link,res,c,w,rs));
     case TCAUC: return(famcauc(y,mean,th,link,res,c,w,rs));
     default:
-      ERROR(("links: invalid family %d",fam));
+      lfERROR(("links: invalid family %d",fam));
       return(LF_FAM);
   }
   if (st!=LF_OK) return(st);
@@ -572,7 +572,7 @@ INT tg;
       y = expit(th);
       return(w*y*(1-y));
   }
-  ERROR(("b2: invalid family %d",tg));
+  lfERROR(("b2: invalid family %d",tg));
   return(0.0);
 }
 
@@ -587,7 +587,7 @@ INT tg;
       y = expit(th);
       return(w*y*(1-y)*(1-2*y));
   }
-  ERROR(("b3: invalid family %d",tg));
+  lfERROR(("b3: invalid family %d",tg));
   return(0.0);
 }
 
@@ -602,6 +602,6 @@ INT tg;
       y = expit(th); y = y*(1-y);
       return(w*y*(1-6*y));
   }
-  ERROR(("b4: invalid family %d",tg));
+  lfERROR(("b4: invalid family %d",tg));
   return(0.0);
 }

@@ -29,7 +29,7 @@ INT n;
   for (i=1; i<=n; i++) z[i] = z[i-1]*b/i;
   if (c==0.0) return(n);
   if (n>=40)
-  { WARN(("exbctay limit to n<40"));
+  { lfWARN(("exbctay limit to n<40"));
     n = 39;
   }
   ec[0] = 1;
@@ -46,7 +46,7 @@ double l0, l1, *cf;
 INT j;
 { double tc[40], f, s;
   INT k, n;
-  if ((l0!=0.0) | (l1!=1.0)) WARN(("explinjtay: invalid l0, l1"));
+  if ((l0!=0.0) | (l1!=1.0)) lfWARN(("explinjtay: invalid l0, l1"));
   n = exbctay(cf[1]+2*cf[2]*l1,cf[2],20,tc);
   s = tc[0]/(j+1);
   f = 1/(j+1);
@@ -83,7 +83,7 @@ INT p;
     if (k>=p) f *= fabs(cf[1])/(k+1);
     k++;
   }
-  if (k==50) WARN(("explint1: want k>50"));
+  if (k==50) lfWARN(("explint1: want k>50"));
   I[k] = 0.0;
   for (j=k-1; j>=k1; j--) /* now do back step recursion */
     I[j] = (I[j]-cf[1]*I[j+1])/(j+1);
@@ -420,7 +420,7 @@ double *cf, *resp;
 INT *mi;
 { INT i;
   double f0, fr, fl;
-  if (mi[MDEG]>=2) ERROR(("onedexpl only valid for deg=0,1"));
+  if (mi[MDEG]>=2) lfERROR(("onedexpl only valid for deg=0,1"));
   if (fabs(cf[1])>=EFACT) return(LF_BADP);
 
   f0 = exp(cf[0]); fl = fr = 1.0;
@@ -439,7 +439,7 @@ INT *mi;
 { INT i;
   double f0, mu, s2;
   if (mi[MDEG]>=3)
-  { ERROR(("onedgaus only valid for deg=0,1,2"));
+  { lfERROR(("onedgaus only valid for deg=0,1,2"));
     return(LF_ERR);
   }
   if (2*cf[2]>=GFACT*GFACT) return(LF_BADP);

@@ -16,7 +16,7 @@ lfit *tr;
   INT i, im;
   xx[0] = tr->dp[DFXH];
   if (xx[0]<=0)
-  { ERROR(("regband: initialize h>0"));
+  { lfERROR(("regband: initialize h>0"));
     return;
   }
   for (i=0; i<=10; i++)
@@ -62,7 +62,7 @@ INT k;
     case 4: f = 3-x*x*(6-x*x); break;
     case 5: f = -x*(15-x*x*(10-x*x)); break;
     case 6: f = -15+x*x*(45-x*x*(15-x*x)); break;
-    default: ERROR(("dnk: k=%d too large",k)); return(0.0);
+    default: lfERROR(("dnk: k=%d too large",k)); return(0.0);
   }
   return(f*exp(-x*x/2)/S2PI);
 }

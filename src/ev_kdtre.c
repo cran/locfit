@@ -94,7 +94,7 @@ double *x;
     if (m<=il) r = il;
   }
   if (l==r) return(l);
-  ERROR(("ksmall failure"));
+  lfERROR(("ksmall failure"));
   return(0);
 }
 
@@ -169,7 +169,7 @@ lfit *tr;
     if (k>=0)
     {
       if ((ncm<nc+2) | (2*nvm<2*nv+vc))
-      { WARN(("Insufficient space for full tree"));
+      { lfWARN(("Insufficient space for full tree"));
         tr->nce = nc; tr->nv = nv;
         return;
       }
@@ -310,13 +310,13 @@ INT what;
   double *ll, *ur, ff, vv[64][64];
   d = lf->mi[MDIM];
   vc = lf->vc;
-  if (d > 6) ERROR(("d too large in kdint"));
+  if (d > 6) lfERROR(("d too large in kdint"));
 
   /* descend the tree to find the terminal cell */
   nt = 0; t[nt] = 0; k = 0;
   while (lf->s[k] != -1)
   { nt++;
-    if (nt>=20) { ERROR(("Too many levels in kdint")); return(NOSLN); }
+    if (nt>=20) { lfERROR(("Too many levels in kdint")); return(NOSLN); }
     k = t[nt] = (x[lf->s[k]] < lf->sv[k]) ? lf->lo[k] : lf->hi[k];
   }
 

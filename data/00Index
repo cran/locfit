@@ -1,29 +1,29 @@
-ais                      Australian Institute of Sport Dataset
-bad                      Example dataset for bandwidth selection
-border                   Cricket Batting Dataset
-chemdiab                 Chemical Diabetes Dataset
-claw54                   Claw Dataset
-cldem                    Example data set for classification
-cltest                   Test dataset for classification
-cltrain                  Training dataset for classification
-co2                      Carbon Dioxide Dataset
-diab                     Exhaust emissions
-ethanol                  Exhaust emissions
-gam.slist                Vector of GAM special terms
-geyser                   Old Faithful Geyser Dataset
-geyser.round             Discrete Old Faithful Geyser Dataset
-heart                    Survival Times of Heart Transplant Recipients
-insect                   Insect Dataset
-iris                     Fisher's Iris Data (subset)
-kangaroo                 Kangaroo skull measurements dataset
-livmet                   liver Metastases dataset
-mcyc                     Acc(De?)celeration of a Motorcycle Hitting a
-                         Wall
-mine                     Fracture Counts in Coal Mines
-mmsamp                   Test dataset for minimax Local Regression
-morths                   Henderson and Sheppard Mortality Dataset
-penny                    Penny Thickness Dataset
-spencer                  Spencer's Mortality Dataset
-stamp                    Stamp Thickness Dataset
-trimod                   Generated sample from a bivariate trimodal
-                         normal mixture
+ais                     Australian Institute of Sport Dataset
+bad                     Example dataset for bandwidth selection
+border                  Cricket Batting Dataset
+chemdiab                Chemical Diabetes Dataset
+claw54                  Claw Dataset
+cldem                   Example data set for classification
+cltest                  Test dataset for classification
+cltrain                 Training dataset for classification
+co2                     Carbon Dioxide Dataset
+diab                    Exhaust emissions
+ethanol                 Exhaust emissions
+gam.slist               Vector of GAM special terms
+geyser                  Old Faithful Geyser Dataset
+geyser.round            Discrete Old Faithful Geyser Dataset
+heart                   Survival Times of Heart Transplant Recipients
+insect                  Insect Dataset
+iris                    Fisher's Iris Data (subset)
+kangaroo                Kangaroo skull measurements dataset
+livmet                  liver Metastases dataset
+mcyc                    Acc(De?)celeration of a Motorcycle Hitting a
+                        Wall
+mine                    Fracture Counts in Coal Mines
+mmsamp                  Test dataset for minimax Local Regression
+morths                  Henderson and Sheppard Mortality Dataset
+penny                   Penny Thickness Dataset
+spencer                 Spencer's Mortality Dataset
+stamp                   Stamp Thickness Dataset
+trimod                  Generated sample from a bivariate trimodal
+                        normal mixture

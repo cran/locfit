@@ -4,7 +4,7 @@
 Add `locfit' line to existing plot
 }
 \usage{
-lines(x, m, \dots)
+\method{lines}{locfit}(x, m, tr=x$trans, ...)
 }
 \description{
 Adds a Locfit line to an existing plot.
@@ -16,10 +16,14 @@ Adds a Locfit line to an existing plot.
 \item{m}{
 Number of points to evaluate the line at. Default: 100.
 }
+\item{tr}{
+Transformation function to use for plotting. Default is the inverse
+link function, or the identity function if derivatives are requested.
+}
 \item{...}{
-Other arguments to the default \code{\link{lines}} function.
+Other arguments to the default \code{lines} function.
 }}
 \seealso{
-\code{\link{locfit}}, \code{\link{plot.locfit}}, \code{\link{lines}}
+\code{\link{locfit}}, \code{\link{plot.locfit}}
 }
-\keyword{locfit}
+\keyword{smooth}

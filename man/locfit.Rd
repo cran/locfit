@@ -4,7 +4,7 @@
 Local Regression, Likelihood and Density Estimation.
 }
 \usage{
-locfit(formula, data, weights, cens, base, subset, geth, \dots, lfproc)
+locfit(formula, data, weights, cens, base, subset, geth, ..., lfproc)
 }
 \description{
   \code{locfit} is the model formula-based interface to the Locfit
@@ -60,7 +60,7 @@ ploting, etc. these objects is provided.
 # fit and plot a univariate local regression
 data(ethanol)
 fit <- locfit(NOx~E,data=ethanol)
-plot(fit,get.data=T)
+plot(fit,get.data=TRUE)
 
 # a bivariate local regression with smaller smoothing parameter
 fit <- locfit(NOx~E+C, data=ethanol, scale=0, alpha=0.5)
@@ -69,7 +69,7 @@ plot(fit)
 # density estimation
 data(geyser)
 fit <- locfit(~geyser, alpha=c(0.1,0.8))
-plot(fit,get.data=T)
+plot(fit,get.data=TRUE)
 }
 \references{
 Loader, C. (1999). Local Regression and Likelihood. Springer, New York.

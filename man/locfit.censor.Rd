@@ -5,8 +5,8 @@ Censored Local Regression
 }
 \usage{
 locfit.censor(x, y, cens, ..., iter=3, km=F)
-locfit(y~x, cens=cens, lfproc=locfit.censor)
-locfit.censor(y~x, cens, ..., iter=3, km=F)
+%locfit(y~x, cens=cens, lfproc=locfit.censor)
+%locfit.censor(y~x, cens, ..., iter=3, km=F)
 }
 \description{
   \code{locfit.censor} produces local regression estimates for censored
@@ -68,5 +68,5 @@ Loader, C. (1999). Local Regression and Likelihood. Springer, NY (Section 7.2).
 Schmee, J. and Hahn, G. J. (1979). A simple method for linear regression
   analysis with censored data (with discussion). Technometrics 21, 417-434.
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

@@ -25,4 +25,4 @@ lfeval(object)
   \code{\link{print.lfeval}}
 }
 
-\keyword{locfit}
+\keyword{smooth}

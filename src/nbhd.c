@@ -44,7 +44,7 @@ INT d, kt, *sty;
     return(sqrt(s));
   }
 
-  ERROR(("rho: invalid kt"));
+  lfERROR(("rho: invalid kt"));
   return(0.0);
 }
 

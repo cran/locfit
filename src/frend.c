@@ -113,42 +113,42 @@ INT v;
   switch(k)
   { case LF_OK: break;
     case LF_NCON:
-      WARN(("procv: locfit did not converge"));
+      lfWARN(("procv: locfit did not converge"));
       break;
     case LF_OOB:
-      WARN(("procv: parameters out of bounds"));
+      lfWARN(("procv: parameters out of bounds"));
       break;
     case LF_PF:
-      if (lf->mi[MDEB]>1) WARN(("procv: perfect fit"));
+      if (lf->mi[MDEB]>1) lfWARN(("procv: perfect fit"));
       set_default_like(lf,nvm,v,d);
       return(k);
     case LF_NOPT:
-      WARN(("procv: no points with non-zero weight"));
+      lfWARN(("procv: no points with non-zero weight"));
       set_default_like(lf,nvm,v,d);
       return(k);
     case LF_INFA:
-      if (lf->mi[MDEB]>1) WARN(("procv: initial value problem"));
+      if (lf->mi[MDEB]>1) lfWARN(("procv: initial value problem"));
       set_default_like(lf,nvm,v,d);
       return(k);
     case LF_DEMP:
-      WARN(("procv: density estimate, empty integration region"));
+      lfWARN(("procv: density estimate, empty integration region"));
       set_default_like(lf,nvm,v,d);
       return(k);
     case LF_XOOR:
-      WARN(("procv: fit point outside xlim region"));
+      lfWARN(("procv: fit point outside xlim region"));
       set_default_like(lf,nvm,v,d);
       return(k);
     case LF_DNOP:
       if (lf->mi[MDEB]>1)
-        WARN(("density estimation -- insufficient points in smoothing window"));
+        lfWARN(("density estimation -- insufficient points in smoothing window"));
       set_default_like(lf,nvm,v,d);
       return(k);
     case LF_FPROB:
-      WARN(("procv: f problem; likelihood failure"));
+      lfWARN(("procv: f problem; likelihood failure"));
       set_default_like(lf,nvm,v,d);
       return(k);
     default:
-      WARN(("procv: unknown return code %d",k));
+      lfWARN(("procv: unknown return code %d",k));
       set_default_like(lf,nvm,v,d);
       return(k);
   }
@@ -202,7 +202,7 @@ INT v;
   des->xev = evpt(lf,v);
 
   lf->h[v] = nbhd(lf,des,(INT)(mi[MN]*lf->dp[DALP]),lf->dp[DFXH],0);
-  if (lf->h[v]<=0) WARN(("zero bandwidth in procvvord"));
+  if (lf->h[v]<=0) lfWARN(("zero bandwidth in procvvord"));
 
   ap = lf->dp[DADP];
   if ((ap==0) & ((mi[MTG]&63)!=TGAUS)) ap = 2.0;
@@ -345,7 +345,7 @@ design *des;
   if ((lf->mi[MTG]&64)==64) /* quasi family */
   { rdf = lf->mi[MN]-2*dp[DT0]+dp[DT1];
     if (rdf<1.0)
-    { WARN(("Estimated rdf < 1.0; not estimating variance"));
+    { lfWARN(("Estimated rdf < 1.0; not estimating variance"));
     }
     else
       dp[DRV] = r1/r2 * lf->mi[MN] / rdf;

@@ -215,7 +215,7 @@ if (j==0) printf("init singular\n");
     if ((j>0) & (fabs(f-old_f)<tol)) return(f);
   }
 if (sing) printf("final singular\n");
-  WARN(("findab not converged"));
+  lfWARN(("findab not converged"));
   *err = NR_NCON;
   return(f);
 }
@@ -231,7 +231,7 @@ double findab(double gam)
   coef = mm_des->cf;
   for (i=0; i<p; i++) coef[i] = 0.0;
   if (mm_initial(mm_des, mm_lf, mm_des->f1, p, coef))
-  { WARN(("findab: initial value divergence"));
+  { lfWARN(("findab: initial value divergence"));
     return(0.0);
   }
   else

@@ -110,7 +110,7 @@ INT z;
   double d0, d1, f0, f1;
 
   if (lf->mi[MDIM]>=2)
-  { WARN(("dens_integrate requires d=1"));
+  { lfWARN(("dens_integrate requires d=1"));
     return(0.0);
   }
 
@@ -139,7 +139,7 @@ INT z;
   f1 = fit[i0];
   d1 = (has_deriv) ? deriv[i0] :
          (fit[i1]-fit[i0])/(xev[i1]-xev[i0]);
-  if (d1 <= 0) WARN(("dens_integrate - ouch!"));
+  if (d1 <= 0) lfWARN(("dens_integrate - ouch!"));
   if (z==2)
   { if (link==LLOG)
     { f1 *= 2; d1 *= 2; }
@@ -153,7 +153,7 @@ INT z;
   f0 = fit[i1];
   d0 = (has_deriv) ? deriv[i1] :
          (fit[i1]-fit[i0])/(xev[i1]-xev[i0]);
-  if (d0 >= 0) WARN(("dens_integrate - ouch!"));
+  if (d0 >= 0) lfWARN(("dens_integrate - ouch!"));
   if (z==2)
   { if (link==LLOG)
     { f0 *= 2; d0 *= 2; }

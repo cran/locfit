@@ -59,7 +59,7 @@ double *t, *resp1, *resp2, *cf, h;
           addouter(resp1,ff,ff,p,wt);
           break;
         default:
-          ERROR(("multint: Invalid link"));
+          lfERROR(("multint: Invalid link"));
           return(LF_LNK);
       }
     }
@@ -144,7 +144,7 @@ double *t, *resp1, *resp2, *cf, h;
           wu /= (2*j-1.0)*(2*j);
           if (j>1) wu *= nb;
         }
-        if (j==jmax) WARN(("mlinint: series not converged"));
+        if (j==jmax) lfWARN(("mlinint: series not converged"));
       }
       g[0] *= hd; g[1] *= hd;
       g[2] *= hd; g[3] *= hd;
@@ -158,7 +158,7 @@ double *t, *resp1, *resp2, *cf, h;
       }
       return(LF_OK);
   }
-  ERROR(("mlinint: deg=0,1 only"));
+  lfERROR(("mlinint: deg=0,1 only"));
   return(LF_ERR);
 }
 
@@ -404,7 +404,7 @@ INT *mi, lset, ang;
     }
 
     if (mi[MKER]==WGAUS)
-    { if (lset) WARN(("Integration for Gaussian weights ignores limits"));
+    { if (lset) lfWARN(("Integration for Gaussian weights ignores limits"));
       if ((mi[MDIM]==1)|(mi[MKT]==KPROD)) return(IPROD);
       return(IMLIN);
     }
@@ -458,11 +458,11 @@ INT m;
     case IPROD: des->itype = prodint; break;
     case IMLIN: des->itype = mlinint; break;
     case IHAZD: des->itype = hazint; break;
-    case INVLD: ERROR(("Invalid integration method %d",lf->mi[MIT]));
+    case INVLD: lfERROR(("Invalid integration method %d",lf->mi[MIT]));
                 break;
-    case IDEFA: ERROR(("No integration type available for this model"));
+    case IDEFA: lfERROR(("No integration type available for this model"));
                 break;
-    default: ERROR(("densinit: unknown integral type"));
+    default: lfERROR(("densinit: unknown integral type"));
   }
 
   switch(deg)
@@ -470,7 +470,7 @@ INT m;
     case 1: rnz = 1; break;
     case 2: rnz = lf->mi[MDIM]+1; break;
     case 3: rnz = lf->mi[MDIM]+2; break;
-    default: ERROR(("densinit: invalid degree %d",deg));
+    default: lfERROR(("densinit: invalid degree %d",deg));
   }
   if (lf_error) return(LF_ERR);
 
@@ -501,7 +501,7 @@ INT m;
       cf[0] = 0.0;
       return(LF_OK);
     default:
-      ERROR(("unknown link in densinit"));
+      lfERROR(("unknown link in densinit"));
       return(LF_ERR);
   }
 }

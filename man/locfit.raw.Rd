@@ -6,7 +6,7 @@ Local Regression, Likelihood and Density Estimation.
 \usage{
 locfit.raw(x, y, weights=1, cens=NULL, base=0,
   scale=F, alpha=0.7, deg=2, kern="tcub", kt="sph", acri="none", basis=list(NULL),
-  deriv=numeric(0), dc=F,
+  deriv=numeric(0), dc=FALSE,
   family, link="default",
   xlim, renorm=F,
   ev="tree", flim, mg=10, cut=0.8,
@@ -52,7 +52,7 @@ Response variable for regression models. For density families,
 \code{y} can be omitted.
 }
 \item{weights}{
-Prior weights for observations (reciprocal of variance, or sample size).  
+Prior weights for observations (reciprocal of variance, or sample size).
 }
 \item{cens}{
 Censoring indicators for hazard rate or censored regression. The coding
@@ -87,7 +87,7 @@ adaptive smoothing.
 \item{deg}{
   Degree of local polynomial. Default: 2 (local quadratic). Degrees
   0 to 3 are supported by almost all parts of the Locfit code. Higher
-  degrees may work in some cases. 
+  degrees may work in some cases.
 }
 \item{kern}{
   Weight function, default = \code{"tcub"}.
@@ -98,7 +98,7 @@ adaptive smoothing.
 }
 \item{kt}{
   Kernel type, \code{"sph"} (default); \code{"prod"}.
-  In multivariate problems, \code{"prod"} uses a 
+  In multivariate problems, \code{"prod"} uses a
   simplified product model which speeds up computations.
 }
 \item{acri}{Criterion for adaptive bandwidth selection.}
@@ -114,9 +114,9 @@ adaptive smoothing.
 \item{dc}{ Derivative adjustment.  }
 
 \item{family}{
-  Local likelihood family; \code{"gaussian"}; 
+  Local likelihood family; \code{"gaussian"};
   \code{"binomial"}; \code{"poisson"}; \code{"gamma"} and \code{"geom"}.
-  Density and rate estimation families are \code{"dens"}, \code{"rate"} and 
+  Density and rate estimation families are \code{"dens"}, \code{"rate"} and
   \code{"hazard"} (hazard rate). If the family is preceded by a \code{'q'}
   (for example, \code{family="qbinomial"}), quasi-likelihood variance
   estimates are used. Otherwise, the residual variance (\code{\link{rv}})
@@ -124,7 +124,7 @@ adaptive smoothing.
   \code{y} is provided; \code{"density"} if no response is provided.
 }
 \item{link}{
-  Link function for local likelihood fitting. Depending on the family, 
+  Link function for local likelihood fitting. Depending on the family,
   choices may be \code{"ident"}, \code{"log"}, \code{"logit"},
   \code{"inverse"}, \code{"sqrt"} and \code{"arcsin"}.
 }
@@ -144,7 +144,7 @@ adaptive smoothing.
 }
 
 \item{ev}{
-  Evaluation Structure, default = \code{"tree"}. Also available are 
+  Evaluation Structure, default = \code{"tree"}. Also available are
   \code{"phull"}, \code{"data"}, \code{"grid"}, \code{"kdtree"},
   \code{"kdcenter"} and \code{"crossval"}. \code{ev="none"} gives no
   evaluation points, effectively producing the global parametric fit.
@@ -153,7 +153,7 @@ adaptive smoothing.
 \item{flim}{
   A vector of lower and upper bounds for the evaluation structure,
   specified as \code{c(ll,ur)}. This should not be confused with
-  \code{xlim}. It defaults to the data range.  
+  \code{xlim}. It defaults to the data range.
 }
 \item{mg}{
   For the \code{"grid"} evaluation structure, \code{mg} specifies the
@@ -161,8 +161,8 @@ adaptive smoothing.
   number or vector.
 }
 \item{cut}{
-  Refinement parameter for adaptive partitions. Default 0.8; smaller 
-  values result in more refined partitions.  
+  Refinement parameter for adaptive partitions. Default 0.8; smaller
+  values result in more refined partitions.
 }
 
 \item{maxk}{
@@ -199,5 +199,5 @@ An object with class "locfit". A standard set of methods for printing, ploting, 
 \references{
 Consult the Web page \url{http://cm.bell-labs.com/stat/project/locfit/}.
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a4.

@@ -31,5 +31,5 @@ rv(fit)
 \seealso{
 \link{locfit}, \link{rv<-}
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

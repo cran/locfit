@@ -137,7 +137,7 @@ char band;
       prepfitp(lf,des,what);
       break;
     default:
-      ERROR(("unknown where in preplot"));
+      lfERROR(("unknown where in preplot"));
   }
 
   if ((what==PT0)|(what==PVARI))
@@ -213,7 +213,7 @@ double *xl;
     }
     return(n);
   }
-  ERROR(("setpppoints: invalid where=%s",where));
+  lfERROR(("setpppoints: invalid where=%s",where));
   return(0);
 }
 

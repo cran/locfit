@@ -28,9 +28,10 @@ Allowed fields are \code{x} (fit points); \code{coef} (fitted values);
 \code{h} (bandwidth) and \code{deg} (degree of fit).
 }
 \item{delete.pv}{If \code{T}, pseudo-vertices are deleted.}
+\item{...}{not used.}
 }
 \value{
 A matrix with one row for each fit point. Columns correspond to
 the specified \code{what} vector; some fields contribute multiple columns.
 }
-\keyword{locfit}
+\keyword{smooth}

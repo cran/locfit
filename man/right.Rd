@@ -4,7 +4,8 @@
 One-sided right smooth for a Locfit model.
 }
 \usage{
-locfit(y~right(x), ev="data", deg=1)
+right(x)
+%locfit(y~right(x), ev="data", deg=1)
 }
 \description{
   The \code{right()} function is used in a locfit model formula

@@ -13,6 +13,7 @@ print.gcvplot(x, ...)
 }
 \arguments{
 \item{x}{ \code{"gcvplot"} object.  }
+\item{...}{other graphical parameters.}
 }
 \seealso{
 \code{\link{gcvplot}},

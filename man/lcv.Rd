@@ -4,7 +4,7 @@
 Compute Likelihood Cross Validation Statistic.
 }
 \usage{
-lcv(x, \dots, pen=2)
+lcv(x, ...)
 }
 \description{
   The calling sequence for \code{lcv} matches those for the
@@ -29,5 +29,5 @@ lcv(x, \dots, pen=2)
   \code{\link{lcvplot}}
 }
 
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

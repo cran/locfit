@@ -13,7 +13,7 @@ kappa0(formula, cov=0.95, \dots)
   from this object.
 }
 \item{cov}{ Coverage Probability for critical values.  }
-\item{ldots}{ Other arguments to \code{\link{locfit}}. Important arguments
+\item{...}{ Other arguments to \code{\link{locfit}}. Important arguments
   include \code{flim} and \code{alpha}. }
 }
 \description{
@@ -63,5 +63,5 @@ plot(fit,crit=crit,band="local")
 Sun, J. and Loader, C. (1994). Simultaneous confidence bands for linear
   regression and smoothing. Annals of Statistics 22, 1328-1345.
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

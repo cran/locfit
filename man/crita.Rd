@@ -40,5 +40,5 @@ plot(fit,band="local")
 crit(fit) <- kappa0(NOx~E,data=ethanol,cov=0.99)
 plot(fit,band="local")
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

@@ -4,8 +4,7 @@
 Compute critical values for confidence intervals.
 }
 \usage{
-crit(fit)
-crit(fit, const=c(0,1), d=1, cov=0.95, rdf=0)
+crit(fit, const = c(0, 1), d = 1, cov = 0.95, rdf = 0)
 }
 \arguments{
 \item{fit}{
@@ -57,5 +56,5 @@ plot(fit,band="local")
 crit(fit) <- kappa0(NOx~E,data=ethanol,cov=0.99)
 plot(fit,band="local")
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

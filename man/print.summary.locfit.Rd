@@ -4,7 +4,7 @@
 Print a Locfit summary object.
 }
 \usage{
-print(x)
+\method{print}{summary.locfit}(x, ...)
 }
 \description{
   Print method for \code{"summary.locfit"} objects.
@@ -13,6 +13,7 @@ print(x)
 \item{x}{
 Object from \code{\link{summary.locfit}()}.
 }
+\item{...}{not used.}
 }
 \seealso{
 \code{\link{summary.locfit}()}

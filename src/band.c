@@ -59,7 +59,7 @@ INT c, cri;
     case BIND:
       return(vr+pen*pen*tb);
   } 
-  ERROR(("bcri: unknown criterion"));
+  lfERROR(("bcri: unknown criterion"));
   return(0.0);
 }
 
@@ -108,7 +108,7 @@ double pn;
   pen = pn;
   if (cri==BIND) pen /= factorial((int)lf.mi[MDEG]+1);
   hmin = h0 = lf.dp[c];
-  if (h0==0) ERROR(("bselect: initial bandwidth is 0"));
+  if (h0==0) lfERROR(("bselect: initial bandwidth is 0"));
   if (lf_error) return;
   sig2 = 1.0;
 
@@ -180,7 +180,7 @@ INT k, ker, n;
 { INT i, j;
   double degfree, dfd, pen, s, r0, r1, d0, d1, ik, wij;
 
-  if (h<=0) WARN(("kdecri, h = %6.4f",h));
+  if (h<=0) lfWARN(("kdecri, h = %6.4f",h));
 
   res[0] = res[1] = 0.0;
   ik = wint(1,NULL,0,ker);
@@ -275,7 +275,7 @@ INT k, ker, n;
       res[1] = exp(log(Wikk(WGAUS,0)/(d0*n))/5)-h;
       return;
   }
-  ERROR(("kdecri: what???"));
+  lfERROR(("kdecri: what???"));
   return;
 }
 

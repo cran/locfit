@@ -66,7 +66,7 @@ char *z, op, cl;
 int i, i2;
 { int k;
   if (z[i] != op)
-  { ERROR(("matchrt: wrong start character"));
+  { lfERROR(("matchrt: wrong start character"));
     return(i);
   }
   k = 0;
@@ -76,7 +76,7 @@ int i, i2;
     if (k==0) return(i);
     i++;
     if (i>i2)
-    { ERROR(("matchrt: unbalanced %c%c: %s",op,cl,z));
+    { lfERROR(("matchrt: unbalanced %c%c: %s",op,cl,z));
       return(i);
     }
   }
@@ -87,7 +87,7 @@ char *z, op, cl;
 int i, i1;
 { int k;
   if (z[i] != cl)
-  { ERROR(("matchlf: wrong end character"));
+  { lfERROR(("matchlf: wrong end character"));
     return(i);
   }
   k = 0;
@@ -97,7 +97,7 @@ int i, i1;
     if (k==0) return(i);
     i--;
     if (i<i1)
-    { ERROR(("matchlf: unbalanced %c%c: %s",op,cl,z));
+    { lfERROR(("matchlf: unbalanced %c%c: %s",op,cl,z));
       return(i);
     }
   }

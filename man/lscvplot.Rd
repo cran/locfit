@@ -38,5 +38,5 @@ estimate, and can be used to produce an LSCV plot.
   \code{\link{plot.gcvplot}}
 }
 
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

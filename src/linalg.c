@@ -72,7 +72,7 @@ INT d, mxit;
       }
     if (ms==0) iter=mxit+10;
   }
-  if (iter==mxit) WARN(("svd not converged"));
+  if (iter==mxit) lfWARN(("svd not converged"));
   for (i=0; i<d; i++)
     if (x[i*d+i]<0)
     { x[i*d+i] = -x[i*d+i];

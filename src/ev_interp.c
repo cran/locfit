@@ -144,7 +144,7 @@ INT nv, d, what, z;
       vv[0] = lf->lik[2*lf->nvm+nv];
       return(1);
     default:
-      ERROR(("Invalid what in exvval"));
+      lfERROR(("Invalid what in exvval"));
       return(0);
   }
   vv[0] = values[nv];
@@ -224,7 +224,7 @@ INT what;
 { locfit(lf,des,0.0,0);
   if (what==PCOEF) return(des->cf[0]);
   if ((what==PNLX)|(what==PT0)) return(sqrt(comp_infl(lf,des)));
-  ERROR(("dointpointpf: invalid what"));
+  lfERROR(("dointpointpf: invalid what"));
   return(0.0);
 }
 
@@ -262,7 +262,7 @@ INT what, ev, j;
     case EFITP: f = fitpint(lf,x,what,j); break;
     case EXBAR: f = xbarint(lf,x,what); break;
     case ENONE: f = 0; break;
-    default: ERROR(("dointpoint: cannot interpolate this structure"));
+    default: lfERROR(("dointpoint: cannot interpolate this structure"));
   }
   if (((what==PT0)|(what==PNLX)) && (f<0)) f = 0.0;
   f += addparcomp(lf,x,what);

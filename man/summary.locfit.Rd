@@ -4,7 +4,7 @@
 Print method for a locfit object.
 }
 \usage{
-summary(object, \dots)
+\method{summary}{locfit}(object, ...)
 }
 \description{
 Prints a short summary of a \code{"locfit"} object.
@@ -13,6 +13,7 @@ Prints a short summary of a \code{"locfit"} object.
 \item{object}{
 \code{"locfit"} object.
 }
+\item{...}{currently not used.}
 }
 
 \value{
@@ -20,5 +21,5 @@ A \code{"summary.locfit"} object, containg a short summary of the
 \code{"locfit"} object.
 }
 
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

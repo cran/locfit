@@ -4,7 +4,7 @@
 Plot method for simultaneous confidence bands
 }
 \usage{
-plot.scb(x, add=F, ...)
+plot.scb(x, add=FALSE, ...)
 }
 \description{
   Plot method for simultaneous confidence bands created by the
@@ -13,6 +13,7 @@ plot.scb(x, add=F, ...)
 \arguments{
 \item{x}{ \code{"scb"} object created by \code{\link{scb}()}.  }
 \item{add}{If true, bands will be added to the existing plot.}
+\item{...}{Other graphical parameters.}
 }
 \examples{
 # corrected confidence bands for a linear logistic model

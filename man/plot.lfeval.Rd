@@ -4,7 +4,7 @@
 Plot a Locfit Evaluation Structure.
 }
 \usage{
-plot.lfeval(x, add=F, txt=F)
+plot.lfeval(x, add=FALSE, txt=FALSE, ...)
 }
 \description{
   Plots the evaluation points from a \code{"locfit"} or \code{"lfeval"}
@@ -16,6 +16,7 @@ plot.lfeval(x, add=F, txt=F)
     Otherwise, a new plot is created.}
   \item{txt}{If \code{TRUE}, the points are annotated with numbers in the
     order they were entered into the fit.}
+  \item{...}{not used.}
 }
 
 \value{
@@ -28,4 +29,4 @@ plot.lfeval(x, add=F, txt=F)
   \code{\link{print.lfeval}}
 }
 
-\keyword{locfit}
+\keyword{smooth}

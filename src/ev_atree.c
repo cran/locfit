@@ -25,7 +25,7 @@ INT *nvm, *ncm, *vc, *mi;
   if (dp[DALP]>0)
   { a0 = (dp[DALP] > 1) ? 1 : 1/dp[DALP];
     if (dp[DCUT]<0.01)
-    { WARN(("guessnv: cut too small."));
+    { lfWARN(("guessnv: cut too small."));
       dp[DCUT] = 0.01;
     }
     cu = 1;

@@ -4,8 +4,8 @@
 Prediction from a Locfit object.
 }
 \usage{
-preplot(object, newdata, where, tr=NULL, what="coef", 
-  band="none", get.data=F, f3d=F)
+\method{preplot}{locfit}(object, newdata, where, tr=NULL, what="coef",
+  band="none", get.data=FALSE, f3d=FALSE, ...)
 }
 \arguments{
 \item{object}{
@@ -55,8 +55,9 @@ added to the plot.
 }
 \item{f3d}{
 If \code{TRUE}, sets a flag that forces ploting using the trellis style.
-Not available in R.
-}}
+Not available in R.}
+\item{...}{not used.}
+}
 \value{
 An object with class \code{"preplot.locfit"}, containing the predicted
 values and additional information used to construct the plot.
@@ -73,5 +74,5 @@ values and additional information used to construct the plot.
 \seealso{
 \code{\link{locfit}}, \code{\link{predict.locfit}}, \code{\link{plot.locfit}}.
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.
