@@ -1,10 +1,12 @@
 \name{lines.locfit}
 \alias{lines.locfit}
+\alias{llines.locfit}
 \title{
 Add `locfit' line to existing plot
 }
 \usage{
 \method{lines}{locfit}(x, m, tr=x$trans, ...)
+llines.locfit(x, m, tr=x$trans, ...)
 }
 \description{
 Adds a Locfit line to an existing plot.
@@ -23,6 +25,7 @@ link function, or the identity function if derivatives are requested.
 \item{...}{
 Other arguments to the default \code{lines} function.
 }}
+\note{\code{llines.locfit} is only used for Lattice/grid graphics.}
 \seealso{
 \code{\link{locfit}}, \code{\link{plot.locfit}}
 }

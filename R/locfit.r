@@ -865,8 +865,18 @@ function(x, y, subscripts, z, xyz.labs, xyz.axes, xyz.mid, xyz.minmax,
   }
   else {
     panel.xyplot(x, y)
-    lines(locfit.raw(x, y, ...))
+    args <- list(...)
+    args <- args[-length(args)]
+    args <- c(list(x=x), list(y=y), args)
+    llines.locfit(do.call("locfit.raw", args))
   }
+}
+llines.locfit <-
+function (x, m = 100, tr = x$trans, ...)
+{
+    newx <- lfmarg(x, m = m)[[1]]
+    y <- predict(x, newx, tr = tr)
+    llines(newx, y, ...)
 }
 
 "lfmarg"<-
