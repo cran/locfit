@@ -17,9 +17,10 @@ gcv(x, \dots)
   sum-of-squares and degrees of freedom are computed using locfit's
   standard interpolation based approximations.
 
-  For likelihood models, GCV is computed using -2 times the log-likelihood
-  in place of the residual sum of squares; I know of no results validating
-  this interpretation.
+  For likelihood models, GCV is computed uses the deviance
+  in place of the residual sum of squares. This produces useful
+  results but I do not know of any theory validating
+  this extension.
 }
 
 \seealso{

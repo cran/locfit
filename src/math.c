@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  *
  *
@@ -9,6 +9,7 @@
   lferf(x)    -- erf(x)
   lferfc(x)   -- erfc(x)
   lfdaws(x)   -- dawson's function
+  lf_exp(x)    -- exp(x), but it won't overflow.
 
   where required, these must be #define'd in local.h.
 
@@ -17,6 +18,14 @@
   logit(x)    -- logistic function.
   expit(x)    -- inverse of logit.
  */
+
+#include <math.h>
+
+double lf_exp(x)
+double x;
+{ if (x>700.0) return(1.014232054735004e+304);
+  return(exp(x));
+}
 
 #include "local.h"
 
@@ -149,4 +158,10 @@ double x;
     return(u/(1+u));
   }
   return(1/(1+exp(-x)));
+}
+
+int factorial(n)
+int n;
+{ if (n<=1) return(1.0);
+  return(n*factorial(n-1));
 }

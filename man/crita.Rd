@@ -1,4 +1,4 @@
-\name{crit<-}
+\name{crita}
 \alias{crit<-}
 \title{
 Substitute critical values on "locfit" object.
@@ -17,7 +17,7 @@ crit(fit) <- crit(cov=0.99)
 }
 \description{
   Every \code{"locfit"} object contains a critical value object to be used in
-  computing and ploting confidence intervals. By default, a 95% pointwise
+  computing and ploting confidence intervals. By default, a 95\% pointwise
   confidence level is used. To change the confidence level, the critical
   value object must be substituted using \code{\link{crit}} and
   \code{\link{crit<-}}.

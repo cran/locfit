@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  *
  *
@@ -8,9 +8,8 @@
     des and lf are pointers to the design and fit structures.
     vfun is the vertex processing function.
     nopc=1 inhibits computation of parametric component.
-  fitdefault(lf,mi,dp,n,d) -- fit default parameters.
+  fitdefault(lf,n,d) -- fit default parameters.
     lf is pointer to fit; n and d are sample size and dimension.
-    usually, mi and dp are NULL; will be taken from lf.
   deschk()  -- assignment function for the design structure.
   preproc() -- fit preprocessing (limits, scales, paramcomp etc.)
   bbox()    -- compute bounding box.
@@ -23,64 +22,53 @@
 
 extern INT cvi;
 
-void fitdefault(lf,mi,dp,n,d)
+void fitdefault(lf,n,d)
 lfit *lf;
-INT *mi, n, d;
-double *dp;
-{ INT i;
-  if (lf!=NULL)
-  { if (dp==NULL)
-    { if (lf->dp==NULL) lf->dp = (double *)calloc(LEND,sizeof(double));
-      dp = lf->dp;
-    }
-    if (mi==NULL)
-    { if (lf->mi==NULL) lf->mi = (INT *)calloc(LENM,sizeof(INT));
-      mi = lf->mi;
-    }
-  }
-  if (mi!=NULL)
-  { mi[MTG] = TNUL;
-    if (lf!=NULL)
-    { mi[MTG] = (lf->y==NULL) ? TDEN : (64+TGAUS);
-    }
-    mi[MLINK] = LDEFAU;
-    mi[MACRI] = ANONE;
-    mi[MDEG] = mi[MDEG0] = 2;
-    mi[MEV] = (ident==1) ? EDATA : ETREE;
-    mi[MKT] = KSPH; mi[MKER] = WTCUB;
-    mi[MIT] = IDEFA; mi[MDC] = mi[MREN] = 0;
-    mi[MK] = 100; mi[MMINT] = 20;
-    mi[MMXIT] = 20;
-    mi[MN] = n; mi[MDIM] = d;
-    mi[MDEB] = 0;
-    mi[MUBAS] = 0;
-  }
+INT n, d;
+{ INT i, *mi;
+  double *dp;
 
-  if (dp!=NULL)
-  { dp[DALP] = 0.7; dp[DFXH] = dp[DADP] = 0.0;
-    dp[DCUT] = 0.8;
-  }
+  dp = lf->dp;
+  mi = lf->mi;
 
-  if (lf==NULL) return;
+  mi[MTG] = TNUL;
+  mi[MTG] = (lf->y==NULL) ? TDEN : (64+TGAUS);
+  mi[MLINK] = LDEFAU;
+  mi[MACRI] = ANONE;
+  mi[MDEG] = mi[MDEG0] = 2;
+  mi[MEV] = (ident==1) ? EDATA : ETREE;
+  mi[MKT] = KSPH; mi[MKER] = WTCUB;
+  mi[MIT] = IDEFA; mi[MDC] = mi[MREN] = 0;
+  mi[MK] = 100; mi[MMINT] = 20;
+  mi[MMXIT] = 20;
+  mi[MN] = n; mi[MDIM] = d;
+  mi[MDEB] = 0;
+  mi[MUBAS] = 0;
+ 
+
+  dp[DALP] = 0.7; dp[DFXH] = dp[DADP] = 0.0;
+  dp[DCUT] = 0.8;
+
   if (d<=0)
     ERROR(("must set MDIM before calling fitdefault"));
   for (i=0; i<d; i++)
-  { if (lf->sca==NULL) lf->sca= (double *)calloc(MXDIM,sizeof(double));
-    if (lf->xl ==NULL) lf->xl = (double *)calloc(2*MXDIM,sizeof(double));
-    if (lf->fl ==NULL) lf->fl = (double *)calloc(2*MXDIM,sizeof(double));
-    lf->sca[i] = 1.0;
+  { lf->sca[i] = 1.0;
     lf->xl[i] = lf->xl[i+d] = 0.0;
     lf->fl[i] = lf->fl[i+d] = 0.0;
   }
 }
 
+int des_reqd(n,p)
+INT n, p;
+{ return(n*(p+5)+2*p*p+4*p + jac_reqd(p));
+}
+int des_reqi(INT n) { return(n); }
+
 void deschk(des,n,p)
 design *des;
 INT n, p;
-{ INT rw;
-  double *z;
-  rw = n*(p+5)+4*p*p+6*p;
-  des->dw = checkvarlen(des->dw,rw,"_deswork",VDOUBLE);
+{ double *z;
+  des->dw = checkvarlen(des->dw,des_reqd(n,p),"_deswork",VDOUBLE);
   z = vdptr(des->dw);
   des->X = z; z += n*p;
   des->w = z; z += n;
@@ -95,12 +83,9 @@ INT n, p;
   des->oc =z; z += p;
   des->cf =z; z += p;
 
-  des->xtwx.Z = z; z += p*p;
-  des->xtwx.Q  =z; z += p*p;
-  des->xtwx.dg =z; z += p;
-  des->xtwx.f2 =z; z += p;
+  z = jac_alloc(&des->xtwx,p,z);
 
-  des->index = checkvarlen(des->index,n,"_desidx",VINT);
+  des->index = checkvarlen(des->index,des_reqi(n),"_desidx",VINT);
   des->ind = (INT *)vdptr(des->index);
   des->n = n; des->p = p;
   des->xtwx.p = p;
@@ -112,10 +97,6 @@ double *bx;
 { INT i, j, d, n;
   double z, mx, mn;
   d = lf->mi[MDIM]; n = lf->mi[MN];
-  if (lf->mi[MKT]==STANGL)
-  { bx[0] = 0.0; bx[1] = 2*PI*lf->sca[0];
-    return;
-  }
   for (i=0; i<d; i++)
     if (bx[i]==bx[i+d])
     { if (lf->sty[i]==STANGL)
@@ -171,6 +152,10 @@ INT nopc;
   bbox(lf,lf->fl);
 }
 
+#ifdef CVERSION
+extern void do_scbsim();
+#endif
+
 void startlf(des,lf,vfun,nopc)
 design *des;
 lfit *lf;
@@ -187,6 +172,7 @@ INT (*vfun)(), nopc;
   if (mi[MDEB]>0) printf("preprocess ok\n");
   if (lf_error) return;
   lf->ord = 0;
+  makecfn(des,lf);
   if ((mi[MDIM]==1) && (lf->sty[0]!=STANGL))
   { i = 1;
     while ((i<mi[MN]) && (datum(lf,0,i)>=datum(lf,0,i-1))) i++;
@@ -206,11 +192,14 @@ INT (*vfun)(), nopc;
     case EXBAR:  xbarf(des,lf); break;
     case ENONE:  lf->nv = lf->nce = 0;
                  return;
+#ifdef CVERSION
+    case 100: do_scbsim(des,lf); break;
+#endif
     default: ERROR(("startlf: Invalid evaluation structure"));
   }
 
   /* renormalize for family=density */
-  if ((mi[MREN]) && (mi[MTG]==TDEN)) densrenorm(lf,des);
+  if ((mi[MREN]) && (mi[MTG]==TDEN)) dens_renorm(lf,des);
 }
 
 #ifdef CVERSION
@@ -309,7 +298,7 @@ INT re;
       d++; key[i1] = kc;
       i0 = i1 = i1+1;
     }
-    fitdefault(lf,NULL,NULL,n,d);
+    fitdefault(lf,n,d);
   }
   mi = lf->mi;
 
@@ -400,13 +389,15 @@ INT re;
 void clocfit(v,re)
 INT re;
 vari *v;
-{ lf.ord = 0;
+{
+  lf.ord = 0;
   lf.kap[0] = lf.kap[1] = lf.kap[2] = 0.0; lf.nk = 0;
   fitoptions(&lf,v,re);
   if (lf_error)
   { if (lf.mi!=NULL) lf.mi[MEV] = ENULL;
     return;
   }
+
 
   lf.nv = 0;
   if (lf.mi[MDEG0]==lf.mi[MDEG])

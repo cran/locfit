@@ -1,7 +1,7 @@
 \name{mine}
+\alias{mine}
 \title{Fracture Counts in Coal Mines}
 \usage{data(mine)}
-\alias{mine}
 \format{
 A dataframe with the response frac, and predictor variables
 extrp, time, seamh and inb.

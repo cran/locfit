@@ -4,36 +4,77 @@
 Local Regression, Likelihood and Density Estimation.
 }
 \usage{
-locfit.raw(x, y, weights, \dots)
+locfit.raw(x, y, weights=1, cens=NULL, base=0,
+  scale=F, alpha=0.7, deg=2, kern="tcub", kt="sph", acri="none", basis=list(NULL),
+  deriv=numeric(0), dc=F,
+  family, link="default",
+  xlim, renorm=F,
+  ev="tree", flim, mg=10, cut=0.8,
+  maxk=100, itype="default", mint=20, maxit=20, debug=0,
+  geth=F, sty=rep(1,d))
+}
+\description{
+  \code{locfit.raw} is an interface to Locfit using numeric vectors
+  (for a model-formula based interface, use \code{\link{locfit}}).
+  Although this function has a large number of arguments, most users
+  are likely to need only a small subset.
+
+  The first set of arguments (\code{x}, \code{y}, \code{weights},
+  \code{cens}, and \code{base}) specify the regression
+  variables and associated quantities.
+
+  Another set (\code{scale}, \code{alpha}, \code{deg}, \code{kern},
+    \code{kt}, \code{acri} and \code{basis}) control the amount of smoothing:
+    bandwidth, smoothing weights and the local model.
+
+  \code{deriv} and \code{dc} relate to derivative (or local slope)
+    estimation.
+
+  \code{family} and \code{link} specify the likelihood family.
+
+  \code{xlim} and \code{renorm} may be used in density estimation.
+
+  \code{ev}, \code{flim}, \code{mg} and \code{cut}
+     control the set of evaluation points.
+
+  \code{maxk},  \code{itype}, \code{mint}, \code{maxit} and \code{debug}
+    control the Locfit algorithms, and will be rarely used.
+
+  \code{geth} and \code{sty} are used by other functions calling
+    \code{locfit.raw}, and should not be used directly.
 }
 \arguments{
 \item{x}{
-Independent variable (or matrix).
+Vector (or matrix) of the independent variable(s).
 }
 \item{y}{
-Response variable.
+Response variable for regression models. For density families,
+\code{y} can be omitted.
 }
 \item{weights}{
 Prior weights for observations (reciprocal of variance, or sample size).  
 }
 \item{cens}{
-Censoring indicators for hazard rate or censored regression.  
+Censoring indicators for hazard rate or censored regression. The coding
+is \code{1} (or \code{TRUE}) for a censored observation, and
+\code{0} (or \code{FALSE}) for uncensored observations.
 }
 \item{base}{
-Baseline parameter estimate.  
+Baseline parameter estimate. If provided, the local regression model is
+fitted as \eqn{Y_i = b_i + m(x_i) + \epsilon_i}, with Locfit estimating
+the \eqn{m(x)} term. For regression models, this effectively subtracts
+\eqn{b_i} from \eqn{Y_i}. The advantage of the \code{base} formulation
+is that it extends to likelihood regression models.
 }
-\item{xlim}{
-For density estimation, optional vector of lower and upper
-bounds for variables.  
-}
-\item{flim}{
-A vector of lower and upper bounds for the evaluation structure.
-Defaults to the data range.  
-}
+
 \item{scale}{
-A scale to apply to each variable. Effectively, the data is
-transformed before fitting, by dividing each component of the 
-independent variable by the corresponding component of \code{scale}.  
+A scale to apply to each variable. This is especially important for
+multivariate fitting, where variables may be measured in
+non-comparable units. It is also used to specify the frequency
+for \code{\link{ang}} terms. If \code{scale=F} (the default) no scaling
+is performed. If \code{scale=T}, marginal standard deviations are used.
+Alternatively, a numeric vector can provide scales for the
+individual variables.
 }
 \item{alpha}{
 Smoothing parameter. A single number (e.g. \code{alpha=0.7})
@@ -43,67 +84,115 @@ is a nearest neighbor fraction, and the second component is
 a fixed component. A third component is the penalty term in locally
 adaptive smoothing.
 }
-\item{ev}{
-Evaluation Structure, default = \code{"tree"}. Also available are 
-\code{"phull"}, \code{"data"}, \code{"grid"}, \code{"kdtree"}, \code{"kdcenter"}, \code{"crossval"}.
-}
 \item{deg}{
-Degree of local polynomial. Default: 2 (local quadratic).  
-}
-\item{family}{
-Local likelihood family; \code{"gaussian"}; 
-\code{"binomial"}; \code{"poisson"}; \code{"gamma"} and \code{"geom"}.
-Density and rate estimation families are \code{"dens"}, \code{"rate"} and 
-\code{"hazard"} (hazard rate).  A default is selected based on whether or 
-not \code{"y"} and \code{"cens"} arguments are given; specifying a 
-\code{family} argument overrides the default.  
-}
-\item{link}{
-Link function for local likelihood fitting. Depending on the family, 
-choices may be \code{"ident"}, \code{"log"}, \code{"logit"}, \code{"inverse"}, 
-\code{"sqrt"}.  
-}
-\item{maxk}{
-Controls space assignment for evaluation structures, default \code{50} 
+  Degree of local polynomial. Default: 2 (local quadratic). Degrees
+  0 to 3 are supported by almost all parts of the Locfit code. Higher
+  degrees may work in some cases. 
 }
 \item{kern}{
-Weight function, default = \code{"tcub"}. Others are \code{"rect"}, \code{"trwt"},
-\code{"tria"}, \code{"epan"}, \code{"bisq"} and \code{"gauss"}. Choices may be restricted
-when derivatives are required; e.g. for confidence bands and some
-bandwidth selectors.
+  Weight function, default = \code{"tcub"}.
+  Other choices are \code{"rect"}, \code{"trwt"}, \code{"tria"},
+  \code{"epan"}, \code{"bisq"} and \code{"gauss"}. Choices may be restricted
+  when derivatives are required; e.g. for confidence bands and some
+  bandwidth selectors.
 }
 \item{kt}{
-Kernel type, \code{"sph"} (default); \code{"prod"}.
-In multivariate problems, \code{"prod"\} uses a 
-simplified product model which speeds up computations.
+  Kernel type, \code{"sph"} (default); \code{"prod"}.
+  In multivariate problems, \code{"prod"} uses a 
+  simplified product model which speeds up computations.
 }
-\item{itype}{
-Integration type for density estimation.
+\item{acri}{Criterion for adaptive bandwidth selection.}
+\item{basis}{User-specified basis functions. See
+  \code{\link{lfbas}} for more details on this argument.}
+
+\item{deriv}{
+  Derivative estimation. If \code{deriv=1}, the returned fit will be
+  estimating the derivative (or more correctly, an estimate of the
+  local slope). If \code{deriv=c(1,1)} the second order derivative
+  is estimated. \code{deriv=2} is for the partial derivative, with
+  respect to the second variable, in multivariate settings.  }
+\item{dc}{ Derivative adjustment.  }
+
+\item{family}{
+  Local likelihood family; \code{"gaussian"}; 
+  \code{"binomial"}; \code{"poisson"}; \code{"gamma"} and \code{"geom"}.
+  Density and rate estimation families are \code{"dens"}, \code{"rate"} and 
+  \code{"hazard"} (hazard rate). If the family is preceded by a \code{'q'}
+  (for example, \code{family="qbinomial"}), quasi-likelihood variance
+  estimates are used. Otherwise, the residual variance (\code{\link{rv}})
+  is fixed at 1. The default family is \code{"qgauss"} if a response
+  \code{y} is provided; \code{"density"} if no response is provided.
 }
-\item{mint}{
-Points for numerical integration rules. Default 20.
+\item{link}{
+  Link function for local likelihood fitting. Depending on the family, 
+  choices may be \code{"ident"}, \code{"log"}, \code{"logit"},
+  \code{"inverse"}, \code{"sqrt"} and \code{"arcsin"}.
 }
-\item{maxit}{
-Maximum iterations for local likelihood estimation. Default 20.
+
+\item{xlim}{
+  For density estimation, Locfit allows the density to be supported on
+  a bounded interval (or rectangle, in more than one dimension).
+  The format should be \code{c(ll,ul)} where \code{ll} is a vector of
+  the lower bounds and \code{ur} the upper bounds. Bounds such as
+  \eqn{[0,\infty)} are not supported, but can be effectively
+  implemented by specifying a very large upper bound.
 }
-\item{cut}{
-Refinement parameter for adaptive partitions. Default 0.8; smaller 
-values result in more refined partitions.  
+\item{renorm}{Local likelihood density estimates may not integrate
+  exactly to 1. If \code{renorm=T}, the integral will be estimated
+  numerically and the estimate rescaled. Presently this is implemented
+  only in one dimension.
 }
-\item{dc}{
-Derivative adjustment.  
+
+\item{ev}{
+  Evaluation Structure, default = \code{"tree"}. Also available are 
+  \code{"phull"}, \code{"data"}, \code{"grid"}, \code{"kdtree"},
+  \code{"kdcenter"} and \code{"crossval"}. \code{ev="none"} gives no
+  evaluation points, effectively producing the global parametric fit.
+  A vector or matrix of evaluation points can also be provided.
 }
-\item{geth}{
-Don't use! 
+\item{flim}{
+  A vector of lower and upper bounds for the evaluation structure,
+  specified as \code{c(ll,ur)}. This should not be confused with
+  \code{xlim}. It defaults to the data range.  
 }
 \item{mg}{
-Margin size for grids.  
+  For the \code{"grid"} evaluation structure, \code{mg} specifies the
+  number of points on each margin. Default 10. Can be either a single
+  number or vector.
 }
-\item{deriv}{
-Don't use! 
+\item{cut}{
+  Refinement parameter for adaptive partitions. Default 0.8; smaller 
+  values result in more refined partitions.  
+}
 
+\item{maxk}{
+  Controls space assignment for evaluation structures.
+  For the adaptive evaluation structures, it is impossible to be sure
+  in advance how many vertices will be generated. If you get
+  warnings about `Insufficient vertex space', Locfit's default assigment
+  can be increased by increasing \code{maxk}. The default is \code{maxk=100}.
+}
+\item{itype}{
+  Integration type for density estimation. Available methods include
+  \code{"prod"}, \code{"mult"} and \code{"mlin"}; and \code{"haz"} for
+  hazard rate estimation problems. The available integration methods
+  depend on model specification (e.g. dimension, degree of fit). By
+  default, the best available method is used.
+}
+\item{mint}{
+  Points for numerical integration rules. Default 20.
+}
+\item{maxit}{
+  Maximum iterations for local likelihood estimation. Default 20.
+}
+\item{debug}{If > 0; prints out some debugging information.}
 
-}}
+\item{geth}{ Don't use!  }
+\item{sty}{Style for special terms (\code{\link{left}},
+  \code{\link{ang}} e.t.c.). Do not try to set this directly;
+  call \code{\link{locfit}} instead.
+}
+}
 \value{
 An object with class "locfit". A standard set of methods for printing, ploting, etc. these objects is provided.
 }

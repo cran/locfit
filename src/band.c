@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -57,7 +57,6 @@ INT c, cri;
       ressumm(&lf,&des);
       return(-2*lf.dp[DLK]/sig2-lf.mi[MN]+pen*lf.dp[DT0]);
     case BIND:
-printf("%8.5f  %12.8f %12.8f  %8.5f\n",h,vr,tb,vr+pen*pen*tb);
       return(vr+pen*pen*tb);
   } 
   ERROR(("bcri: unknown criterion"));
@@ -107,7 +106,7 @@ double pn;
 { double h0, g0, ifact;
   INT i;
   pen = pn;
-  if (cri==BIND) pen /= factorial(lf.mi[MDEG]+1);
+  if (cri==BIND) pen /= factorial((int)lf.mi[MDEG]+1);
   hmin = h0 = lf.dp[c];
   if (h0==0) ERROR(("bselect: initial bandwidth is 0"));
   if (lf_error) return;
@@ -179,7 +178,10 @@ void kdecri(x,h,res,c,k,ker,n)
 double *x, h, *res, c;
 INT k, ker, n;
 { INT i, j;
-  double pen, s, r0, r1, d0, d1, ik;
+  double degfree, dfd, pen, s, r0, r1, d0, d1, ik, wij;
+
+  if (h<=0) WARN(("kdecri, h = %6.4f",h));
+
   res[0] = res[1] = 0.0;
   ik = wint(1,NULL,0,ker);
   switch(k)
@@ -213,23 +215,36 @@ INT k, ker, n;
       }
       return;
     case 3: /* lscv */
-      r0 = r1 = d0 = d1 = 0.0;
+      r0 = r1 = d0 = d1 = degfree = 0.0;
       for (i=0; i<n; i++)
-      { for (j=0; j<n; j++) if (i != j)
+      { dfd = 0.0;
+        for (j=0; j<n; j++)
         { s = (x[i]-x[j])/h;
-          r1 += W(s,ker);
-          d1 += -s*s*Wd(s,ker);
+          wij = W(s,ker);
+          dfd += wij;
+/* 
+ *  r0 = \int fhat * fhat = sum_{i,j} W*W( (Xi-Xj)/h ) / n^2 h.
+ *  d0 is it's derivative wrt h.
+ *
+ *  r1 = 1/n sum( f_{-i}(X_i) ).
+ *  d1 is  it's derivative wrt h.
+ *
+ *  degfree = sum_i ( W_0 / sum_j W( (Xi-Xj)/h ) ) is fitted d.f.
+ */
           r0 += Wconv(s,ker);
           d0 += -s*s*Wconv1(s,ker);
+          if (i != j)
+          { r1 += wij;
+            d1 += -s*s*Wd(s,ker);
+          }
         }
+        degfree += 1.0/dfd;
       }
       d1 -= r1;
-      r0 += n*Wconv(0.0,ker);
       d0 -= r0;
-      res[0] = r0/(n*n*h*ik)   - 2*r1/(n*(n-1)*h);
-printf("lscv: h %8.5f   intl %8.5f  pen %8.5f\n",h,r0/(n*n*h*ik),r1/(n*(n-1)*h))
-;
-      res[1] = d0/(n*n*h*h*ik) - 2*d1/(n*(n-1)*h*h);
+      res[0] = r0/(n*n*h*ik*ik)   - 2*r1/(n*(n-1)*h*ik);
+      res[1] = d0/(n*n*h*h*ik*ik) - 2*d1/(n*(n-1)*h*h*ik);
+      res[2] = degfree;
       return;
     case 4: /* bcv */
       r0 = d0 = 0.0;
@@ -351,13 +366,13 @@ vari *v;
 #endif
 
 #ifdef SVERSION
-void slscv(x,n,h,m,z)
+void slscv(x,n,h,z)
 double *x, *h, *z;
-int *m, *n;
+int *n;
 { INT i;
   double res[4];
-  for (i=0; i<*m; i++)
-    kdecri(x,h[i],res,0.0,3,WGAUS,*n);
-  z[i] = res[0];
+  kdecri(x,*h,res,0.0,3,WGAUS,*n);
+  z[0] = res[0];
+  z[1] = res[2];
 }
 #endif

@@ -6,6 +6,13 @@ Compute the likelihood cross-validation plot.
 \usage{
 lcvplot(..., alpha)
 }
+\description{
+  The \code{lcvplot} function loops through calls to the \code{\link{lcv}}
+function (and hence to \code{link{locfit}}), using a different
+smoothing parameter for each call.
+The returned structure contains the likelihood cross validation statistic
+for each fit, and can be used to produce an LCV plot.
+}
 \arguments{
   \item{...}{ arguments to the \code{\link{lcv}}, \code{\link{locfit}}
      functions.}

@@ -1,50 +1,9 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
 #include "local.h"
-
-void eigen(x,p,d,mxit)
-double *x, *p;
-INT d, mxit;
-{ INT i, j, k, iter, ms;
-  double c, s, r, u, v;
-  for (i=0; i<d; i++)
-    for (j=0; j<d; j++) p[i*d+j] = (i==j);
-  for (iter=0; iter<mxit; iter++)
-  { ms = 0;
-    for (i=0; i<d; i++)
-      for (j=i+1; j<d; j++)
-        if (SQR(x[i*d+j])>1.0e-15*fabs(x[i*d+i]*x[j*d+j]))
-        { c = (x[j*d+j]-x[i*d+i])/2;
-          s = -x[i*d+j];
-          r = sqrt(c*c+s*s);
-          c /= r;
-          s = sqrt((1-c)/2)*(2*(s>0)-1);
-          c = sqrt((1+c)/2);
-          for (k=0; k<d; k++)
-          { u = x[i*d+k]; v = x[j*d+k];
-            x[i*d+k] = u*c+v*s;
-            x[j*d+k] = v*c-u*s;
-          }
-          for (k=0; k<d; k++)
-          { u = x[k*d+i]; v = x[k*d+j];
-            x[k*d+i] = u*c+v*s;
-            x[k*d+j] = v*c-u*s;
-          }
-          x[i*d+j] = x[j*d+i] = 0.0;
-          for (k=0; k<d; k++)
-          { u = p[k*d+i]; v = p[k*d+j];
-            p[k*d+i] = u*c+v*s;
-            p[k*d+j] = v*c-u*s;
-          }
-          ms = 1;
-        }
-    if (ms==0) return;
-  }
-  WARN(("eigen not converged"));
-}
 
 void svd(x,p,q,d,mxit)  /* svd of square matrix */
 double *x, *p, *q;
@@ -261,17 +220,6 @@ INT p;
   }
 }
 
-void bacu1(R,f,p)   /* (R^T)^{-1} f */
-double *R, *f;
-INT p;
-{ INT i, j;
-  for (i=0; i<p; i++)
-  { for (j=0; j<i; j++)
-      f[i] -= R[j*p+i]*f[j];
-    f[i] /= R[i*(p+1)];
-  }
-}
-
 void solve(A,b,d) /* this is crude! A organized by column. */
 double *A, *b;
 INT d;
@@ -309,91 +257,24 @@ INT d;
   }
 }
 
-void choldec(A,n) /* assume A is P.d. */
-double *A;
-INT n;
-{ INT i, j, k;
-  for (j=0; j<n; j++)
-  { k = n*j+j;
-    for (i=0; i<j; i++) A[k] -= A[n*i+j]*A[n*i+j];
-    if (A[k]<=0)
-    { for (i=j; i<n; i++) A[n*j+i] = 0.0; }
-    else
-    { A[k] = sqrt(A[k]);
-      for (i=j+1; i<n; i++)
-      { for (k=0; k<j; k++)
-          A[n*j+i] -= A[n*k+i]*A[n*k+j];
-        A[n*j+i] /= A[n*j+j];
-      }
-    }
-  }
-  for (j=0; j<n; j++)
-    for (i=j+1; i<n; i++) A[n*i+j] = 0.0;
-}
-
-void cholsolve(v,A,k,p) /* p*p matrix; use k*k sector */
-double *v, *A;
-INT k, p;
-{ INT i, j;
-  for (i=0; i<k; i++)
-  { for (j=0; j<i; j++) v[i] -= A[j*p+i]*v[j];
-    v[i] /= A[i*p+i];
-  }
-  for (i=k-1; i>=0; i--)
-  { for (j=i+1; j<k; j++) v[i] -= A[i*p+j]*v[j];
-    v[i] /= A[i*p+i];
-  }
-}
-
-void xtwxdec(xtwx,meth,rhs,nop)
-xtwxstruc *xtwx;
-double *rhs;
-INT meth, nop;
-{ INT i, j, p;
-  p = xtwx->p;
-  if (nop<p)
-  { for (i=nop; i<p; i++)
-    { for (j=0; j<i; j++)
-        xtwx->Z[i*p+j] = xtwx->Z[j*p+i] = 0.0;
-      xtwx->Z[i*p+i] = 1.0;
-      rhs[i] = 0.0;
-    }
-  }
-  for (i=0; i<p; i++)
-  { if (xtwx->Z[i*(p+1)]<=0)
-    {
-/* if (xtwx->Z[i*(p+1)]<0) WARN(("xtwxdec: negative diagonal, zeroing")); */
-      xtwx->dg[i] = 0.0;
-    }
-    else
-      xtwx->dg[i] = 1/sqrt(xtwx->Z[i*(p+1)]);
-  }
-  xtwx->sm = meth;
-  switch(meth)
-  { case 1:
-      for (i=0; i<p; i++)
-        for (j=0; j<p; j++)
-          xtwx->Z[i*p+j] *= xtwx->dg[i]*xtwx->dg[j];
-      eigen(xtwx->Z,xtwx->Q,p,20);
-      break;
-    case 2:
-      choldec(xtwx->Z,p);
-      break;
-    default: ERROR(("xtwxdec: unknown solution method %d",meth));
-  }
-}
-
 void setzero(v,p)
 double *v;
 INT p;
-{ INT i;
+{ int i;
   for (i=0; i<p; i++) v[i] = 0.0;
+}
+
+void unitvec(x,k,p)
+double *x;
+INT k, p;
+{ setzero(x,p);
+  x[k] = 1.0;
 }
 
 double innerprod(v1,v2,p)
 double *v1, *v2;
 INT p;
-{ INT i;
+{ int i;
   double s;
   s = 0;
   for (i=0; i<p; i++) s += v1[i]*v2[i];
@@ -403,7 +284,7 @@ INT p;
 void addouter(re,v1,v2,p,c)
 double *re, *v1, *v2, c;
 INT p;
-{ INT i, j;
+{ int i, j;
   for (i=0; i<p; i++)
     for (j=0; j<p; j++)
       re[i*p+j] += c*v1[i]*v2[j];
@@ -416,8 +297,39 @@ INT n;
   for (i=0; i<n; i++) A[i] *= z;
 }
 
-INT factorial(n)
-INT n;
-{ if (n<=1) return(1.0);
-  return(n*factorial(n-1));
+/*
+ *  transpose() transposes an m*n matrix in place.
+ *  At input, the matrix has n rows, m columns and
+ *    x[0..n-1] is the is the first column.
+ *  At output, the matrix has m rows, n columns and
+ *    x[0..m-1] is the first column.
+ */
+void transpose(x,m,n)
+double *x;
+INT m, n;
+{ INT t0, t, ti, tj;
+  double z;
+  for (t0=1; t0<m*n-2; t0++)
+    { ti = t0%m; tj = t0/m;
+      do
+      { t = ti*n+tj;
+        ti= t%m;
+        tj= t/m;
+      } while (t<t0);
+      z = x[t];
+      x[t] = x[t0];
+      x[t0] = z;
+    }
+}
+
+/* trace of an n*n square matrix. */
+double m_trace(x,n)
+double *x;
+int n;
+{ int i;
+  double sum;
+  sum = 0;
+  for (i=0; i<n; i++)
+    sum += x[i*(n+1)];
+  return(sum);
 }

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -16,9 +16,11 @@ static double hmin;
 
 double acri(lk,t0,t2,pen)
 double lk, t0, t2, pen;
-{ /* return(-2*lk/(t0*exp(pen*log(1-t2/t0)))); */
+{ double y;
+/* return(-2*lk/(t0*exp(pen*log(1-t2/t0)))); */
   /* return((-2*lk+pen*t2)/t0); */
-  return((MAX(-2*lk,t0-t2)+pen*t2)/t0);
+  y = (MAX(-2*lk,t0-t2)+pen*t2)/t0;
+  return(y);
 }
 
 double mmse(lf,des)
@@ -37,7 +39,7 @@ design *des;
     for (j=0; j<lf->mi[MDEG]; j++) dp *= des->di[ii];
     sb += fabs(l[i])*dp;
   }
-  p1 = factorial(lf->mi[MDEG]+1);
+  p1 = factorial((int)lf->mi[MDEG]+1);
   return(sv+sb*sb*lf->dp[DADP]*lf->dp[DADP]/(p1*p1));
 }
 
@@ -73,11 +75,11 @@ lfit   *lf;
 
   switch(lf->mi[MACRI])
   { case ACP:
-      ldf(lf,des,t,1,lf->mi,NULL);
+      local_df(lf,des,t);
       mcp = acri(des->llk,t[0],t[2],lf->dp[DADP]);
       return(lf_status);
     case AKAT:
-      ldf(lf,des,t,1,lf->mi,NULL);
+      local_df(lf,des,t);
       clo = des->cf[0]-lf->dp[DADP]*t[5];
       cup = des->cf[0]+lf->dp[DADP]*t[5];
       return(lf_status);
@@ -109,7 +111,7 @@ double h0;
   while ((!done) & (nu1<(n-p)*0.95))
   { h = nbhd(lf,des,0,(1+0.3/d)*h,1);
     if (locfit(lf,des,h,1)>0) WARN(("aband2: failed fit"));
-    ldf(lf,des,t,1,lf->mi,NULL);
+    local_df(lf,des,t);
     nu1 = t[0]-t[2]; /* tr(A) */
     switch(lf->mi[MACRI])
     { case AKAT:
@@ -163,7 +165,7 @@ double h0;
     h = h0*(1+0.1*i/lf->mi[MDIM]);
     h = nbhd(lf,des,0,h,1);
     if (locfit(lf,des,h,1)>0) WARN(("aband3: failed fit"));
-    ldf(lf,des,t,1,lf->mi,NULL);
+    local_df(lf,des,t);
     switch (lf->mi[MACRI])
     { case AKAT:
         tlo = des->cf[0]-lf->dp[DADP]*t[5];

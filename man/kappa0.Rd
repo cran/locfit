@@ -8,14 +8,13 @@ kappa0(formula, cov=0.95, \dots)
 }
 \arguments{
 \item{formula}{
-Local regression model formula.
+  Local regression model formula. A \code{"locfit"} object can also
+  be provided; in this case the formula and other arguments are extracted
+  from this object.
 }
-\item{cov}{
-Coverage Probability for critical values.
-}
-\item{ldots}{
-Other arguments to \code{\link{locfit}}.
-}
+\item{cov}{ Coverage Probability for critical values.  }
+\item{ldots}{ Other arguments to \code{\link{locfit}}. Important arguments
+  include \code{flim} and \code{alpha}. }
 }
 \description{
   The geometric constants for simultaneous confidence bands are computed,
@@ -24,18 +23,23 @@ Other arguments to \code{\link{locfit}}.
   computes the critical value for the confidence bands.
 
   The method requires both the weight diagrams l(x), the
-  derivative l'(x) and second derivatives l''(x). These are
-  implemented exactly for a constant bandwidth; that
+  derivative l'(x) and (in 2 or more dimensions) the second
+  derivatives l''(x).
+  These are implemented exactly for a constant bandwidth; that
   is, \code{alpha=c(0,h)} for some \code{h}. For nearest
-  neighbor bandwidths, the computations are approximate.
+  neighbor bandwidths, the computations are approximate and a warning
+  is produced.
 
-  The theoretical justification for the bands are computed using
-  the spherical symmetry of the Normal distributions. For non-normal
-  distributions, and likelihood models, one relies on central
-  limit and related theorems...
+  The theoretical justification for the bands uses normality of
+  the random errors \eqn{e_1,\dots,e_n} in the regression model,
+  and in particular the spherical symmetry of the error vector.
+  For non-normal distributions, and likelihood models, one relies
+  on central limit and related theorems.
 
   Computation uses the product Simpson's rule to evaluate the
-  multidimensional integrals. Expect this to be slow in more
+  multidimensional integrals (The domain of integration, and
+  hence the region of simultaneous coverage, is determined by
+  the \code{flim} argument). Expect the integration to be slow in more
   than one dimension. The \code{mint} argument controls the
   precision.
 }

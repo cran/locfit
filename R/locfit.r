@@ -1,62 +1,9 @@
-"ang"<- 
-function(x)
-x
-
-"gam.lf"<- 
-function(x, y, w, xeval, ...)
-{
-  if(!missing(xeval)) {
-    fit <- locfit.raw(x, y, weights = w, geth = 5, ...)
-    return(predict(fit, xeval))
-  }
-  locfit.raw(x, y, weights = w, geth = 4, ...)
-}
-
-"gam.slist"<- 
-c("s", "lo", "random", "lf")
-
-"lf"<- 
-function(..., alpha = 0.7, deg = 2, scale = 1, kern = "tcub", ev = "tree", maxk
-   = 100)
-{
-  if(!any(gam.slist == "lf"))
-    warning("gam.slist does not include \"lf\" -- fit will be incorrect")
-  args <- list(...)
-  x <- args[[1]]
-  nargs <- length(args)
-  if(nargs > 1)
-    for(i in 2:nargs)
-      x <- cbind(x, args[[i]])
-  scall <- deparse(sys.call())
-  d <- if(is.matrix(x)) ncol(x) else 1
-  attr(x, "alpha") <- alpha
-  attr(x, "deg") <- deg
-  attr(x, "scale") <- scale
-  attr(x, "kern") <- kern
-  attr(x, "ev") <- ev
-  attr(x, "maxk") <- maxk
-  attr(x, "call") <- substitute(gam.lf(data[[scall]], z, w, alpha = alpha, deg
-     = deg, scale = scale, kern = kern, ev = ev, maxk = maxk))
-  attr(x, "class") <- "smooth"
-  x
-}
-
-"lfbas"<- 
-function(x, tt, ind)
-{
-  ind <- ind + 1
-  # C starst at 0, S at 1
-  x <- x[ind]
-  res <- basis(x, tt)
-  as.numeric(t(res))
-}
-
 "locfit"<- 
 function(formula, data = sys.frame(sys.parent()), weights = 1, cens = 0, base = 0, subset, 
   geth = F, ..., lfproc = locfit.raw)
 {
   Terms <- terms(formula, data = data, specials = c("left", "right", "ang", 
-    "cpar", "lfbas"))
+    "cpar"))
   attr(Terms, "intercept") <- 0
   m <- match.call()
   m[[1]] <- as.name("model.frame")
@@ -84,9 +31,8 @@ function(formula, data = sys.frame(sys.parent()), weights = 1, cens = 0, base = 
     nr <- attr(Terms, "response")
     sty[spec$left - nr] <- 5
     sty[spec$right - nr] <- 6
-    sty[spec$ang - nr] <- 3
+    sty[spec$ang - nr] <- 4
     sty[spec$cpar - nr] <- 7
-    sty[spec$lfbas - nr] <- 8
   }
   if(!missing(weights))
     weights <- model.extract(frm, weights)
@@ -96,22 +42,22 @@ function(formula, data = sys.frame(sys.parent()), weights = 1, cens = 0, base = 
     base <- model.extract(frm, base)
   ret <- lfproc(x, y, weights = weights, cens = cens, base = base, geth = geth, 
     sty = sty, ...)
-  if(any(geth == 1:6))
-    return(ret)
-  ret$terms <- Terms
-  ret$call <- match.call()
-  if(!is.null(yname))
-    ret$yname <- yname
-  ret$frame <- sys.frame(sys.parent())
+  if(geth == 0) {
+    ret$terms <- Terms
+    ret$call <- match.call()
+    if(!is.null(yname))
+      ret$yname <- yname
+    ret$frame <- sys.frame(sys.parent())
+  }
   ret
 }
 
 "locfit.raw"<- 
-function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale = 
-  F, alpha = 0.7, ev = "tree", deg = 2, family, link = "default", maxk = 100, 
-  kern = "tcub", kt = "sph", itype = "default", acri = "none", mint = 20, maxit
-   = 20, cut = 0.8, dc = F, geth = F, renorm = F, mg = 10, deriv = numeric(0), 
-  sty = rep(1, d), basis = list(NULL), debug = 0)
+function(x, y, weights = 1, cens = NULL, base = 0, scale = F, alpha = 0.7, deg
+   = 2, kern = "tricube", kt = "sph", acri = "none", basis = list(NULL), deriv
+   = numeric(0), dc = F, family, link = "default", xlim, renorm = F, ev = 
+  "tree", flim, mg = 10, cut = 0.8, maxk = 100, itype = "default", mint = 20, 
+  maxit = 20, debug = 0, geth = F, sty = rep(1, d))
 {
   if(!is.matrix(x)) {
     vnames <- deparse(substitute(x))
@@ -138,12 +84,10 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
   }
   if(is.null(cens))
     cens <- 0
-  kt <- pmatch(kt, c("sph", "prod", "ang", "center", "left", "right"))
-  if(any(kt == c(3, 5, 6)))
-    stop("kt=ang,left,right no longer used. Use eg. y~ang(x) formula")
+  kt <- pmatch(kt, c("sph", "prod", "center", "lm"))
   if(!missing(basis)) {
     assign("basis", basis, 1)
-    p <- deg0 <- deg <- length(basis(0, d))
+    p <- deg0 <- deg <- length(basis(matrix(0, nrow = 1, ncol = d), rep(0, d)))
   }
   else {
     if(length(deg) >= 2) {
@@ -151,8 +95,11 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
       deg <- deg[2]
     }
     else deg0 <- deg
-    p <- ifelse(kt == 2, d * deg + 1, ifelse(deg == 0, 1, prod(d + (1:deg))/
-      prod(1:deg)))
+    p <- switch(kt,
+      ifelse(deg == 0, 1, prod(d + (1:deg))/prod(1:deg)),
+      d * deg - 1,
+      ifelse(deg == 0, 1, prod(d + (1:deg))/prod(1:deg)),
+      d)
   }
   xl <- rep(0, 2 * d)
   lset <- 0
@@ -165,10 +112,9 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
     fl <- lflim(flim, vnames, fl)
   if(is.numeric(ev)) {
     xev <- ev
-    vc <- ncm <- 0
-    nvm <- length(xev)/d
-    ev <- pres
-    if(nvm == 0)
+    size <- list(vc = 0, ncm = 0, nvm = length(xev)/d)
+    ev <- "pres"
+    if(size$nvm == 0)
       stop("Invalid ev argument")
   }
   evs <- c("tree", "phull", "data", "grid", "kdtree", "kdcenter", "crossval", 
@@ -180,69 +126,22 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
     print(mi)
   alpha <- c(alpha, 0, 0, 0)[1:3]
   dp <- c(alpha, cut, 0, 0, 0, 0, 0, 0)
+  if(ev == 4) {
+    mg <- rep(mg, length.out = d)
+    size <- list(vc = 2^d, nvm = max(prod(mg), maxk), ncm = 0)
+  }
+  else if(ev != 8)
+    size <- .C("guessnv",
+      nvm = integer(1),
+      ncm = integer(1),
+      vc = integer(1),
+      dp = as.numeric(dp),
+      mi = as.integer(mi))
   if(is.character(deriv))
     deriv <- match(deriv, vnames)
-  switch(ev,
-    {
-      vc <- 2^d
-      guessnv <- .C("guessnv",
-        nvm = integer(1),
-        ncm = integer(1),
-        dp = as.numeric(dp),
-        mi = as.integer(mi))
-      nvm <- guessnv$nvm
-      ncm <- guessnv$ncm
-    }
-    ,
-    {
-      vc <- d + 1
-      nvm <- ncm <- maxk * d
-    }
-    ,
-    {
-      vc <- ncm <- 0
-      nvm <- n
-    }
-    ,
-    {
-      vc <- 2^d
-      mg <- rep(mg, length = d)
-      nvm <- max(prod(mg), maxk)
-      ncm <- 0
-    }
-    ,
-    {
-      vc <- 2^d
-      fc <- floor((cut * n * min(alpha[1], 1))/4)
-      k <- floor((2 * n)/fc)
-      ncm <- 2 * k + 1
-      nvm <- ((k + 2) * vc)/2
-      print(c(ncm, nvm))
-    }
-    ,
-    {
-      vc <- 1
-      fc <- floor(n * alpha[1])
-      nvm <- 1 + floor((2 * n)/fc)
-      ncm <- 2 * nvm + 1
-    }
-    ,
-    {
-      vc <- ncm <- 0
-      nvm <- n
-    }
-    ,
-    ,
-    {
-      vc <- ncm <- 0
-      nvm <- 1
-    }
-    ,
-    {
-      vc <- ncm <- 0
-      nvm <- 1
-    }
-    )
+  nvm <- size$nvm
+  ncm <- size$ncm
+  vc <- size$vc
   if(is.logical(scale))
     scale <- 1 - as.numeric(scale)
   if(length(scale) == 1)
@@ -252,7 +151,14 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
   lwtre <- nvm * (3 * d + 8) + ncm
   w3 <- n + ncm * vc + 3 * max(nvm, ncm)
   lwpc <- d + 4 * p + 2 * p * p
-  wl <- c(1, n * nvm, 2 * n * (d * d + d + 1), 1, 1, 1, 2)[geth + 1]
+  if(any(geth == 70:74)) {
+    wl <- max(2 * nvm, 2 * n * (d * d + d + 1))
+    lkap <- 1
+  }
+  else {
+    wl <- c(1, n * nvm, 2 * n * (d * d + d + 1), 1, 1, 1, 2)[geth + 1]
+    lkap <- c(1, 1, d + 1, length(deriv), 1, 1, 1)[geth + 1]
+  }
   z <- .C("slocfit",
     x = as.numeric(x),
     y = as.numeric(rep(y, length.out = n)),
@@ -273,7 +179,7 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
     lw = as.integer(c(lwdes, lwtre, w3, lwpc, wl)),
     mg = as.integer(mg),
     L = numeric(wl),
-    kap = numeric(c(1, 1, d + 1, length(deriv), 1, 1, 1, 1)[geth + 1]),
+    kap = numeric(lkap),
     deriv = as.integer(deriv),
     nd = as.integer(length(deriv)),
     sty = as.integer(sty),
@@ -318,10 +224,15 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
       pmax(sin(x), 0)^2)
   t1 <- z$wtre
   t2 <- z$iwork[ - (1:n)]
-  eva <- list(xev = z$xev[1:(d * nv)], coef = matrix(t1[1:((3 * d + 8) * nvm)], 
-    nrow = nvm)[1:nv,  ], scale = z$scale, pc = z$wpc)
+  xev <- z$xev[1:(d * nv)]
+  coef <- matrix(t1[1:((3 * d + 8) * nvm)], nrow = nvm)[1:nv,  ]
   if(nv == 1)
-    eva$coef <- matrix(eva$coef, nrow = 1)
+    coef <- matrix(coef, nrow = 1)
+  if(any(geth == 70:74)) {
+    return(list(xev = xev, coef = coef[, 1], sd = coef[, 3], lower = z$L[1:nv], 
+      upper = z$L[nvm + (1:nv)], trans = trans))
+  }
+  eva <- list(xev = xev, coef = coef, scale = z$scale, pc = z$wpc)
   class(eva) <- "lfeval"
   if(nc == 0) {
     cell <- list(sv = integer(0), ce = integer(0), s = integer(0), lo = 
@@ -340,6 +251,59 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
     vnames, yname = yname, call = match.call(), frame = sys.frame(sys.parent()))
   class(ret) <- "locfit"
   ret
+}
+
+"ang"<- 
+function(x)
+x
+
+"gam.lf"<- 
+function(x, y, w, xeval, ...)
+{
+  if(!missing(xeval)) {
+    fit <- locfit.raw(x, y, weights = w, geth = 5, ...)
+    return(predict(fit, xeval))
+  }
+  locfit.raw(x, y, weights = w, geth = 4, ...)
+}
+
+"gam.slist"<- 
+c("s", "lo", "random", "lf")
+
+"lf"<- 
+function(..., alpha = 0.7, deg = 2, scale = 1, kern = "tcub", ev = "tree", maxk
+   = 100)
+{
+  if(!any(gam.slist == "lf"))
+    warning("gam.slist does not include \"lf\" -- fit will be incorrect")
+  args <- list(...)
+  x <- args[[1]]
+  nargs <- length(args)
+  if(nargs > 1)
+    for(i in 2:nargs)
+      x <- cbind(x, args[[i]])
+  scall <- deparse(sys.call())
+  d <- if(is.matrix(x)) ncol(x) else 1
+  attr(x, "alpha") <- alpha
+  attr(x, "deg") <- deg
+  attr(x, "scale") <- scale
+  attr(x, "kern") <- kern
+  attr(x, "ev") <- ev
+  attr(x, "maxk") <- maxk
+  attr(x, "call") <- substitute(gam.lf(data[[scall]], z, w, alpha = alpha, deg
+     = deg, scale = scale, kern = kern, ev = ev, maxk = maxk))
+  attr(x, "class") <- "smooth"
+  x
+}
+
+"lfbas"<- 
+function(dim, indices, tt, ...)
+{
+  indices <- indices + 1
+  # C starts at 0, S at 1
+  x <- cbind(...)[indices,  ]
+  res <- basis(x, tt)
+  as.numeric(t(res))
 }
 
 "left"<- 
@@ -399,12 +363,110 @@ function(object, data = NULL, what = "coef", cv = F, studentize = F, type =
 function(object)
 object$call$formula
 
+"predict.locfit"<- 
+function(object, newdata = NULL, where = "fitp", se.fit = F, band = "none", 
+  what = "coef", ...)
+{
+  if((se.fit) && (band == "none"))
+    band <- "global"
+  for(i in 1:length(what)) {
+    pred <- preplot.locfit(object, newdata, where = where, band = band, what = 
+      what[i], ...)
+    fit <- pred$trans(pred$fit)
+    if(i == 1)
+      res <- fit
+    else res <- cbind(res, fit)
+  }
+  if(band == "none")
+    return(res)
+  return(list(fit = res, se.fit = pred$se.fit, residual.scale = pred$
+    residual.scale))
+}
+
 "lines.locfit"<- 
-function(x, m = 100, ...)
+function(x, m = 100, tr = x$trans, ...)
 {
   newx <- lfmarg(x, m = m)[[1]]
-  y <- predict(x, newx)
+  y <- predict(x, newx, tr = tr)
   lines(newx, y, ...)
+}
+
+"points.locfit"<- 
+function(x, tr, ...)
+{
+  d <- x$mi["d"]
+  p <- x$mi["p"]
+  nv <- x$nvc["nv"]
+  if(d == 1) {
+    if(missing(tr))
+      tr <- x$trans
+    x1 <- x$eva$xev
+    x2 <- x$eva$coef[, 1]
+    points(x1, tr(x2), ...)
+  }
+  if(d == 2) {
+    xx <- knots(x, what = "x")
+    points(xx[, 1], xx[, 2], ...)
+  }
+}
+
+"print.locfit"<- 
+function(x, ...)
+{
+  if(!is.null(cl <- x$call)) {
+    cat("Call:\n")
+    dput(cl)
+  }
+  cat("\n")
+  cat("Number of observations:         ", x$mi["n"], "\n")
+  cat("Family: ", c("Density", "PP Rate", "Hazard", "Gaussian", "Logistic", 
+    "Poisson", "Gamma", "Geometric", "Circular", "Huber", "Robust Binomial", 
+    "Weibull", "Cauchy")[x$mi["tg"] %% 64], "\n")
+  cat("Fitted Degrees of freedom:      ", round(x$dp["df2"], 3), "\n")
+  cat("Residual scale:                 ", signif(sqrt(x$dp["rv"]), 3), "\n")
+  invisible(x)
+}
+
+"residuals.locfit"<- 
+function(object, data = NULL, type = "deviance", ...)
+{
+  if(missing(data)) {
+    data <- if(is.null(object$call$data)) sys.frame(sys.parent()) else eval(object$call$
+        data)
+  }
+  fitted.locfit(object, data, ..., type = type)
+}
+
+"summary.locfit"<- 
+function(object, ...)
+{
+  mi <- object$mi
+  fam <- c("Density Estimation", "Poisson process rate estimation", 
+    "Hazard Rate Estimation", "Local Regression", "Local Likelihood - Binomial",
+    "Local Likelihood - Poisson", "Local Likelihood - Gamma", 
+    "Local Likelihood - Geometric", "Local Robust Regression")[mi["tg"] %% 64]
+  estr <- c("Rectangular Tree", "Triangulation", "Data", "Rectangular Grid", 
+    "k-d tree", "k-d centres", "Cross Validation", "User-provided")[mi["ev"]]
+  ret <- list(call = object$call, fam = fam, n = mi["n"], d = mi["d"], estr = 
+    estr, nv = object$nvc["nv"], deg = mi["deg"], dp = object$dp, vnames = 
+    object$vnames)
+  class(ret) <- "summary.locfit"
+  ret
+}
+
+"print.summary.locfit"<- 
+function(x)
+{
+  cat("Estimation type:", x$fam, "\n")
+  cat("\nCall:\n")
+  print(x$call)
+  cat("\nNumber of data points: ", x$n, "\n")
+  cat("Independent variables: ", x$vnames, "\n")
+  cat("Evaluation structure:", x$estr, "\n")
+  cat("Number of evaluation points: ", x$nv, "\n")
+  cat("Degree of fit: ", x$deg, "\n")
+  cat("Fitted Degrees of Freedom: ", round(x$dp["df2"], 3), "\n")
+  invisible(x)
 }
 
 "plot.locfit"<- 
@@ -445,25 +507,6 @@ function(x, xlim, pv, tv, m, mtv = 6, band = "none", tr = NULL, what = "coef",
   plot(pred, pv = pv, tv = tv, ...)
 }
 
-"points.locfit"<- 
-function(x, tr, ...)
-{
-  d <- x$mi["d"]
-  p <- x$mi["p"]
-  nv <- x$nvc["nv"]
-  if(d == 1) {
-    if(missing(tr))
-      tr <- x$trans
-    x1 <- x$eva$xev
-    x2 <- x$eva$coef[1:nv]
-    points(x1, tr(x2), ...)
-  }
-  if(d == 2) {
-    xx <- knots(x, what = "x")
-    points(xx[, 1], xx[, 2], ...)
-  }
-}
-
 "preplot.locfit"<- 
 function(object, newdata = NULL, where, tr = NULL, what = "coef", band = "none",
   get.data = F, f3d = F)
@@ -479,8 +522,10 @@ function(object, newdata = NULL, where, tr = NULL, what = "coef", band = "none",
       where <- if(nointerp) "fitp" else "grid"
     if(where == "grid")
       newdata <- lfmarg(object)
-    if(where == "fitp")
+    if(any(where == c("fitp", "ev", "fitpoints"))) {
+      where <- "fitp"
       newdata <- knots(object, what = "x", delete.pv = F)
+    }
     if(where == "data")
       newdata <- locfit.matrix(object)$x
     if(where == "vect")
@@ -517,7 +562,8 @@ function(object, newdata = NULL, where, tr = NULL, what = "coef", band = "none",
     sse <- z$se
   else sse <- numeric(0)
   if(where != "grid")
-    newdata <- list(xev = newdata)
+    newdata <- list(xev = newdata, where = where)
+  else newdata$where <- where
   data <- if(get.data) locfit.matrix(object) else list()
   if((f3d) | (dim > 3))
     dim <- 3
@@ -578,59 +624,11 @@ function(object, newdata, where, what, band)
     bs = list(eval(object$call$basis)))
 }
 
-"predict.locfit"<- 
-function(object, newdata = NULL, where = "fitp", se.fit = F, band = "none", 
-  what = "coef", ...)
-{
-  if((se.fit) && (band == "none"))
-    band <- "global"
-  for(i in 1:length(what)) {
-    pred <- preplot.locfit(object, newdata, where = where, band = band, what = 
-      what[i], ...)
-    fit <- pred$trans(pred$fit)
-    if(i == 1)
-      res <- fit
-    else res <- cbind(res, fit)
-  }
-  if(band == "none")
-    return(res)
-  return(list(fit = res, se.fit = pred$se.fit, residual.scale = pred$
-    residual.scale))
-}
-
-"print.locfit"<- 
-function(object, ...)
-{
-  if(!is.null(cl <- object$call)) {
-    cat("Call:\n")
-    dput(cl)
-  }
-  cat("\n")
-  cat("Number of observations:         ", object$mi["n"], "\n")
-  cat("Family: ", c("Density", "PP Rate", "Hazard", "Gaussian", "Logistic", 
-    "Poisson", "Gamma", "Geometric", "Circular", "Huber", "Robust Binomial", 
-    "Weibull", "Cauchy")[object$mi["tg"] %% 64], "\n")
-  cat("Fitted Degrees of freedom:      ", round(object$dp["df2"], 3), "\n")
-  cat("Residual scale:                 ", round(sqrt(object$dp["rv"]), 3), "\n"
-    )
-  invisible(object)
-}
-
 "print.preplot.locfit"<- 
 function(x, ...)
 {
   print(x$trans(x$fit))
   invisible(x)
-}
-
-"residuals.locfit"<- 
-function(object, data = NULL, type = "deviance", ...)
-{
-  if(missing(data)) {
-    data <- if(is.null(object$call$data)) sys.frame(sys.parent()) else eval(object$call$
-        data)
-  }
-  fitted.locfit(object, data, ..., type = type)
 }
 
 "plot.locfit.1d"<- 
@@ -693,7 +691,7 @@ function(x, pv, tv, main = "", xlab = "default", ylab = x$yname, type = "l",
 "plot.locfit.2d"<- 
 function(x, pv, tv, main, type = "contour", xlab, ylab, zlab = x$yname, ...)
 {
-  if(!is.list(x$xev))
+  if(x$xev$where != "grid")
     stop("Can only plot from grids")
   if(missing(xlab))
     xlab <- x$vnames[1]
@@ -730,15 +728,17 @@ function(x, pv, tv, main, type = "contour", xlab, ylab, zlab = x$yname, ...)
 function(x, main = "", pv, tv, type = "level", pred.lab = x$vnames, resp.lab = 
   x$yname, crit = 1.96, ...)
 {
-  if(!is.list(x$xev))
+  xev <- x$xev
+  if(xev$where != "grid")
     stop("Can only plot from grids")
-  newx <- as.matrix(expand.grid(x$xev))
+  xev$where <- NULL
+  newx <- as.matrix(expand.grid(xev))
   newy <- x$trans(x$fit)
   wh <- rep("f", length(newy))
   if(length(x$data) > 0) {
     dat <- x$data
     for(i in tv) {
-      m <- x$xev[[i]]
+      m <- xev[[i]]
       dat$x[, i] <- m[1 + round((dat$x[, i] - m[1])/(m[2] - m[1]))]
     }
     newx <- rbind(newx, dat$x)
@@ -796,9 +796,12 @@ function(x, main = "", pv, tv, type = "level", pred.lab = x$vnames, resp.lab =
       pl <- wireframe(formula, xlab = pred.lab[pv[1]], ylab = pred.lab[pv[2]], 
         zlab = resp.lab, data = newdat, strip = loc.strip, ...)
   }
-  if(length(tv) > 0)
-    names(attr(pl$glist, "endpts")) <- attr(pl$glist, "names") <- names(attr(pl$
-      glist, "index")) <- pred.lab[tv]
+  if(length(tv) > 0) {
+    if(exists("is.R") && is.function(is.R) && is.R())
+      names(pl$cond) <- pred.lab[tv]
+    else names(attr(pl$glist, "endpts")) <- attr(pl$glist, "names") <- names(
+        attr(pl$glist, "index")) <- pred.lab[tv]
+  }
   pl
 }
 
@@ -833,32 +836,36 @@ function(object, ...)
   invisible(NULL)
 }
 
+"summary.preplot.locfit"<- 
+function(object, ...)
+object$trans(object$fit)
+
 "panel.locfit"<- 
 function(x, y, subscripts, z, xyz.labs, xyz.axes, xyz.mid, xyz.minmax, 
-  xyz.range, col.regions, at, drape, contour, region, ...)
+  xyz.range, col.regions, at, drape, contour, region, groups, ...)
 {
   if(!missing(z)) {
-    z <- z[subscripts]
-    fit <- locfit(z ~ x + y, ...)
+    zs <- z[subscripts]
+    fit <- locfit.raw(cbind(x, y), zs, ...)
     marg <- lfmarg(fit, m = 10)
     zp <- predict(fit, marg)
-    if(!missing(contour))
+    if(!missing(contour)) {
+      print("contour")
+      print(range(zp))
       render.contour.trellis(marg[[1]], marg[[2]], zp, at = at)
+    }
     else {
       loc.dat <- cbind(as.matrix(expand.grid(x = marg[[1]], y = marg[[1]])), z
          = zp)
-      print(xyz.minmax)
-      print(xyz.range)
-      print(xyz.mid)
-      print(xyz.axes)
-      render.3d.trellis(loc.dat, type = "wires", xyz.labs = xyz.labs, xyz.axes
-         = xyz.axes, xyz.mid = xyz.mid, xyz.minmax = xyz.minmax, xyz.range = 
-        xyz.range, col.regions = col.regions, at = at, drape = drape)
+      render.3d.trellis(cbind(x = x, y = y, z = z[subscripts]), type = "cloud", 
+        xyz.labs = xyz.labs, xyz.axes = xyz.axes, xyz.mid = xyz.mid, xyz.minmax
+         = xyz.minmax, xyz.range = xyz.range, col.regions = col.regions, at = 
+        at, drape = drape)
     }
   }
   else {
     panel.xyplot(x, y)
-    lines(locfit(y ~ x, ...))
+    lines(locfit.raw(x, y, ...))
   }
 }
 
@@ -881,14 +888,48 @@ function(xlim, m = 40)
 function(object)
 object$eva
 
-"lflim"<- 
-function(limits, names, ret)
+"plot.lfeval"<- 
+function(x, add = F, txt = F, ...)
 {
-  d <- length(names)
+  if(class(x) == "locfit")
+    x <- x$eva
+  d <- length(x$scale)
+  v <- matrix(x$xev, nrow = d)
+  if(d == 1) {
+    xx <- v[1,  ]
+    y <- x$coef[, 1]
+  }
+  if(d == 2) {
+    xx <- v[1,  ]
+    y <- v[2,  ]
+  }
+  if(!add) {
+    plot(xx, y, type = "n")
+  }
+  points(xx, y)
+  if(txt)
+    text(xx, y, (1:length(xx)) - 1)
+  invisible(x)
+}
+
+"print.lfeval"<- 
+function(x)
+{
+  if(class(x) == "locfit")
+    x <- x$eva
+  d <- length(x$scale)
+  ret <- matrix(x$xev, ncol = d, byrow = T)
+  print(ret)
+}
+
+"lflim"<- 
+function(limits, nm, ret)
+{
+  d <- length(nm)
   if(is.numeric(limits))
     ret <- limits
   else {
-    z <- match(names, names(limits))
+    z <- match(nm, names(limits))
     for(i in 1:d)
       if(!is.na(z[i])) ret[c(i, i + d)] <- limits[[z[i]]]
   }
@@ -925,7 +966,8 @@ function(x, add = F, text = F, ...)
       as.integer(x$mi),
       as.numeric(x$dp),
       nt = integer(1),
-      term = integer(600))
+      term = integer(600),
+      box = x$box)
     ce <- zz$term + 1
   }
   else ce <- x$cell$ce + 1
@@ -962,51 +1004,6 @@ function(fit, value)
   fit
 }
 
-"summary.locfit"<- 
-function(object, ...)
-{
-  mi <- object$mi
-  fam <- c("Density Estimation", "Poisson process rate estimation", 
-    "Hazard Rate Estimation", "Local Regression", "Local Likelihood - Binomial",
-    "Local Likelihood - Poisson", "Local Likelihood - Gamma", 
-    "Local Likelihood - Geometric", "Local Robust Regression")[mi["tg"] %% 64]
-  estr <- c("Rectangular Tree", "Triangulation", "Data", "Rectangular Grid", 
-    "k-d tree", "k-d centres", "Cross Validation", "User-provided")[mi["ev"]]
-  ret <- list(call = object$call, fam = fam, n = mi["n"], d = mi["d"], estr = 
-    estr, nv = object$nvc["nv"], deg = mi["deg"], dp = object$dp, vnames = 
-    object$vnames)
-  class(ret) <- "summary.locfit"
-  ret
-}
-
-"summary.preplot.locfit"<- 
-function(object, ...)
-object$trans(object$fit)
-
-"print.summary.locfit"<- 
-function(x)
-{
-  cat("Estimation type:", x$fam, "\n")
-  cat("\nCall:\n")
-  print(x$call)
-  cat("\nNumber of data points: ", x$n, "\n")
-  cat("Independent variables: ", x$vnames, "\n")
-  cat("Evaluation structure:", x$estr, "\n")
-  cat("Number of evaluation points: ", x$nv, "\n")
-  cat("Degree of fit: ", x$deg, "\n")
-  cat("Fitted Degrees of Freedom: ", round(x$dp["df2"], 3), "\n")
-  invisible(x)
-}
-
-"hatmatrix"<- 
-function(formula, dc = T, ...)
-{
-  m <- match.call()
-  m$geth <- 1
-  m[[1]] <- as.name("locfit")
-  eval(m, sys.frame(sys.parent()))
-}
-
 "regband"<- 
 function(formula, what = c("CP", "GCV", "GKK", "RSW"), deg = 1, ...)
 {
@@ -1022,7 +1019,7 @@ function(formula, what = c("CP", "GCV", "GKK", "RSW"), deg = 1, ...)
 }
 
 "kdeb"<- 
-function(x, h0 = 0.01 * sd, h1 = sd, what = c("AIC", "LCV", "LSCV", "BCV", 
+function(x, h0 = 0.01 * sd, h1 = sd, meth = c("AIC", "LCV", "LSCV", "BCV", 
   "SJPI", "GKK"), kern = "gauss", gf = 2.5)
 {
   n <- length(x)
@@ -1030,16 +1027,16 @@ function(x, h0 = 0.01 * sd, h1 = sd, what = c("AIC", "LCV", "LSCV", "BCV",
   z <- .C("kdeb",
     x = as.numeric(x),
     mi = as.integer(n),
-    band = numeric(length(what)),
+    band = numeric(length(meth)),
     ind = integer(n),
     h0 = as.numeric(gf * h0),
     h1 = as.numeric(gf * h1),
-    meth = as.integer(match(what, c("AIC", "LCV", "LSCV", "BCV", "SJPI", "GKK")
+    meth = as.integer(match(meth, c("AIC", "LCV", "LSCV", "BCV", "SJPI", "GKK")
       )),
-    nmeth = as.integer(length(what)),
+    nmeth = as.integer(length(meth)),
     kern = pmatch(kern, c("rect", "epan", "bisq", "tcub", "trwt", "gauss")))
   band <- z$band
-  names(band) <- what
+  names(band) <- meth
   band
 }
 
@@ -1157,65 +1154,186 @@ function(fit, data)
   list(x = x, y = y, w = w, sc = sc, ce = ce, base = base)
 }
 
-"kappa0"<- 
-function(formula, dc = T, cov = 0.95, ...)
+"expit"<- 
+function(x)
 {
-  if(class(formula) == "locfit") {
-    m <- formula$call
+  y <- x
+  ix <- (x < 0)
+  y[ix] <- exp(x[ix])/(1 + exp(x[ix]))
+  y[!ix] <- 1/(1 + exp( - x[!ix]))
+  y
+}
+
+"plotbyfactor"<- 
+function(x, y, f, data, col = 1:10, pch = "O", add = F, lg, xlab = deparse(
+  substitute(x)), ylab = deparse(substitute(y)), log = "", ...)
+{
+  if(!missing(data)) {
+    x <- eval(substitute(x), data)
+    y <- eval(substitute(y), data)
+    f <- eval(substitute(f), data)
   }
-  else {
-    m <- match.call()
-    m$cov <- NULL
+  f <- as.factor(f)
+  if(!add)
+    plot(x, y, type = "n", xlab = xlab, ylab = ylab, log = log, ...)
+  lv <- levels(f)
+  col <- rep(col, length.out = length(lv))
+  pch <- rep(pch, length.out = length(lv))
+  for(i in 1:length(lv)) {
+    ss <- f == lv[i]
+    if(any(ss))
+      points(x[ss], y[ss], col = col[i], pch = pch[i])
   }
-  m$dc <- T
-  m$geth <- 2
+  if(!missing(lg))
+    legend(lg[1], lg[2], legend = levels(f), col = col, pch = paste(pch, 
+      collapse = ""))
+}
+
+"hatmatrix"<- 
+function(formula, dc = T, ...)
+{
+  m <- match.call()
+  m$geth <- 1
   m[[1]] <- as.name("locfit")
-  z <- eval(m, sys.frame(sys.parent()))
-  print("call crit")
-  crit(const = z$const, d = z$d, cov = cov)
+  eval(m, sys.frame(sys.parent()))
 }
 
-"crit"<- 
-function(fit, const = c(0, 1), d = 1, cov = 0.95, rdf = 0)
+"locfit.robust"<- 
+function(x, y, weights, ..., iter = 3)
 {
-  if(!missing(fit)) {
-    z <- fit$critval
-    if(missing(const) & missing(d) & missing(cov))
-      return(z)
-    if(!missing(const))
-      z$const <- const
-    if(!missing(d))
-      z$d <- d
-    if(!missing(cov))
-      z$cov <- cov
-    if(!missing(rdf))
-      z$rdf <- rdf
+  m <- match.call()
+  if((!is.numeric(x)) && (class(x) == "formula")) {
+    m1 <- m[[1]]
+    m[[1]] <- as.name("locfit")
+    m$lfproc <- m1
+    names(m)[[2]] <- "formula"
+    return(eval(m, sys.frame(sys.parent())))
   }
-  else {
-    z <- list(const = const, d = d, cov = cov, rdf = rdf, crit.val = 0)
-    class(z) <- "kappa"
-  }
-  z$crit.val <- .C("scritval",
-    k0 = as.numeric(z$const),
-    d = as.integer(z$d),
-    cov = as.numeric(z$cov),
-    m = as.integer(length(z$const)),
-    rdf = as.numeric(z$rdf),
-    x = numeric(1))$x
-  z
-}
-
-"crit<-"<- 
-function(fit, value)
-{
-  if(is.numeric(value))
-    fit$critval$crit.val <- value[1]
-  else {
-    if(class(value) != "kappa")
-      stop("crit<-: value must be numeric or class kappa")
-    fit$critval <- value
+  n <- length(y)
+  lfr.wt <- rep(1, n)
+  m[[1]] <- as.name("locfit.raw")
+  for(i in 0:iter) {
+    m$weights <- lfr.wt
+    fit <- eval(m, sys.frame(sys.parent()))
+    res <- residuals(fit, type = "raw")
+    s <- median(abs(res))
+    lfr.wt <- pmax(1 - (res/(6 * s))^2, 0)^2
   }
   fit
+}
+
+"locfit.censor"<- 
+function(x, y, cens, ..., iter = 3, km = F)
+{
+  m <- match.call()
+  if((!is.numeric(x)) && (class(x) == "formula")) {
+    m1 <- m[[1]]
+    m[[1]] <- as.name("locfit")
+    m$lfproc <- m1
+    names(m)[[2]] <- "formula"
+    return(eval(m, sys.frame(sys.parent())))
+  }
+  lfc.y <- y
+  cens <- as.logical(cens)
+  m$cens <- m$iter <- m$km <- NULL
+  m[[1]] <- as.name("locfit.raw")
+  for(i in 0:iter) {
+    m$y <- lfc.y
+    fit <- eval(m, sys.frame(sys.parent()))
+    fh <- fitted(fit)
+    if(km) {
+      sr <- y - fh
+      lfc.y <- y + km.mrl(sr, cens)
+    }
+    else {
+      rdf <- sum(1 - cens) - 2 * fit$dp["df1"] + fit$dp["df2"]
+      sigma <- sqrt(sum((y - fh) * (lfc.y - fh))/rdf)
+      sr <- (y - fh)/sigma
+      lfc.y <- fh + (sigma * dnorm(sr))/pnorm( - sr)
+    }
+    lfc.y[!cens] <- y[!cens]
+  }
+  m$cens <- substitute(cens)
+  m$y <- substitute(y)
+  fit$call <- m
+  fit
+}
+
+"km.mrl"<- 
+function(times, cens)
+{
+  n <- length(times)
+  if(length(cens) != length(times))
+    stop("times and cens must have equal length")
+  ord <- order(times)
+  times <- times[ord]
+  cens <- cens[ord]
+  n.alive <- n:1
+  haz.km <- (1 - cens)/n.alive
+  surv.km <- exp(cumsum(log(1 - haz.km[ - n])))
+  int.surv <- c(diff(times) * surv.km)
+  mrl.km <- c(rev(cumsum(rev(int.surv)))/surv.km, 0)
+  mrl.km[!cens] <- 0
+  mrl.km.ord <- numeric(n)
+  mrl.km.ord[ord] <- mrl.km
+  mrl.km.ord
+}
+
+"locfit.quasi"<- 
+function(x, y, weights, ..., iter = 3, var = function(mean)
+abs(mean))
+{
+  m <- match.call()
+  if((!is.numeric(x)) && (class(x) == "formula")) {
+    m1 <- m[[1]]
+    m[[1]] <- as.name("locfit")
+    m$lfproc <- m1
+    names(m)[[2]] <- "formula"
+    return(eval(m, sys.frame(sys.parent())))
+  }
+  n <- length(y)
+  w0 <- lfq.wt <- if(missing(weights)) rep(1, n) else weights
+  m[[1]] <- as.name("locfit.raw")
+  for(i in 0:iter) {
+    m$weights <- lfq.wt
+    fit <- eval(m, sys.frame(sys.parent()))
+    fh <- fitted(fit)
+    lfq.wt <- w0/var(fh)
+  }
+  fit
+}
+
+"density.lf"<- 
+function(x, n = 50, window = "gaussian", width, from, to, cut = if(iwindow == 
+  4.) 0.75 else 0.5, ev = "grid", deg = 0, family = "density", link = "ident", 
+  ...)
+{
+  if(!exists("logb"))
+    logb <- log
+  # for R
+  x <- sort(x)
+  r <- range(x)
+  iwindow <- pmatch(window, c("rectangular", "triangular", "cosine", "gaussian"
+    ), -1.)
+  if(iwindow < 0.)
+    kern <- window
+  else kern <- c("rect", "tria", NA, "gauss")[iwindow]
+  if(missing(width)) {
+    nbar <- logb(length(x), base = 2.) + 1.
+    width <- diff(r)/nbar * 0.5
+  }
+  if(missing(from))
+    from <- r[1.] - width * cut
+  if(missing(to))
+    to <- r[2.] + width * cut
+  if(to <= from)
+    stop("Invalid from/to values")
+  alpha <- c(0, width/2)
+  if(kern == "gauss")
+    alpha <- alpha * 1.25
+  fit <- locfit.raw(x, ev = ev, mg = n, flim = c(from, to), alpha = alpha, kern
+     = kern, deg = deg, link = link, family = family, ...)
+  list(x = fit$eva$xev, y = fit$eva$coef[, 1])
 }
 
 "gcv"<- 
@@ -1262,8 +1380,8 @@ function(x, y, xlab = "Fitted DF", ylab = x$cri, ...)
 }
 
 "print.gcvplot"<- 
-function(object, ...)
-plot.gcvplot(x = object, ...)
+function(x, ...)
+plot.gcvplot(x = x, ...)
 
 "summary.gcvplot"<- 
 function(object, ...)
@@ -1389,17 +1507,42 @@ function(..., alpha)
 }
 
 "lscv"<- 
-function(...)
+function(x, ..., exact = F)
 {
-  m <- match.call()
-  if(is.numeric(x))
-    m[[1]] <- as.name("locfit.raw")
-  else {
-    m[[1]] <- as.name("locfit")
-    names(m)[2] <- "formula"
+  if(exact) {
+    ret <- lscv.exact(x, ...)
   }
-  m$geth <- 6
-  eval(m, sys.frame(sys.parent()))
+  else {
+    m <- match.call()
+    m$exact <- NULL
+    if(is.numeric(x))
+      m[[1]] <- as.name("locfit.raw")
+    else {
+      m[[1]] <- as.name("locfit")
+      names(m)[2] <- "formula"
+    }
+    m$geth <- 6
+    ret <- eval(m, sys.frame(sys.parent()))
+  }
+  ret
+}
+
+"lscv.exact"<- 
+function(x, alpha, ...)
+{
+  if(missing(alpha))
+    stop("lscv.exact: no bandwidth.")
+  # this function only takes a fixed bandwidth.
+  # If alpha is given as one component, we use this.
+  # If alpha has >=2 components, we use the second, in
+  # accordance with the locfit standard.
+  if(length(alpha) >= 2) alpha <- alpha[2]
+  ret <- .C("slscv",
+    x = as.numeric(x),
+    n = as.integer(length(x)),
+    h = as.numeric(alpha),
+    ret = numeric(2))$ret
+  ret
 }
 
 "lscvplot"<- 
@@ -1420,204 +1563,220 @@ function(..., alpha)
   ret
 }
 
-"dv"<- 
-function(z)
+"sjpi"<- 
+function(x, a)
 {
-  n <- length(z)
-  e <- z[ - c(1, n)] - (z[ - c(1, 2)] + z[ - c(n - 1, n)])/2
-  return((2 * sum(e * e))/(3 * (n - 2)))
+  dnorms <- function(x, k)
+  {
+    if(k == 0)
+      return(dnorm(x))
+    if(k == 1)
+      return( - x * dnorm(x))
+    if(k == 2)
+      return((x * x - 1) * dnorm(x))
+    if(k == 3)
+      return(x * (3 - x * x) * dnorm(x))
+    if(k == 4)
+      return((3 - x * x * (6 - x * x)) * dnorm(x))
+    if(k == 6)
+      return((-15 + x * x * (45 - x * x * (15 - x * x))) * dnorm(x))
+    stop("k too large in dnorms")
+  }
+  alpha <- a * sqrt(2)
+  n <- length(x)
+  M <- outer(x, x, "-")
+  s <- numeric(length(alpha))
+  for(i in 1:length(alpha)) {
+    s[i] <- sum(dnorms(M/alpha[i], 4))
+  }
+  s <- s/(n * (n - 1) * alpha^5)
+  h <- (s * 2 * sqrt(pi) * n)^(-0.2)
+  lambda <- diff(summary(x)[c(2, 5)])
+  A <- 0.92 * lambda * n^(-1/7)
+  B <- 0.912 * lambda * n^(-1/9)
+  tb <-  - sum(dnorms(M/B, 6))/(n * (n - 1) * B^7)
+  sa <- sum(dnorms(M/A, 4))/(n * (n - 1) * A^5)
+  ah <- 1.357 * (sa/tb * h^5)^(1/7)
+  cbind(h, a, ah/sqrt(2), s)
 }
 
-"expit"<- 
-function(x)
+"scb"<- 
+function(x, ..., type = 1)
 {
-  y <- x
-  ix <- (x < 0)
-  y[ix] <- exp(x[ix])/(1 + exp(x[ix]))
-  y[!ix] <- 1/(1 + exp( - x[ix]))
-  y
-}
-
-"fw"<- 
-function(x, k = 1)
-{
-  f <- rep(0, length(x))
-  if(k == 1) {
-    tj <- c(0.1, 0.13, 0.15, 0.23, 0.25, 0.4, 0.44, 0.65, 0.76, 0.78, 0.81)
-    hj <- c(4, -5, 3, -4, 5, -4.2, 2.1, 4.3, -3.1, 2.1, -4.2)
-    for(j in 1:length(tj))
-      f <- f + 3.6 * (hj[j] * (x > tj[j]))
-  }
-  if(k == 2) {
-    tj <- c(0.1, 0.13, 0.15, 0.23, 0.25, 0.4, 0.44, 0.65, 0.76, 0.78, 0.81)
-    hj <- c(4, 5, 3, 4, 5, 4.2, 2.1, 2.1, 4.3, -3.1, 2.1, -4.2)
-    for(j in 1:length(tj))
-      f <- f + 3.6 * (hj[j] * (x > tj[j]))
-  }
-  if(k == 2) {
-    tj <- c(0.1, 0.13, 0.15, 0.23, 0.25, 0.4, 0.44, 0.65, 0.76, 0.78, 0.81)
-    hj <- c(4, 5, 3, 4, 5, 4.2, 2.1, 4.3, 3.1, 5.1, 4.2)
-    wj <- c(5, 5, 6, 10, 10, 30, 10, 10, 5, 8, 5)/1000
-    for(j in 1:length(tj))
-      f <- f + (10 * hj[j])/(1 + abs((x - tj[j])/wj[j]))^4
-  }
-  if(k == 3) {
-    f <- 10 * sin(4 * pi * x) - 5 * ((x > 0.3) & (x < 0.72))
-  }
-  if(k == 4) {
-    f <- 20 * sqrt(x * (1 - x)) * sin((2 * pi * 1.05)/(x + 0.05))
-  }
-  f
-}
-
-"locfit.robust"<- 
-function(x, y, weights, ..., iter = 3)
-{
-  m <- match.call()
-  if((!is.numeric(x)) && (class(x) == "formula")) {
-    m1 <- m[[1]]
+  oc <- m <- match.call()
+  if(is.numeric(x))
+    m[[1]] <- as.name("locfit.raw")
+  else {
     m[[1]] <- as.name("locfit")
-    m$lfproc <- m1
-    names(m)[[2]] <- "formula"
-    return(eval(m, sys.frame(sys.parent())))
+    names(m)[2] <- "formula"
   }
+  m$type <- NULL
+  m$geth <- 70 + type
+  m$ev <- "grid"
+  fit <- eval(m, sys.frame(sys.parent()))
+  fit$call <- oc
+  class(fit) <- "scb"
+  fit
+}
+
+"plot.scb"<- 
+function(x, add = F, ...)
+{
+  fit <- x$trans(x$coef)
+  lower <- x$trans(x$lower)
+  upper <- x$trans(x$upper)
+  if(!add) {
+    yl <- range(c(lower, upper))
+    plot(x$xev, fit, type = "l", ylim = yl)
+  }
+  lines(x$xev, lower)
+  lines(x$xev, upper)
+}
+
+"print.scb"<- 
+function(x, ...)
+{
+  m <- cbind(x$xev, x$trans(x$coef), x$trans(x$lower), x$trans(x$upper))
+  dimnames(m) <- list(NULL, c("xev", "fit", "lower", "upper"))
+  print(m)
+}
+
+"kappa0"<- 
+function(formula, cov = 0.95, ...)
+{
+  if(class(formula) == "locfit") {
+    m <- formula$call
+  }
+  else {
+    m <- match.call()
+    m$cov <- NULL
+  }
+  m$dc <- T
+  m$geth <- 2
+  m[[1]] <- as.name("locfit")
+  z <- eval(m, sys.frame(sys.parent()))
+  crit(const = z$const, d = z$d, cov = cov)
+}
+
+"crit"<- 
+function(fit, const = c(0, 1), d = 1, cov = 0.95, rdf = 0)
+{
+  if(!missing(fit)) {
+    z <- fit$critval
+    if(missing(const) & missing(d) & missing(cov))
+      return(z)
+    if(!missing(const))
+      z$const <- const
+    if(!missing(d))
+      z$d <- d
+    if(!missing(cov))
+      z$cov <- cov
+    if(!missing(rdf))
+      z$rdf <- rdf
+  }
+  else {
+    z <- list(const = const, d = d, cov = cov, rdf = rdf, crit.val = 0)
+    class(z) <- "kappa"
+  }
+  z$crit.val <- .C("scritval",
+    k0 = as.numeric(z$const),
+    d = as.integer(z$d),
+    cov = as.numeric(z$cov),
+    m = as.integer(length(z$const)),
+    rdf = as.numeric(z$rdf),
+    x = numeric(1))$x
+  z
+}
+
+"crit<-"<- 
+function(fit, value)
+{
+  if(is.numeric(value))
+    fit$critval$crit.val <- value[1]
+  else {
+    if(class(value) != "kappa")
+      stop("crit<-: value must be numeric or class kappa")
+    fit$critval <- value
+  }
+  fit
+}
+
+"spence.15"<- 
+function(y)
+{
   n <- length(y)
-  lfr.wt <- rep(1, n)
-  m[[1]] <- as.name("locfit.raw")
-  for(i in 0:iter) {
-    m$weights <- lfr.wt
-    fit <- eval(m, sys.frame(sys.parent()))
-    res <- residuals(fit, type = "raw")
-    s <- median(abs(res))
-    lfr.wt <- pmax(1 - (res/(6 * s))^2, 0)^2
-  }
-  fit
-}
-
-"locfit.censor"<- 
-function(x, y, cens, ..., iter = 3, km = F)
-{
-  m <- match.call()
-  if((!is.numeric(x)) && (class(x) == "formula")) {
-    m1 <- m[[1]]
-    m[[1]] <- as.name("locfit")
-    m$lfproc <- m1
-    names(m)[[2]] <- "formula"
-    return(eval(m, sys.frame(sys.parent())))
-  }
-  lfc.y <- y
-  cens <- as.logical(cens)
-  m$cens <- m$iter <- m$km <- NULL
-  m[[1]] <- as.name("locfit.raw")
-  for(i in 0:iter) {
-    m$y <- lfc.y
-    fit <- eval(m, sys.frame(sys.parent()))
-    fh <- fitted(fit)
-    if(km) {
-      sr <- y - fh
-      lfc.y <- fh + km.mrl(sr, cens)
-    }
-    else {
-      rdf <- sum(1 - cens) - 2 * fit$dp["df1"] + fit$dp["df2"]
-      sigma <- sqrt(sum((y - fh) * (lfc.y - fh))/rdf)
-      sr <- (y - fh)/sigma
-      lfc.y <- fh + (sigma * dnorm(sr))/pnorm( - sr)
-    }
-    lfc.y[!cens] <- y[!cens]
-  }
-  m$cens <- substitute(cens)
-  m$y <- substitute(y)
-  fit$call <- m
-  fit
-}
-
-"locfit.quasi"<- 
-function(x, y, weights, ..., iter = 3, var = function(mean)
-abs(mean))
-{
-  m <- match.call()
-  if((!is.numeric(x)) && (class(x) == "formula")) {
-    m1 <- m[[1]]
-    m[[1]] <- as.name("locfit")
-    m$lfproc <- m1
-    names(m)[[2]] <- "formula"
-    return(eval(m, sys.frame(sys.parent())))
-  }
+  y <- c(rep(y[1], 7), y, rep(y[n], 7))
   n <- length(y)
-  w0 <- lfq.wt <- if(missing(weights)) rep(1, n) else weights
-  m[[1]] <- as.name("locfit.raw")
-  for(i in 0:iter) {
-    m$weights <- lfq.wt
-    fit <- eval(m, sys.frame(sys.parent()))
-    fh <- fitted(fit)
-    lfq.wt <- w0/var(fh)
-  }
-  fit
+  k <- 3:(n - 2)
+  a3 <- y[k - 1] + y[k] + y[k + 1]
+  a2 <- y[k - 2] + y[k + 2]
+  y1 <- y[k] + 3 * (a3 - a2)
+  n <- length(y1)
+  k <- 1:(n - 3)
+  y2 <- y1[k] + y1[k + 1] + y1[k + 2] + y1[k + 3]
+  n <- length(y2)
+  k <- 1:(n - 3)
+  y3 <- y2[k] + y2[k + 1] + y2[k + 2] + y2[k + 3]
+  n <- length(y3)
+  k <- 1:(n - 4)
+  y4 <- y3[k] + y3[k + 1] + y3[k + 2] + y3[k + 3] + y3[k + 4]
+  y4/320
 }
 
-"locfit.add"<- 
-function(x1, x2, y, iter = 5)
+"spence.21"<- 
+function(y)
 {
-  base <- 0
-  for(i in 1:iter) {
-    assign("loc.dat", data.frame(x1 = x1, y = y, base = base), frame = 1)
-    fit1 <- locfit(y ~ x1, base = base, data = loc.dat)
-    base <- fitted(fit1, data = loc.dat)
-    assign("loc.dat", data.frame(x2 = x2, y = y, base = base), frame = 1)
-    fit2 <- locfit(y ~ x2, base = base, data = loc.dat)
-    base <- fitted(fit2, data = loc.dat)
-    base <- base - base[1]
-    print(fit1$dp["lk"])
-  }
-  list(f1 = fit1, f2 = fit2)
-}
-
-"plotbyfactor"<- 
-function(x, y, f, data, col = 1:10, pch = "O", add = F, lg, xlab = deparse(
-  substitute(x)), ylab = deparse(substitute(y)), log = "", ...)
-{
-  if(!missing(data)) {
-    x <- eval(substitute(x), data)
-    y <- eval(substitute(y), data)
-    f <- eval(substitute(f), data)
-  }
-  f <- as.factor(f)
-  if(!add)
-    plot(x, y, type = "n", xlab = xlab, ylab = ylab, log = log, ...)
-  lv <- levels(f)
-  col <- rep(col, length.out = length(lv))
-  pch <- rep(pch, length.out = length(lv))
-  for(i in 1:length(lv)) {
-    ss <- f == lv[i]
-    if(any(ss))
-      points(x[ss], y[ss], col = col[i], pch = pch[i])
-  }
-  if(!missing(lg))
-    legend(lg[1], lg[2], legend = levels(f), col = col, pch = paste(pch, 
-      collapse = ""))
+  n <- length(y)
+  y <- c(rep(y[1], 10), y, rep(y[n], 10))
+  n <- length(y)
+  k <- 4:(n - 3)
+  y1 <-  - y[k - 3] + y[k - 1] + 2 * y[k] + y[k + 1] - y[k + 3]
+  n <- length(y1)
+  k <- 4:(n - 3)
+  y2 <- y1[k - 3] + y1[k - 2] + y1[k - 1] + y1[k] + y1[k + 1] + y1[k + 2] + y1[
+    k + 3]
+  n <- length(y2)
+  k <- 3:(n - 2)
+  y3 <- y2[k - 2] + y2[k - 1] + y2[k] + y2[k + 1] + y2[k + 2]
+  n <- length(y3)
+  k <- 3:(n - 2)
+  y4 <- y3[k - 2] + y3[k - 1] + y3[k] + y3[k + 1] + y3[k + 2]
+  y4/350
 }
 
 "store"<- 
-function()
+function(data = F, grand = F)
 {
-  lffuns <- c("ang", "gam.lf", "gam.slist", "lf", "lfbas", "locfit", 
-    "locfit.raw", "left", "right", "cpar", "fitted.locfit", "formula.locfit", 
-    "lines.locfit", "plot.locfit", "points.locfit", "preplot.locfit", 
-    "preplot.locfit.raw", "predict.locfit", "print.locfit", 
-    "print.preplot.locfit", "residuals.locfit", "plot.locfit.1d", 
-    "plot.locfit.2d", "plot.locfit.3d", "panel.xyplot.lf", 
-    "plot.preplot.locfit", "panel.locfit", "lfmarg", "lfeval", "lflim", 
-    "plot.eval", "rv", "rv<-", "summary.locfit", "summary.preplot.locfit", 
-    "print.summary.locfit", "hatmatrix", "regband", "kdeb", "knots", 
-    "locfit.matrix", "kappa0", "crit", "crit<-", "gcv", "gcvplot", 
-    "plot.gcvplot", "print.gcvplot", "summary.gcvplot", "aic", "aicplot", "cp", 
-    "cpplot", "lcv", "lcvplot", "lscv", "lscvplot", "dv", "expit", "fw", 
-    "locfit.robust", "locfit.censor", "locfit.quasi", "locfit.add", 
-    "plotbyfactor", "store")
+  lfmod <- c("ang", "gam.lf", "gam.slist", "lf", "lfbas", "left", "right", 
+    "cpar")
+  lfmeth <- c("fitted.locfit", "formula.locfit", "predict.locfit", 
+    "lines.locfit", "points.locfit", "print.locfit", "residuals.locfit", 
+    "summary.locfit", "print.summary.locfit")
+  lfplo <- c("plot.locfit", "preplot.locfit", "preplot.locfit.raw", 
+    "print.preplot.locfit", "plot.locfit.1d", "plot.locfit.2d", 
+    "plot.locfit.3d", "panel.xyplot.lf", "plot.preplot.locfit", 
+    "summary.preplot.locfit", "panel.locfit", "lfmarg")
+  lffre <- c("hatmatrix", "locfit.robust", "locfit.censor", "km.mrl", 
+    "locfit.quasi", "density.lf")
+  lfscb <- c("scb", "plot.scb", "print.scb", "kappa0", "crit", "crit<-")
+  lfgcv <- c("gcv", "gcvplot", "plot.gcvplot", "print.gcvplot", 
+    "summary.gcvplot", "aic", "aicplot", "cp", "cpplot", "lcv", "lcvplot", 
+    "lscv", "lscv.exact", "lscvplot", "sjpi")
+  lfspen <- c("spence.15", "spence.21")
+  lffuns <- c("locfit", "locfit.raw", lfmod, lfmeth, lfplo, "lfeval", 
+    "plot.lfeval", "print.lfeval", "lflim", "plot.eval", "rv", "rv<-", 
+    "regband", "kdeb", "knots", "locfit.matrix", "expit", "plotbyfactor", lffre,
+    lfgcv, lfscb, lfspen, "store")
   lfdata <- c("bad", "cltest", "cltrain", "co2", "diab", "geyser", "ethanol", 
-    "mcyc", "morths", "border", "heart", "trimod", "iris", "spencer", "stamp")
+    "mcyc", "morths", "border", "heart", "trimod", "insect", "iris", "spencer", 
+    "stamp")
+  lfgrand <- c("locfit.raw", "crit", "predict.locfit", "preplot.locfit", 
+    "preplot.locfit.raw", "lfbas", "expit", "rv", "rv<-", "knots")
   dump(lffuns, "S/locfit.s")
-  dump(lfdata, "S/locfit.dat")
+  if(data)
+    dump(lfdata, "S/locfit.dat")
+  if(grand)
+    dump(lfgrand, "src-gr/lfgrand.s")
   dump(lffuns, "R/locfit.s")
 }
 

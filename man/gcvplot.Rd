@@ -6,6 +6,13 @@ Compute a generalized cross-validation plot.
 \usage{
 gcvplot(..., alpha, df=2)
 }
+\description{
+  The \code{gcvplot} function loops through calls to the \code{\link{gcv}}
+function (and hence to \code{link{locfit}}), using a different
+smoothing parameter for each call.
+The returned structure contains the GCV statistic for each fit, and can
+be used to produce an GCV plot.
+}
 \arguments{
   \item{...}{ arguments to the \code{\link{gcv}}, \code{\link{locfit}}
      functions.}
@@ -33,8 +40,9 @@ plot(gcvplot(NOx~E,data=ethanol,alpha=seq(0.2,1.0,by=0.05)))
 \seealso{
   \code{\link{locfit}},
   \code{\link{locfit.raw}},
-  \code{\link{gcv}}
-  \code{\link{plot.gcvplot}}
+  \code{\link{gcv}},
+  \code{\link{plot.gcvplot}},
+  \code{\link{summary.gcvplot}}
 }
 
 \keyword{locfit}

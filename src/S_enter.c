@@ -17,38 +17,38 @@ INT lf_error;
 extern INT cvi;
 
 #ifdef RVERSION
-#define CALL_S_FUNC char
-#define CALL_S_ARGS void
+typedef char * CALL_S_FUNC;
+typedef void * CALL_S_ARGS;
 #else
-#define CALL_S_FUNC void
-#define CALL_S_ARGS char
+typedef void * CALL_S_FUNC;
+typedef char * CALL_S_ARGS;
 #endif
-#define CALL_S_LEN  long int
-#define CALL_S_NARG long int
-#define CALL_S_MODE char
-#define CALL_S_NRES long int
-#define CALL_S_VALS char
+typedef long int CALL_S_LEN;
+typedef long int CALL_S_NARG;
+typedef char * CALL_S_MODE;
+typedef long int CALL_S_NRES;
+typedef char * CALL_S_VALS;
 
-static CALL_S_FUNC *bsfunc, *bsf2;
+static CALL_S_FUNC bsfunc, bsf2;
 
 void basis(x,t,f,dim,p)
 double *x, *t, *f;
 INT dim, p;
 {
-  CALL_S_ARGS *args[2];
+  CALL_S_ARGS args[2];
   CALL_S_LEN  length[2];
   CALL_S_NARG nargs;
-  CALL_S_MODE *mode[2];
+  CALL_S_MODE mode[2];
   CALL_S_NRES nres;
-  CALL_S_VALS *values[1];
+  CALL_S_VALS values[1];
   double z0[1], z1[1], *vptr;
   int i;
 
-  args[0] = (char *)x;
+  args[0] = (CALL_S_ARGS)x;
   mode[0] = "double";
   length[0] = dim;
 
-  args[1] = (char *)t;
+  args[1] = (CALL_S_ARGS)t;
   mode[1] = "double";
   length[1] = dim;
 
@@ -61,32 +61,38 @@ INT dim, p;
   for (i=0; i<p; i++) f[i] = vptr[i];
 }
 
-double vbasis(x,t,n,d,ind,m,p,X)
+void vbasis(x,t,n,d,ind,m,p,X)
 double **x, *t, *X;
 int n, d, m, p, *ind;
 {
-  CALL_S_ARGS *args[3];
-  CALL_S_LEN  length[3];
+  CALL_S_ARGS args[MXDIM+3];
+  CALL_S_LEN  length[MXDIM+3];
   CALL_S_NARG nargs;
-  CALL_S_MODE *mode[3];
+  CALL_S_MODE mode[MXDIM+3];
   CALL_S_NRES nres;
-  CALL_S_VALS *values[1];
+  CALL_S_VALS values[1];
   double *vptr;
   int i;
 
-  args[0] = (char *)x[0];
-  mode[0] = "double";
-  length[0] = n;
+  args[0] = (CALL_S_ARGS)(&d);
+  mode[0] = "integer";
+  length[0] = 1;
 
-  args[1] = (char *)t;
-  mode[1] = "double";
-  length[1] = d;
+  args[1] = (CALL_S_ARGS)ind;
+  mode[1] = "integer";
+  length[1] = m;
 
-  args[2] = (char *)ind;
-  mode[2] = "integer";
-  length[2] = m;
+  args[2] = (CALL_S_ARGS)t;
+  mode[2] = "double";
+  length[2] = d;
 
-  nargs = 3;
+  for (i=0; i<d; i++)
+  { args[3+i] = (CALL_S_ARGS)x[i];
+    mode[3+i] = "double";
+    length[3+i] = n;
+  }
+
+  nargs = d+3;
   nres = 1;
 
   call_S(bsf2,nargs,args,mode,length,0,nres,values);
@@ -108,7 +114,7 @@ void slocfit(x,y,c,w,b,lim,mi,dp,str,sca,xev,wdes,wtre,wpc,nvc,
 double *x, *y, *c, *w, *b, *lim, *dp, *sca, *xev, *L, *kap, *wdes, *wtre, *wpc;
 INT *mi, *nvc, *iwork, *lw, *mg, *deriv, *nd, *sty;
 char **str;
-CALL_S_FUNC **bs;
+CALL_S_FUNC *bs;
 { INT n, d, i, kk;
   vari v1, v2, v3, vL, vi, vx, vxev;
   if (mi[MUBAS])
@@ -123,7 +129,7 @@ CALL_S_FUNC **bs;
   }
   lf.y = y; lf.w = w;
   lf.base = b;
-  lf.c = c; lf.xl = lim;
+  lf.c = c;
 
   des.dw = setsvar(&v2,wdes,lw[0]);
   vx.dpr = (double *)iwork; vx.n = n; des.index = &vx;
@@ -133,9 +139,7 @@ CALL_S_FUNC **bs;
   lf.tw   = setsvar(&v1,wtre,lw[1]);
   lf.pc.wk= setsvar(&v3,wpc,lw[3]);
   vi.dpr = (double *)iwork; vi.n = lw[2]-n; lf.iw = &vi;
-  lf.fl = &lim[2*d];
-  lf.mg = mg; lf.sca = sca;
-  lf.mi = mi; lf.dp = dp;
+  lf.mg = mg;
   vL.dpr = L; vL.n = lw[4]; lf.L = &vL;
   lf.nvm = nvc[0];
   setstrval(mi,MKER ,str[0]);
@@ -148,6 +152,11 @@ CALL_S_FUNC **bs;
   for (i=0; i<*nd; i++) lf.deriv[i] = deriv[i]-1;
   if (lf_error) return;
 
+  memcpy(lf.fl,&lim[2*d],2*d*sizeof(double));
+  memcpy(lf.xl ,lim,2*d*sizeof(double));
+  memcpy(lf.sca,sca,d*sizeof(double));
+  memcpy(lf.mi,mi,LENM*sizeof(INT));
+  memcpy(lf.dp,dp,LEND*sizeof(double));
   switch(mi[MGETH])
   { case 0: /* the standard fit */
     case 4: /* for gam.lf, return residuals */
@@ -169,14 +178,26 @@ CALL_S_FUNC **bs;
       return;
     case 6: /* lscv */
       startlf(&des,&lf,procv,1);
-      dlscv(&des,&lf);
+      dens_lscv(&des,&lf);
       return;
+    case 70:
+    case 71: /* scb */
+    case 72:
+    case 73:
+    case 74:
+      scb(&des,&lf);
+      break;
   }
 
   nvc[0] = lf.nvm;
   nvc[1] = lf.ncm;
   nvc[3] = lf.nv;
   nvc[4] = lf.nce;
+  memcpy(mi,lf.mi,LENM*sizeof(INT));
+  memcpy(dp,lf.dp,LEND*sizeof(double));
+  memcpy(&lim[2*d],lf.fl,2*d*sizeof(double));
+  memcpy(lim,      lf.xl,2*d*sizeof(double));
+  memcpy(sca,lf.sca,d*sizeof(double));
 }
 
 void recoef(coef,ce,d,ev,nvc)
@@ -224,11 +245,15 @@ void **bs;
   vxev.dpr = xev; vxev.n = mi[MDIM]*lf.nv; lf.xxev = &vxev;
 
   recoef(coef,ce,mi[MDIM],mi[MEV],nvc);
-  lf.sv = sv;   lf.sca = sca;
+  memcpy(lf.sca,sca,mi[MDIM]*sizeof(double));
+  memcpy(lf.mi,mi,LENM*sizeof(INT));
+  memcpy(lf.dp,dp,LEND*sizeof(double));
+  lf.sv = sv;
   lf.mg = mg;
-  v3.dpr = wpc; v3.n = 0; lf.pc.wk = &v3;
+  v3.dpr = wpc; lf.pc.wk = &v3;
+  v3.n = pc_reqd(mi[MDIM],p);
   pcchk(&lf.pc,mi[MDIM],p,0);
-  lf.pc.xtwx.sm = 1;
+  lf.pc.xtwx.st = JAC_EIGD;
   for (i=0; i<mi[MDIM]; i++) lf.sty[i] = sty[i];
 
   /* set up the data structures right */
@@ -249,7 +274,6 @@ void **bs;
       ERROR(("unknown where in spreplot"));
   }
 
-  lf.dp = dp; lf.mi = mi;
   lf.nd = *nd;
   for (i=0; i<*nd; i++) lf.deriv[i] = deriv[i]-1;
 
@@ -276,33 +300,38 @@ void **bs;
   lf.y = y; lf.w = w; lf.c = c; lf.base = ba;
   vxev.dpr = xev; vxev.n = mi[MDIM]*lf.nv; lf.xxev = &vxev;
   recoef(coef,ce,mi[MDIM],mi[MEV],nvc);
-  lf.sv = sv;   lf.sca = sca;
-  v3.dpr = wpc; v3.n = 0; lf.pc.wk = &v3;
+  memcpy(lf.sca,sca,mi[MDIM]*sizeof(double));
+  memcpy(lf.mi,mi,LENM*sizeof(INT));
+  memcpy(lf.dp,dp,LEND*sizeof(double));
+  lf.sv = sv;
+  v3.dpr = wpc; lf.pc.wk = &v3;
+  v3.n = pc_reqd(mi[MDIM],mi[MP]);
   pcchk(&lf.pc,mi[MDIM],mi[MP],0);
-  lf.pc.xtwx.sm = 1;
-  lf.dp = dp; lf.mi = mi;
+  lf.pc.xtwx.st = JAC_EIGD;
   lf.nd = *nd;
   for (i=0; i<*nd; i++) lf.deriv[i] = deriv[i]-1;
   fitted(&lf,&des,fit,ppwhat(what[0]),*cv,*st,restyp(what[1]));
 }
 
-void triterm(xev,h,ce,lo,hi,sca,nvc,mi,dp,nt,term)
-double *xev, *h, *sca, *dp;
+void triterm(xev,h,ce,lo,hi,sca,nvc,mi,dp,nt,term,box)
+double *xev, *h, *sca, *dp, *box;
 INT *ce, *lo, *hi, *nvc, *mi, *nt, *term;
 { INT d, i, t;
   vari vxev;
   lf_error = 0;
   lf.nv = lf.nvm = nvc[3];
   vxev.dpr = xev; vxev.n = mi[MDIM]*lf.nv; lf.xxev = &vxev;
-  lf.sca = sca;
+  memcpy(lf.sca,sca,mi[MDIM]*sizeof(double));
+  memcpy(lf.mi,mi,LENM*sizeof(INT));
+  memcpy(lf.dp,dp,LEND*sizeof(double));
   lf.h = h;
   lf.ce = ce;
   lf.lo = lo;
   lf.hi = hi;
-  lf.dp = dp; lf.mi = mi; *nt = 0;
+  *nt = 0;
   d = mi[MDIM];
   if (mi[MEV]==ETREE)
-    atree_grow(NULL,&lf,lf.ce,nt,term,xev,&xev[d*((1<<d)-1)],lf.fl);
+    atree_grow(NULL, &lf, lf.ce, nt, term, box, &box[d]);
   else
     for (i=0; i<nvc[4]; i++)
       triang_grow(NULL,&lf,&lf.ce[i*lf.vc],nt,term);

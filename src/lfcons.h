@@ -156,13 +156,13 @@
 */
 #define KSPH   1
 #define KPROD  2
-#define KCE    4
+#define KCE    3
+#define KLM    4
 
-#define STANGL 3
+#define STANGL 4
 #define STLEFT 5
 #define STRIGH 6
 #define STCPAR 7
-#define STUSER 8
 
 /*
   Local likelihood family mi[MTG]
@@ -194,7 +194,6 @@
 #define IPROD 3
 #define IMLIN 4
 #define IHAZD 5
-#define IHARD 6
 #define IMONT 7
 
 /*
@@ -265,7 +264,6 @@
 /*
   return status for the locfit() function
 */
-#define LF_QR   -1
 #define LF_OK   0
 #define LF_OOB  2   /* out of bounds, or large unstable parameter */
 #define LF_PF   3   /* perfect fit; interpolation; deviance=0 */
@@ -278,4 +276,5 @@
 #define LF_FPROB 80
 #define LF_BADP 81  /* bad parameters e.g. neg prob for binomial */
 #define LF_LNK  82  /* invalid link */
+#define LF_FAM  83  /* invalid family */
 #define LF_ERR  99  /* error */

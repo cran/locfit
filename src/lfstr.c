@@ -1,12 +1,11 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  *
  *
  *
- *  strval() function for converting string arguments to Locfit's
- *  numeric values.
- *  a typical call will be setstrval(lf.mi,MKER,"gauss")
+ *  setstrval() is a  function for converting string arguments to Locfit's
+ *    numeric values.  A typical call will be setstrval(lf.mi,MKER,"gauss").
  *
  *  components that can be set in this manner are
  *    MKER  (weight function)
@@ -20,16 +19,18 @@
  *  INT ppwhat(str) interprets the preplot what argument.
  *  INT restyp(str) interprets the residual type argument.
  *
- *  Also includes other misc. string functions.
  */
 
 #include "local.h"
 
-INT stm(u,v,k)
-char *u, *v;
-INT k;
-{ return((strncmp(u,v,k)==0));
-}
+static char *famil[17] =
+  { "density", "ate",   "hazard",    "gaussian", "binomial",
+    "poisson", "gamma", "geometric", "circular", "obust", "huber",
+    "weibull", "cauchy","probab",    "logistic", "nbinomial", "vonmises" };
+static int   fvals[17] = 
+  { TDEN,  TRAT,  THAZ,  TGAUS, TLOGT,
+    TPOIS, TGAMM, TGEOM, TCIRC, TROBT, TROBT,
+    TWEIB, TCAUC, TPROB, TLOGT, TGEOM, TCIRC };
 
 INT lffamily(z)
 char *z;
@@ -40,37 +41,11 @@ char *z;
     robu  |= (z[0]=='r');
     z++;
   }
-  switch(z[0])
-  { /* 'a' and 'o' are for old 'rate' and 'robu'. */
-    case 'a':
-      f = TRAT; robu = 0;
-      break;
-    case 'o':
-      f = TROBT; robu = 0;
-      break;
-    case 'd': f = TDEN; break;
-    case 'h':
-      f = THAZ;
-      if (z[1]=='u') f = TROBT;
-      break;
-    case 'b': f = TLOGT; break;
-    case 'c':
-      f = TCIRC;
-      if (z[1]=='a') f = TCAUC;
-      break;
-    case 'p':
-      f = TPOIS;
-      if (z[1]=='r') f = TPROB;
-      break;
-    case 'w': f = TWEIB; break;
-    case 'g':
-      if (z[1]=='e') f = TGEOM;
-      else
-        f = (stm(z,"gau",3)) ? TGAUS : TGAMM;
-      break;
-    default:
-      WARN(("unknown family %s",z));
-      f = TGAUS;
+  f = pmatch(z,famil,fvals,16,-1);
+  if ((z[0]=='o') | (z[0]=='a')) robu = 0;
+  if (f==-1)
+  { WARN(("unknown family %s",z));
+    f = TGAUS;
   }
   if (quasi) f += 64;
   if (robu)  f += 128;
@@ -83,102 +58,64 @@ INT *x;
 { *x = lffamily(z[0]);
 }
 
+static char *wfuns[13] = {
+  "rectangular", "epanechnikov", "bisquare",    "tricube",
+  "triweight",   "gaussian",     "triangular",  "ququ",
+  "6cub",        "minimax",      "exponential", "maclean", "parametric" };
+static int wvals[13] = { WRECT, WEPAN, WBISQ, WTCUB,
+  WTRWT, WGAUS, WTRIA, WQUQU, W6CUB, WMINM, WEXPL, WMACL, WPARM };
+
+static char *ktype[3] = { "spherical", "product", "center" };
+static int   kvals[3] = { KSPH, KPROD, KCE };
+
+static char *ltype[8] = { "default", "canonical", "identity", "log",
+                          "logi",    "inverse",   "sqrt",     "arcsin" };
+static int   lvals[8] = { LDEFAU, LCANON, LIDENT, LLOG,
+                          LLOGIT, LINVER, LSQRT,  LASIN };
+
+static char *etype[9] = { "tree",     "phull", "data", "grid", "kdtree",
+                          "kdcenter", "cross", "xbar", "none" };
+static int   evals[9] = { ETREE, EPHULL, EDATA, EGRID, EKDTR,
+                          EKDCE, ECROS,  EXBAR, ENONE };
+
+static char *itype[6] = { "default", "multi", "product", "mlinear",
+                          "hazard",  "monte" };
+static int   ivals[6] = { IDEFA, IMULT, IPROD, IMLIN, IHAZD, IMONT };
+
+static char *atype[5] = { "none", "cp", "ici", "mindex", "ok" };
+static int   avals[5] = { ANONE, ACP, AKAT, AMDI, AOK };
+
 void setstrval(mi,v,z)
 INT *mi, v;
 char *z;
-{ switch(v)
+{ 
+  switch(v)
   { case MKER:
-      switch(z[0])
-      { case 'r': mi[v] = WRECT; return;
-        case 'e': mi[v] = (z[1]=='x') ? WEXPL : WEPAN; return;
-        case 'b': mi[v] = WBISQ; return;
-        case 'g': mi[v] = WGAUS; return;
-        case 't': if (z[1]=='r')
-                    mi[v] = (z[2]=='i') ? WTRIA : WTRWT;
-                  else mi[v] = WTCUB;
-                  return;
-        case 'q': mi[v] = WQUQU; return;
-        case '6': mi[v] = W6CUB; return;
-        case 'm': mi[v] = (z[1]=='c') ? WMACL : WMINM;
-                  return;
-        case 'p': mi[v] = WPARM; return;
-      }
-      WARN(("Unknown weight function %s; using default",z));
-      mi[v] = WTCUB;
+      mi[v] = pmatch(z, wfuns, wvals, 13, WTCUB);
       return;
 
     case MKT:
-      switch(z[0])
-      { case 's': mi[v] = KSPH;  return;
-        case 'p': mi[v] = KPROD; return;
-        case 'c': mi[v] = KCE;   return;
-      }
+      mi[v] = pmatch(z, ktype, kvals, 3, KSPH);
+      return;
 
     case MTG:
       mi[v] = lffamily(z);
       return;
 
     case MLINK:
-      switch(z[0])
-      { case 'd' : mi[v] = LDEFAU; return;
-        case 'c' : mi[v] = LCANON; return;
-        case 'i' : mi[v] = (z[1]=='n') ? LINVER : LIDENT; return;
-        case 'l' : if (stm(z,"logi",4)) mi[v] = LLOGIT;
-                                   else mi[v] = LLOG;
-                   return;
-        case 's' : mi[v] = LSQRT; return;
-        case 'a' : mi[v] = LASIN; return;
-      }
-      WARN(("unknown link %s",z));
-      mi[v] = LDEFAU;
+      mi[v] = pmatch(z, ltype, lvals, 8, LDEFAU);
       return;
 
     case MIT:
-      switch(z[0])
-      { case 'p': mi[v] = IPROD; return;
-        case 'd': mi[v] = IDEFA; return;
-        case 'h':
-          mi[v] = IHAZD;
-          if (stm(z,"har",3)) mi[v] = IHARD;
-          return;
-        case 'm':
-          mi[v] = IMULT;
-          if (z[1]=='l') mi[v] = IMLIN;
-#ifdef CVERSION
-          if (z[1]=='o') mi[v] = IMONT;
-#endif
-          return;
-      }
-      WARN(("unknown integration type %s",z));
-      mi[v] = IDEFA;
+      mi[v] = pmatch(z, itype, ivals, 6, IDEFA);
       return;
 
     case MEV:
-      switch(z[0])
-      { case 't': mi[v] = ETREE; return;
-        case 'p': mi[v] = EPHULL;return;
-        case 'd': mi[v] = EDATA; return;
-        case 'g': mi[v] = EGRID; return;
-        case 'k': mi[v] = (stm(z,"kdc",3)) ? EKDCE : EKDTR;
-                  return;
-        case 'c': mi[v] = ECROS; return;
-        case 'x': mi[v] = EXBAR; return;
-        case 'n': mi[v] = ENONE; return;
-      }
-      ERROR(("unknown evaluation structure %s",z));
-      mi[v] = ETREE;
+      mi[v] = pmatch(z, etype, evals, 9, ETREE);
       return;
 
     case MACRI:
-      switch(z[0])
-      { case 'n': mi[v] = ANONE; return;
-        case 'c': mi[v] = ACP; return;
-        case 'i': mi[v] = AKAT;return;
-        case 'm': mi[v] = AMDI;return;
-        case 'o': mi[v] = AOK; return;
-      }
-      WARN(("unknown adaptive criterion %s",z));
-      mi[v] = 0;
+      mi[v] = pmatch(z, atype, avals, 5, ANONE);
       return;
   }
 
@@ -186,37 +123,28 @@ char *z;
   return;
 }
 
+static char *rtype[8] = { "deviance", "d2",    "pearson", "raw",
+                          "ldot",     "lddot", "fit",     "mean" };
+static int   rvals[8] = { RDEV, RDEV2, RPEAR, RRAW, RLDOT, RLDDT, RFIT, RMEAN};
+
+static char *whtyp[8] = { "coef", "nlx", "infl", "band",
+                          "degr", "like", "rdf", "vari" };
+static int   whval[8] = { PCOEF, PNLX, PT0, PBAND, PDEGR, PLIK, PRDF, PVARI };
+
 INT restyp(z)
 char *z;
-{ switch(z[0])
-  { case 'd':
-      if (z[1]=='2') return(RDEV2);
-                else return(RDEV);
-    case 'p': return(RPEAR);
-    case 'r': return(RRAW);
-    case 'l':
-      if ((z[1]=='d') && (z[2]=='d')) return(RLDDT);
-         else return(RLDOT);
-    case 'f': return(RFIT);
-    case 'm': return(RMEAN);
-  }
-  ERROR(("Unknown type= argument"));
-  return(0);
+{ int val;
+  
+  val = pmatch(z, rtype, rvals, 8, -1);
+  if (val==-1) ERROR(("Unknown type = %s",z));
+  return((INT)val);
 }
 
 INT ppwhat(z)
 char *z;
-{
-  switch(z[0])
-  { case 'c': return(PCOEF);
-    case 'n': return(PNLX);
-    case 'i': return(PT0);
-    case 'b': return(PBAND);
-    case 'd': return(PDEGR);
-    case 'l': return(PLIK);
-    case 'r': return(PRDF);
-    case 'v': return(PVARI);
-  }
-  ERROR(("Unknown what= argument"));
-  return(0);
+{ int val;
+  
+  val = pmatch(z, whtyp, whval, 8, -1);
+  if (val==-1) ERROR(("Unknown what = %s",z));
+  return((INT)val);
 }

@@ -18,7 +18,7 @@ Other arguments to the default \code{\link{points}} function.
 }}
 \description{This function shows the points at which the local fit
   was computed directly, rather than being interpolated. This can
-  be useful if one is unsure of the validity of interpolation.
+  be useful if one is unsure of the validity of interpolation.}
 \seealso{
 \code{\link{locfit}}, \code{\link{plot.locfit}}, \code{\link{points}}
 }

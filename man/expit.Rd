@@ -7,13 +7,13 @@ Inverse logistic link function
 expit(x)
 }
 \description{
-  Computes \eqn{e^x/(1+e^x)}{exp(x)/(1+exp(x))}. 
+  Computes \eqn{e^x/(1+e^x)}{\exp(x)/(1+\exp(x))}. 
   This is the inverse of the logistic link function,
-  \eqn{\log(p/(1-p))}{log(p/(1-p))}.
+  \eqn{\log(p/(1-p))}.
 }
 \arguments{
   \item{x}{numeric vector}
 }
 
-\keyword{locfit}
+\keyword{math}
 % Converted by Sd2Rd version 0.2-a5.

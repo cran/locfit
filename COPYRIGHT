@@ -1,15 +1,17 @@
-/*
- * The author of the Locfit software is
- * Catherine Loader, catherine@research.bell-labs.com.
- *
- * Copyright (c) 1996-2000 Lucent Technologies, Bell Laboratories.
- * Permission to use, copy, modify, and distribute this software for any
- * purpose without fee is hereby granted, provided that this entire notice
- * is included in all copies of any software which is or includes a copy
- * or modification of this software and in all copies of the supporting
- * documentation for such software.
- * THIS SOFTWARE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
- * WARRANTY.  IN PARTICULAR, NEITHER THE AUTHOR NOR LUCENT TECHNOLOGIES
- * MAKE ANY REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE
- * MERCHANTABILITY OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
- */
+ The author of the Locfit software is
+ Catherine Loader, catherine@research.bell-labs.com
+                or cathl@optonline.net
+
+ Copyright (c) 1996-2001 Lucent Technologies, Bell Laboratories.
+ Permission to use, copy, modify, and distribute this software for any
+ purpose without fee is hereby granted, provided that this entire notice
+ is included in all copies of any software which is or includes a copy
+ or modification of this software and in all copies of the supporting
+ documentation for such software.
+ THIS SOFTWARE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
+ WARRANTY.  IN PARTICULAR, NEITHER THE AUTHOR NOR LUCENT TECHNOLOGIES
+ MAKE ANY REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE
+ MERCHANTABILITY OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
+
+ SCB (simultaneous confidence bands) code is joint copyright with
+ Jiayang Sun (jiayang@sun.stat.cwru.edu)

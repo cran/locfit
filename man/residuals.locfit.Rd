@@ -31,6 +31,7 @@ If \code{TRUE}, residuals are studentized.
 }
 \description{\code{residuals.locfit} is implemented as a front-end to
   \code{\link{fitted.locfit}}, with the \code{type} argument set.
+}
 \value{
 A numeric vector of the residuals.
 }

@@ -1,9 +1,15 @@
 \name{plotbyfactor}
+\alias{plotbyfactor}
 \title{
 x-y scatterplot, colored by levels of a factor.
 }
 \usage{
 plotbyfactor(x, y, f, data, col, pch, add, lg, \dots)
+}
+\description{
+  Produces a scatter plot of x-y data, with different classes given
+  by a factor f. The different classes are identified by different
+  colours and/or symbols.
 }
 \arguments{
 \item{x}{

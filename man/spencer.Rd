@@ -1,4 +1,5 @@
 \name{spencer}
+\alias{spencer}
 \title{Spencer's Mortality Dataset}
 \usage{data(spencer)}
 \alias{spencer}

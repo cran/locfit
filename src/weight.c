@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  *
  *
@@ -89,6 +89,7 @@ INT hasdi;
   { if ((lf->sty[i]==STLEFT) && (u[i]>0.0)) return(0.0);
     if ((lf->sty[i]==STRIGH) && (u[i]<0.0)) return(0.0);
   }
+  if (h==0) return((di==0.0) ? 1.0 : 0.0);
 
   return(W(di/h,lf->mi[MKER]));
 }
@@ -216,7 +217,7 @@ INT ker;
 double wint(d,j,nj,ker)
 INT d, *j, nj, ker;
 { double I, z;
-  INT k, dj;
+  int k, dj;
   dj = d;
   for (k=0; k<nj; k++) dj += j[k];
   switch(ker) /* int_0^1 u^(dj-1) W(u)du  */
@@ -225,7 +226,7 @@ INT d, *j, nj, ker;
     case WBISQ: I = 8.0/(dj*(dj+2)*(dj+4)); break;
     case WTCUB: I = 162.0/(dj*(dj+3)*(dj+6)*(dj+9)); break;
     case WTRWT: I = 48.0/(dj*(dj+2)*(dj+4)*(dj+6)); break;
-    case WTRIA: I = 1/(dj*(dj+1)); break;
+    case WTRIA: I = 1.0/(dj*(dj+1)); break;
     case WQUQU: I = 384.0/(dj*(dj+2)*(dj+4)*(dj+6)*(dj+8)); break;
     case W6CUB: I = 524880.0/(dj*(dj+3)*(dj+6)*(dj+9)*(dj+12)*(dj+15)*(dj+18)); break;
     case WGAUS: switch(d)

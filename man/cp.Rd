@@ -1,7 +1,7 @@
 \name{cp}
 \alias{cp}
 \title{
-Compute Mallow's Cp for local regression models.
+Compute Mallows' Cp for local regression models.
 }
 \usage{
 cp(x, \dots, sig2=1)
@@ -13,7 +13,8 @@ cp(x, \dots, sig2=1)
   Cp criterion for the fit.
 
   Cp is usually computed using a variance estimate from the largest
-  model under consideration, rather than sig2=1. This will be done
+  model under consideration, rather than
+  \eqn{\sigma^2=1}. This will be done
   automatically when the \code{\link{cpplot}} function is used.
 
   The Cp score is exact (up to numerical roundoff) if the
@@ -22,8 +23,9 @@ cp(x, \dots, sig2=1)
   standard interpolation based approximations.
 }
 \arguments{
-  \item{x}{model formula}
-  \item{...}{other arguments to locfit}
+  \item{x}{model formula or numeric vector of the independent variable.}
+  \item{...}{other arguments to \code{\link{locfit}} and/or
+    \code{\link{locfit.raw}}.}
   \item{sig2}{residual variance estimate.}
 }
 

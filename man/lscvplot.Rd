@@ -6,6 +6,13 @@ Compute the LSCV plot.
 \usage{
 lscvplot(..., alpha)
 }
+\description{
+  The \code{lscvplot} function loops through calls to the \code{\link{lscv}}
+function (and hence to \code{link{locfit}}), using a different
+smoothing parameter for each call.
+The returned structure contains the LSCV statistic for each density
+estimate, and can be used to produce an LSCV plot.
+}
 \arguments{
   \item{...}{ arguments to the \code{\link{lscv}}, \code{\link{locfit}}
      functions.}

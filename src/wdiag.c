@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  *
  *
@@ -18,23 +18,6 @@ static double *wd;
 extern double robscale;
 extern void unitvec();
 
-void hvxtwx(xtwx,v,k) /* (X^T W X)^{-1/2} v */
-xtwxstruc *xtwx;
-double *v;
-INT k;
-{ INT i;
-  switch(xtwx->sm)
-  { case 1: /* eigenvalues on corr matrix */
-      for (i=0; i<xtwx->p; i++) v[i] *= xtwx->dg[i];
-      hsvdsolve(v,xtwx->f2,xtwx->Q,xtwx->Z,xtwx->Q,xtwx->p,1.0e-8);
-      return;
-    case 2: /* chol decomposition of cov matrix */
-      ERROR(("hvxtwx: unavailable for chol. dec"));
-      return;
-  }
-  ERROR(("hvxtwx: unknown method %d",xtwx->sm));
-}
-
 void nnresproj(lf,des,u,m,p,mi)
 lfit *lf;
 design *des;
@@ -45,11 +28,11 @@ INT m, p, *mi;
   setzero(des->f1,p);
   for (j=0; j<m; j++)
   { stdlinks(link,lf,des->ind[j],des->th[j],robscale);
-    for (i=0; i<p; i++) des->f1[i] += link[ZDDLL]*des->X[j*p+i]*u[j];
+    for (i=0; i<p; i++) des->f1[i] += link[ZDDLL]*d_xij(des,j,i)*u[j];
   }
-  vxtwx(&des->xtwx,des->f1,p);
+  jacob_solve(&des->xtwx,des->f1);
   for (i=0; i<m; i++)
-    u[i] -= innerprod(des->f1,&des->X[i*p],p)*des->w[i];
+    u[i] -= innerprod(des->f1,d_xi(des,i),p)*des->w[i];
 }
 
 void wdexpand(l,n,ind,m)
@@ -84,12 +67,12 @@ INT deg, ty, exp;
   deriv = lf->deriv; nd = lf->nd;
   fitfun(lf,des->xev,lf->pc.xbar,des->f1,deriv,nd);
   if (exp)
-  { vxtwx(&lf->pc.xtwx,des->f1,p);
+  { jacob_solve(&lf->pc.xtwx,des->f1);
     for (i=0; i<mi[MN]; i++)
-      lx[i] = innerprod(des->f1,&des->X[i*p],p);
+      lx[i] = innerprod(des->f1,d_xi(des,i),p);
     return(mi[MN]);
   }
-  hvxtwx(&lf->pc.xtwx,des->f1,p);
+  jacob_hsolve(&lf->pc.xtwx,des->f1);
   for (i=0; i<p; i++) lx[i] = des->f1[i];
 
   if (deg>=1)
@@ -97,7 +80,7 @@ INT deg, ty, exp;
     { deriv[nd] = i;
       l1 = &lx[(i+1)*p];
       fitfun(lf,des->xev,lf->pc.xbar,l1,deriv,nd+1);
-      hvxtwx(&lf->pc.xtwx,l1,p);
+      jacob_hsolve(&lf->pc.xtwx,l1);
     }
 
   if (deg>=2)
@@ -107,7 +90,7 @@ INT deg, ty, exp;
       { deriv[nd+1] = j;
         l1 = &lx[(i*mi[MDIM]+j+mi[MDIM]+1)*p];
         fitfun(lf,des->xev,lf->pc.xbar,l1,deriv,nd+2);
-        hvxtwx(&lf->pc.xtwx,l1,p);
+        jacob_hsolve(&lf->pc.xtwx,l1);
     } }
   return(p);
 }
@@ -131,7 +114,7 @@ INT deg, ty, exp;
   mi = lf->mi; h = des->h;
   deriv = lf->deriv; nd = lf->nd;
   wd = des->wd;
-  d = mi[MDIM]; p = des->p; X = des->X;
+  d = mi[MDIM]; p = des->p; X = d_x(des);
   ulx = des->res;
   m = des->n;
   for (i=0; i<d; i++) hs[i] = h*lf->sca[i];
@@ -144,8 +127,7 @@ INT deg, ty, exp;
   } }
   if (nd>0) fitfun(lf,des->xev,des->xev,des->f1,deriv,nd); /* c(0) */
     else unitvec(des->f1,0,p);
-printf("%8.5f %8.5f %8.5f\n",des->f1[0],des->f1[1],des->f1[2]);
-  vxtwx(&des->xtwx,des->f1,p);   /* c(0) (X^TWX)^{-1} */
+  jacob_solve(&des->xtwx,des->f1);   /* c(0) (X^TWX)^{-1} */
   for (i=0; i<m; i++)
   { ii = des->ind[i];
     lx[i] = innerprod(des->f1,&X[i*p],p); /* c(0)(XTWX)^{-1}X^T */
@@ -182,7 +164,7 @@ printf("%8.5f %8.5f %8.5f\n",des->f1[0],des->f1[1],des->f1[2]);
           des->f1[j] -= link[ZDDLL]*lxd[i*m+k]*X[k*p+j];
         /* c'(x)-c(x)(XTWX)^{-1}XTW'X */
       }
-      vxtwx(&des->xtwx,des->f1,p); /* (...)(XTWX)^{-1} */
+      jacob_solve(&des->xtwx,des->f1); /* (...)(XTWX)^{-1} */
       for (j=0; j<m; j++)
         ulx[j] = innerprod(des->f1,&X[j*p],p); /* (...)XT */
       for (j=0; j<d; j++)
@@ -205,7 +187,7 @@ printf("%8.5f %8.5f %8.5f\n",des->f1[0],des->f1[1],des->f1[2]);
     for (i=0; i<d; i++)
     { deriv[nd]=i;
       fitfun(lf,des->xev,des->xev,des->f1,deriv,nd+1);
-      vxtwx(&des->xtwx,des->f1,p);
+      jacob_solve(&des->xtwx,des->f1);
       for (k=0; k<m; k++)
         for (l=0; l<p; l++)
           lxd[i*m+k] += des->f1[l]*X[k*p+l]*des->w[k];
@@ -218,7 +200,7 @@ printf("%8.5f %8.5f %8.5f\n",des->f1[0],des->f1[1],des->f1[2]);
       for (j=0; j<d; j++)
       { deriv[nd+1]=j;
         fitfun(lf,des->xev,des->xev,des->f1,deriv,nd+2);
-        vxtwx(&des->xtwx,des->f1,p);
+        jacob_solve(&des->xtwx,des->f1);
         for (k=0; k<m; k++)
           for (l=0; l<p; l++)
             lxdd[(i*d+j)*m+k] += des->f1[l]*X[k*p+l]*des->w[k];

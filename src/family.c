@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -53,7 +53,7 @@ INT link, family;
   { case TDEN:
     case TRAT:
     case THAZ:
-      return((link==LLOG) | (link==LIDENT) | (link==LSQRT));
+      return((link==LLOG) | (link==LIDENT));
     case TGAUS:
       return((link==LIDENT) | (link==LLOG) | (link==LLOGIT));
     case TROBT:
@@ -473,33 +473,49 @@ double *res, rs;
   res[ZLIK] = sc*sc/2-sc*z;
 }
 
+double lf_link(y,lin)
+double y;
+INT lin;
+{ switch(lin)
+  { case LIDENT: return(y);
+    case LLOG:   return(log(y));
+    case LLOGIT: return(logit(y));
+    case LINVER: return(1/y);
+    case LSQRT:  return(sqrt(fabs(y)));
+    case LASIN:  return(asin(sqrt(y)));
+  }
+  ERROR(("link: unknown link %d",lin));
+  return(0.0);
+}
+
+double invlink(th,lin)
+double th;
+INT lin;
+{ switch(lin)
+  { case LIDENT: return(th);
+    case LLOG:   return(lf_exp(th));
+    case LLOGIT: return(expit(th));
+    case LINVER: return(1/th);
+    case LSQRT:  return(th*fabs(th));
+    case LASIN:  return(sin(th)*sin(th));
+    case LINIT:  return(0.0);
+  }
+  ERROR(("invlink: unknown link %d",lin));
+  return(0.0);
+}
+
 INT links(th,y,fam,lin,res,cd,w,rs) /* the link and various related functions */
 double th, y, *res, w, cd, rs;
 INT fam, lin;
 { double mean;
   INT c, link, st;
   c = (INT)cd; link = (INT)lin;
-  switch(link)
-  { case LIDENT: mean = res[ZMEAN] = th; break; /* mean */
-    case LLOG:   mean = res[ZMEAN] = exp(MIN(th,300)); break;
-    case LLOGIT: mean = res[ZMEAN] = expit(th); break;
-    case LINVER: mean = res[ZMEAN] = 1/th; break;
-    case LSQRT:  mean = res[ZMEAN] = th*fabs(th); break;
-    case LASIN:  mean = sin(th);
-                 mean = res[ZMEAN] =  mean*mean;
-                 break;
-    case LINIT:  mean = 0; break;
-    default:
-      ERROR(("links: unknown link %d",link));
-      return(LF_LNK);
-  }
-  if (w==0) /* necessary to protect cross-validation */
-  { res[ZLIK] = res[ZDLL] = res[ZDDLL] = 0.0;
-    return(LF_OK);
-  }
+
+  mean = res[ZMEAN] = invlink(th,lin);
+  if (lf_error) return(LF_LNK);
+
   switch(fam&63)
-  { case TNUL: return(LF_OK); /* backtr -- need mean only */
-    case THAZ:
+  { case THAZ:
     case TDEN:
     case TRAT: return(famdens(mean,th,link,res,c,w));
     case TGAUS: st = famgaus(y,mean,th,link,res,c,w);
@@ -521,7 +537,7 @@ INT fam, lin;
     case TCAUC: return(famcauc(y,mean,th,link,res,c,w,rs));
     default:
       ERROR(("links: invalid family %d",fam));
-      return(1);
+      return(LF_FAM);
   }
   if (st!=LF_OK) return(st);
   if (link==LINIT) return(st);
@@ -538,4 +554,54 @@ lfit *lf;
 double th, rs, *res;
 INT i;
 { return(links(th,resp(lf,i),lf->mi[MTG],lf->mi[MLINK],res,cens(lf,i),prwt(lf,i),rs));
+}
+
+/*
+ *  functions used in variance, skewness, kurtosis calculations
+ *  in scb corrections.
+ */
+
+double b2(th,tg,w)
+double th, w;
+INT tg;
+{ double y;
+  switch(tg&63)
+  { case TGAUS: return(w);
+    case TPOIS: return(w*lf_exp(th));
+    case TLOGT:
+      y = expit(th);
+      return(w*y*(1-y));
+  }
+  ERROR(("b2: invalid family %d",tg));
+  return(0.0);
+}
+
+double b3(th,tg,w)
+double th, w;
+INT tg;
+{ double y;
+  switch(tg&63)
+  { case TGAUS: return(0.0);
+    case TPOIS: return(w*lf_exp(th));
+    case TLOGT:
+      y = expit(th);
+      return(w*y*(1-y)*(1-2*y));
+  }
+  ERROR(("b3: invalid family %d",tg));
+  return(0.0);
+}
+
+double b4(th,tg,w)
+double th, w;
+INT tg;
+{ double y;
+  switch(tg&63)
+  { case TGAUS: return(0.0);
+    case TPOIS: return(w*lf_exp(th));
+    case TLOGT:
+      y = expit(th); y = y*(1-y);
+      return(w*y*(1-6*y));
+  }
+  ERROR(("b4: invalid family %d",tg));
+  return(0.0);
 }

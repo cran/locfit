@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -217,13 +217,15 @@ lfit *tr;
   double V[MXDIM*MXDIM], P[MXDIM*MXDIM], sigma, z[MXDIM], xa[1+MXDIM], *xev;
   xev = vdptr(tr->xxev);
   d = tr->mi[MDIM]; n = tr->mi[MN]; tr->nv = nc = 0;
-  vc = d+1; nvm = tr->mi[MK]*d; ncm = nvm;
+
+  guessnv(&nvm,&ncm,&vc,tr->dp,tr->mi);
   trchck(tr,nvm,ncm,d,des->p,vc);
+
   ce = tr->ce;
   for (j=0; j<d; j++) xev[j] = tr->pc.xbar[j];
   tr->nv = 1;
   covrofdata(tr,V,tr->pc.xbar); /* fix this with scaling */
-  eigen(V,P,d,tr->mi[MMXIT]);
+  eig_dec(V,P,d);
 
   for (i=0; i<d; i++) /* add vertices +- 2sigma*eigenvect */
   { sigma = sqrt(V[i*(d+1)]);

@@ -6,6 +6,9 @@ Add `locfit' line to existing plot
 \usage{
 lines(x, m, \dots)
 }
+\description{
+Adds a Locfit line to an existing plot.
+}
 \arguments{
 \item{x}{
 \code{"locfit"} object. Should be a model with one predictor.
@@ -20,4 +23,3 @@ Other arguments to the default \code{\link{lines}} function.
 \code{\link{locfit}}, \code{\link{plot.locfit}}, \code{\link{lines}}
 }
 \keyword{locfit}
-% Converted by Sd2Rd version 0.2-a5.

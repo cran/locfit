@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -66,44 +66,6 @@ INT k;
   }
   return(f*exp(-x*x/2)/S2PI);
 }
-
-/*
-double ise(da,h,k,mu,sg,l)
-struct data *da;
-double h, *mu, sg;
-INT k, l;
-{ double i0, i1, i2, z, h2s;
-  INT fact[]={1,1,2,6,24,120,720}, m4[]={1,-4,16,-64,256,-1024},
-      m2[]={1,-2,4,-8,16,-32,64,-128};
-  INT i, j, r, s, n;
-  n = da->n;
-  i0 = 0;
-  for (i=0; i<n; i++)
-    for (j=0; j<n; j++)
-    { z = (da->x[0][i]-da->x[0][j])/(h*SQRT2);
-      for (r=0; r<l; r++)
-        for (s=0; s<l; s++)
-          i0 += dnk(z,2*(r+s))/(fact[s]*fact[r]*m4[s+r]);
-    }
-  i0 /= (n*n*SQRT2*h);
-  i1 = 0;
-  for (i=0; i<n; i++)
-    for (j=0; j<k; j++)
-    { z = (da->x[0][i]-mu[j])/sqrt(sg*sg+h*h);
-      for (s=0; s<l; s++)
-      { h2s = (s==0) ? 1.0 : h2s*h*h/(sg*sg+h*h);
-        i1 += dnk(z,2*s)*h2s/(fact[s]*m2[s]);
-      }
-    }
-  i1 /= n*k*sqrt(sg*sg+h*h);
-  i2 = 0;
-  for (i=0; i<k; i++)
-    for (j=0; j<k; j++)
-      i2 += dnk((mu[i]-mu[j])/(SQRT2*sg),0);
-  i2 /= k*k*SQRT2*sg;
-  return(i0-2*i1+i2);
-}
-*/
 
 double locai(h,des,tr)
 double h;

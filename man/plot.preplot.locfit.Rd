@@ -1,4 +1,5 @@
 \name{plot.preplot.locfit}
+\alias{plot.preplot.locfit}
 \title{
 Plot a "preplot.locfit" object.
 }

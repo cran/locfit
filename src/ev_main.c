@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -8,7 +8,7 @@
 INT cvi=-1;
 
 /*
- * the C version has its own checkvarlen, file src-c/vari.c.
+ * the C version has its own createvar, file src-c/vari.c.
  * For other versions, use the simple function here.
  */
 #ifndef CVERSION
@@ -16,6 +16,7 @@ vari *createvar(name,type,n,mode)
 varname name;
 INT type, n, mode;
 { vari *v;
+printf("creating variable\n");
   v = (vari *)malloc(sizeof(vari));
   vdptr(v) = (double *)calloc( vlength(v)=n ,
               (mode==VDOUBLE) ? sizeof(double) : sizeof(INT));
@@ -24,9 +25,56 @@ INT type, n, mode;
 #endif
 
 /*
+ *  guessnv is used to guess the number of vertices etc in the
+ *  evaluation structure.
+ */
+void guessnv(nvm,ncm,vc,dp,mi)
+double *dp;
+int *nvm, *ncm, *vc, *mi;
+{ switch(mi[MEV])
+  { case ETREE:
+      atree_guessnv(nvm,ncm,vc,dp,mi);
+      return;
+    case EPHULL:
+      *nvm = *ncm = mi[MK]*mi[MDIM];
+      *vc = mi[MDIM]+1;
+      return;
+    case EDATA:
+    case ECROS:
+      *nvm = mi[MN];
+      *ncm = *vc = 0;
+      return;
+    case EKDTR:
+    case EKDCE:
+      kdtre_guessnv(nvm,ncm,vc,dp,mi);
+      return;
+    case EXBAR:
+    case ENONE:
+      *nvm = 1;
+      *ncm = *vc = 0;
+      return;
+    case EPRES:
+      /* preset -- leave everything unchanged. */
+      return;
+    default:
+      ERROR(("guessnv: I don't know this evaluation structure."));
+  }
+  return;
+}
+
+/*
  * trchck checks the working space on the lfit structure 
  * has space for nvm vertices and ncm cells.
  */
+int lfit_reqd(d,nvm,ncm)
+INT d, nvm, ncm;
+{ return(nvm*(3*d+8)+ncm);
+}
+int lfit_reqi(nvm,ncm,vc)
+INT nvm, ncm, vc;
+{ return(ncm*vc+3*MAX(ncm,nvm));
+}
+
 void trchck(tr,nvm,ncm,d,p,vc)
 lfit *tr;
 INT nvm, ncm, d, p, vc;
@@ -36,7 +84,7 @@ INT nvm, ncm, d, p, vc;
   tr->xxev = checkvarlen(tr->xxev,d*nvm,"_lfxev",VDOUBLE);
 
   rw = nvm*(3*d+8)+ncm;
-  tr->tw = checkvarlen(tr->tw,rw,"_lfwork",VDOUBLE);
+  tr->tw = checkvarlen(tr->tw,lfit_reqd(d,nvm,ncm),"_lfwork",VDOUBLE);
   z = (double *)vdptr(tr->tw);
   tr->coef= z; z += nvm*(d+1);
   tr->nlx = z; z += nvm*(d+1);
@@ -48,7 +96,7 @@ INT nvm, ncm, d, p, vc;
   if (z != (double *)vdptr(tr->tw)+rw)
     WARN(("trchck: double assign problem"));
 
-  rw = ncm*vc+3*MAX(ncm,nvm);
+  rw = lfit_reqi(nvm,ncm,vc);
   tr->iw = checkvarlen(tr->iw,rw,"_lfiwork",VINT);
   k = (INT *)vdptr(tr->iw);
   tr->ce = k; k += vc*ncm;
@@ -99,52 +147,62 @@ lfit *lf;
 void dataf(des,lf)
 design *des;
 lfit *lf;
-{ INT d, i, j, nv;
-  nv = lf->mi[MN]; d = lf->mi[MDIM];
+{ INT d, i, j, ncm, nv, vc;
+
+  d = lf->mi[MDIM];
+  guessnv(&nv,&ncm,&vc,lf->dp,lf->mi);
   trchck(lf,nv,0,d,des->p,0);
+
   for (i=0; i<nv; i++)
     for (j=0; j<d; j++) evptx(lf,i,j) = datum(lf,j,i);
   for (i=0; i<nv; i++)
   { des->vfun(des,lf,i);
     lf->s[i] = 0;
   }
-  lf->nv = nv; lf->nce = 0;
+  lf->nv = lf->nvm = nv; lf->nce = 0;
 }
 
 void xbarf(des,lf)
 design *des;
 lfit *lf;
-{ int i, d;
+{ int i, d, nvm, ncm, vc;
   d = lf->mi[MDIM];
-  trchck(lf,1,0,lf->mi[MDIM],des->p,0);
+  guessnv(&nvm,&ncm,&vc,lf->dp,lf->mi);
+  trchck(lf,1,0,d,des->p,0);
   for (i=0; i<d; i++) evptx(lf,0,i) = lf->pc.xbar[i];
   des->vfun(des,lf,0);
   lf->s[0] = 0;
   lf->nv = 1; lf->nce = 0;
 }
 
-void preset(des,tr)
+#ifndef GR
+void preset(des,lf)
 design *des;
-lfit *tr;
+lfit *lf;
 { INT i, nv;
   double *tmp;
-  nv = tr->nvm;
-  tmp = vdptr(tr->xxev);
-  trchck(tr,nv,0,tr->mi[MDIM],des->p,0);
-  tr->xxev->dpr = tmp;
+  nv = lf->nvm;
+  tmp = vdptr(lf->xxev);
+  trchck(lf,nv,0,lf->mi[MDIM],des->p,0);
+  lf->xxev->dpr = tmp;
   for (i=0; i<nv; i++)
-  { des->vfun(des,tr,i);
-    tr->s[i] = 0;
+  { 
+    des->vfun(des,lf,i);
+    lf->s[i] = 0;
   }
-  tr->nv = nv; tr->nce = 0;
+  lf->nv = nv; lf->nce = 0;
 }
+#endif
 
 void crossf(des,lf)
 design *des;
 lfit *lf;
-{ INT d, i, j, n;
+{ INT d, i, j, n, nv, ncm, vc;
+
   n = lf->mi[MN]; d = lf->mi[MDIM];
+  guessnv(&nv,&ncm,&vc,lf->dp,lf->mi);
   trchck(lf,n,0,d,des->p,0);
+
   for (i=0; i<n; i++)
     for (j=0; j<d; j++) evptx(lf,i,j) = datum(lf,j,i);
   for (cvi=0; cvi<n; cvi++)
@@ -158,7 +216,7 @@ lfit *lf;
 void gridf(des,tr)
 design *des;
 lfit *tr;
-{ INT d, i, j, nv, u, z;
+{ INT d, i, j, nv, u0, u1, z;
   nv = 1; d = tr->mi[MDIM];
   for (i=0; i<d; i++)
   { if (tr->mg[i]==0)
@@ -169,9 +227,10 @@ lfit *tr;
   for (i=0; i<nv; i++)
   { z = i;
     for (j=0; j<d; j++)
-    { u = z%tr->mg[j];
+    { u0 = z%tr->mg[j];
+      u1 = tr->mg[j]-1-u0;
       evptx(tr,i,j) = (tr->mg[j]==1) ? tr->fl[j] :
-                      tr->fl[j]+(tr->fl[j+d]-tr->fl[j])*u/(tr->mg[j]-1);
+                      (u1*tr->fl[j]+u0*tr->fl[j+d])/(tr->mg[j]-1);
       z = z/tr->mg[j];
     }
     tr->s[i] = 0;

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -189,7 +189,6 @@ INT what;
   z0 = 0; vc = 1<<d;
   for (j=d-1; j>=0; j--)
   { v[j] = (INT)((tr->mg[j]-1)*(x[j]-ll[j])/(ur[j]-ll[j]));
-    printf("j %2d  mg %2d  v %2d\n",j,tr->mg[j],v[j]);
     if (v[j]<0) v[j]=0;
     if (v[j]>=tr->mg[j]-1) v[j] = tr->mg[j]-2;
     z0 = z0*tr->mg[j]+v[j];
@@ -222,11 +221,9 @@ lfit *lf;
 design *des;
 double *x;
 INT what;
-{ double trc[6], t0;
-  locfit(lf,des,0.0,0);
+{ locfit(lf,des,0.0,0);
   if (what==PCOEF) return(des->cf[0]);
-  ldf(lf,des,trc,0,0,&t0);
-  if ((what==PNLX)|(what==PT0)) return(sqrt(t0));
+  if ((what==PNLX)|(what==PT0)) return(sqrt(comp_infl(lf,des)));
   ERROR(("dointpointpf: invalid what"));
   return(0.0);
 }

@@ -1,22 +1,27 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
+ *
+ *
+ *   Compute minimax weights for local regression.
  */
 
 #include "local.h"
 
-/*
-  Compute minimax weights for local regression.
-*/
+int mmsm_ct;
 
-static double alp[10];
-static int debug;
-#define SINGTOL 1.0e-3
+static int debug=0;
 #define CONVTOL 1.0e-8
+#define SINGTOL 1.0e-10
+#define NR_SINGULAR 100
+
+static lfit *mm_lf;
+static design *mm_des;
+static double mm_gam;
 
 double ipower(x,n) /* use for n not too large!! */
 double x;
-INT n;
+int n;
 { if (n==0) return(1.0);
   if (n<0) return(1/ipower(x,-n));
   return(x*ipower(x,n-1));
@@ -31,119 +36,49 @@ double *a, gam;
   sw = 0.0;
   p = lf->mi[MP];
   for (i=0; i<lf->mi[MN]; i++)
-  { ip = innerprod(a,&des->X[i*p],p);
+  { ip = innerprod(a,d_xi(des,i),p);
     wt = prwt(lf,i);
-    w0 = wt*(ip - gam*des->wd[i]);
-    w1 = wt*(ip + gam*des->wd[i]);
+    w0 = ip - gam*des->wd[i];
+    w1 = ip + gam*des->wd[i];
     des->w[i] = 0.0;
-    if (w0>0) { des->w[i] = w0; sw += w0*w0; }
-    if (w1<0) { des->w[i] = w1; sw += w1*w1; }
+    if (w0>0) { des->w[i] = w0; sw += wt*w0*w0; }
+    if (w1<0) { des->w[i] = w1; sw += wt*w1*w1; }
   }
-if (debug) printf("try: %8.5f %8.5f %8.5f\n",a[0],a[1],sw/2-a[0]);
   return(sw/2-a[0]);
 }
 
 /* compute sum_{w!=0} AA^T; e1-sum wA  */
-INT mmsums(des,lf,z,y) /* y=1: don't decompose jacobian */
-double *z;
-design *des;
-lfit *lf;
-INT y;
-{ INT i, j, p;
+int mmsums(coef,f,z,J)
+double *coef, *f, *z;
+jacobian *J;
+{ int i, j, p, sing;
   double *A;
-  A = des->xtwx.Z;
-  p = lf->mi[MP];
-  for (i=0; i<p*p; i++) A[i] = 0.0;
+
+mmsm_ct++;
+  A = J->Z;
+  *f = setmmwt(mm_des,mm_lf,coef,mm_gam);
+
+  p = mm_lf->mi[MP];
+  setzero(A,p*p);
+  setzero(z,p);
   z[0] = 1.0;
-  for (i=1; i<p; i++) z[i] = 0.0;
 
-  for (i=0; i<lf->mi[MN]; i++)
-    if (des->w[i]!=0.0)
-    { addouter(A,&des->X[i*p],&des->X[i*p],p,1.0);
-      for (j=0; j<p; j++) z[j] -= des->w[i]*des->X[i*p+j];
+  for (i=0; i<mm_lf->mi[MN]; i++)
+    if (mm_des->w[i]!=0.0)
+    { addouter(A,d_xi(mm_des,i),d_xi(mm_des,i),p,prwt(mm_lf,i));
+      for (j=0; j<p; j++) z[j] -= prwt(mm_lf,i)*mm_des->w[i]*mm_des->X[i*p+j];
     }
-  if (y) return(0);
 
-  /* now, decompose. */
-  for (i=0; i<p; i++)
-  { des->xtwx.dg[i] = A[i*p+i];
-    if (des->xtwx.dg[i]>0) des->xtwx.dg[i] = 1/sqrt(A[i*p+i]);
-  }
-  for (i=0; i<p; i++)
-    for (j=0; j<p; j++)
-      A[i*p+j] *= des->xtwx.dg[i]*des->xtwx.dg[j];
-  eigen(A,des->xtwx.Q,p,lf->mi[MMXIT]);
-  des->xtwx.sm = 1;
+  J->st = JAC_RAW;
+  jacob_dec(J,JAC_EIGD);
 
-  /* is it nearly singular? */
-  for (i=0; i<p; i++)
-    if (A[i*p+i]<SINGTOL) return(1);
-  return(0);
-}
+  sing = 0;
+  for (i=0; i<p; i++) sing |= (J->Z[i*p+i]<SINGTOL);
+  if ((debug) & (sing)) printf("SINGULAR!!!!\n");
 
-double updatenr(des,lf,z,p,a,a0,sw0,gam)
-design *des;
-lfit *lf;
-INT p;
-double *z, *a, *a0, sw0, gam;
-{ double f, sw;
-  INT i, done;
-  vxtwx(&des->xtwx,z,p);
-  if (lf_error) return(0.0);
-  done = 0;
-  f = 1.0;
-  while (!done)
-  { for (i=0; i<p; i++) a[i] = alp[i]+f*z[i];
-    sw = setmmwt(des,lf,a,gam);
-    if ((sw==0.0) | (sw>sw0+CONVTOL)) f /= 2.0;
-    else done = 1;
-    if (f<0.000000001)
-    { printf("updatenr failure\n");
-/* printf("z: %8.5f %8.5f\n",z[0],z[1]);
-printf("a0 %8.5f %8.5f  gam %8.5f\n",a0[0],a0[1],gam);
-for (i=0; i<lf->mi[MN]; i++)
-  printf("%2d %8.5f %8.5f\n",i,des->wd[i],des->w[i]); */
-      return(0.0);
-    }
-  }
-  return(sw);
-}
-
-double updatesa(des,lf,z,p,a,a0,sw0,gam)
-design *des;
-lfit *lf;
-int p;
-double *z, *a, *a0, sw0, gam;
-{ double f, sw, c0, c1, lb;
-  INT i, j, done;
-  c0 = c1 = 0.0;
-  for (i=0; i<p; i++) c0 += z[i]*z[i];
-
-  mmsums(des,lf,z,1);
-if (debug) {
-printf("A: %8.5f %8.5f  %8.5f\n",des->xtwx.Z[0],des->xtwx.Z[1],z[0]);
-printf("A: %8.5f %8.5f  %8.5f\n",des->xtwx.Z[2],des->xtwx.Z[3],z[1]);
-}
-  for (i=0; i<p; i++)
-    for (j=0; j<p; j++)
-      c1 += z[i]*des->xtwx.Z[i*p+j]*z[j];
-  lb = c0/c1;
-if (debug) printf("sa: c0 %8.5f c1 %8.5f lb %8.5f\n",c0,c1,lb);
-
-  done = 0;
-  f = 1.0;
-  while (!done)
-  { for (i=0; i<p; i++) a[i] = alp[i]+f*lb*z[i];
-    sw = setmmwt(des,lf,a,gam);
-if (debug) printf("sa: f %8.5f  sw %8.5f\n",f,sw);
-    if ((sw==0.0) | (sw>sw0+CONVTOL)) f /= 2.0;
-    else done = 1;
-    if (f<0.001)
-    { printe("updatesa failure\n");
-      return(0.0);
-    }
-  }
-  return(sw);
+/* printf("%8.5f %8.5f  %8.5f   f %8.5f  z %8.5f %8.5f\n",
+  coef[0],coef[1],mm_gam,*f,z[0],z[1]); */
+  return((sing) ? NR_SINGULAR : NR_OK);
 }
 
 double updatesd(des,lf,z,p,a,a0,sw0,gam)
@@ -163,7 +98,8 @@ if (debug) printf("updatesd\n");
     tmp[sd] = 1.0;
   }
 
-  mmsums(des,lf,z,1);
+  mmsums(a0,&sw,z,&des->xtwx);
+
   c0 = c1 = 0.0;
   for (i=0; i<p; i++)
   { c0 += tmp[i]*z[i];
@@ -201,124 +137,120 @@ if (debug) printf("sdir: c0 %8.5f  c1 %8.5f  z %8.5f %8.5f  tmp %8.5f %8.5f\n",c
   }
 }
 
-double updatea0(des,lf,z,p,a,a0,sw0,gam)
+int mm_initial(des,lf,z,p,coef)
 design *des;
 lfit *lf;
 int p;
-double *z, *a, *a0, sw0, gam;
-{ double alo, ahi, sw, inc, f;
-  int i;
-  for (i=0; i<p; i++) a[i] = a0[i];
-  sw = setmmwt(des,lf,a,gam);
-if (debug) printf("1 a %8.5f  sw %8.5f\n",a[0],sw);
-  if (sw!=sw0) printf("updatea0: start error\n");
-  mmsums(des,lf,z,1);
-  
-  /* z[0] = 1-sum(wi). If +ve, increase a */
-  inc = (z[0]>0) ? 1.0 : -1.0;
-  if (z[0]<0) WARN(("updatea0: z0<0 not implemented"));
-  f = 1.0; alo = a0[0];
-  while(z[0]>0)
-  { a[0] = ahi = a0[0]+f*inc;
-    sw = setmmwt(des,lf,a,gam);
-    mmsums(des,lf,z,1);
-if (debug) printf("2 a %8.5f  sw %8.5f  z %8.5f\n",a[0],sw,z[0]);
+double *z, *coef;
+{ int st;
+  double f;
 
-    if (sw<sw0) sw0 = sw;
-    if (fabs(z[0])<1.0e-8) return(sw); /* bingo! */
-    if (z[0]>0) { f *= 2.0; alo = ahi; }
-  }
-if (debug) printf("alo %8.5f ahi %8.5f\n",alo,ahi);
+  setzero(coef,p);
+  coef[0] = 1;
   while (1)
-  { a[0] = (ahi+alo)/2;
-    sw = setmmwt(des,lf,a,gam);
-    mmsums(des,lf,z,1);
-if (debug) printf("3 a %8.5f  sw %8.5f  z %8.5f\n",a[0],sw,z[0]);
-    if ((sw<sw0+CONVTOL) & (a[0]+sw>0)) return(sw);
-    if (z[0]>0) alo = a[0]; else ahi = a[0];
-  }
+  {
+    st = mmsums(coef,&f,z,&des->xtwx);
+    if (st==NR_OK) return(0);
+    coef[0] *= 2;
+    if (coef[0]>1e8) return(1);
+  } 
 }
 
-double findab(gam,lf,des,a)
-lfit *lf;
-design *des;
-double gam, *a;
-{ double *A, *z, sl, sw, sw0;
-  INT i, j, n, p, sing, done;
-  if (debug) printf("findab: gam = %8.5f\n",gam);
-  n = lf->mi[MN]; p = lf->mi[MP];
-  A = des->xtwx.Z; z = des->f1;
+int mmax(coef, old_coef, f1, delta, J, p, maxit, tol, err)
+double *coef, *old_coef, *f1, *delta, tol;
+int p, maxit, *err;
+jacobian *J;
+{ double f, old_f, lambda;
+  int i, j, fr, sing;
+
+  *err = NR_OK;
+  J->p = p;
+  J->st = JAC_RAW;
+  fr = mmsums(coef,&f,f1,J);
+
+  for (j=0; j<maxit; j++)
+  { memcpy(old_coef,coef,p*sizeof(double));
+    old_f = f;
+
+    /* compute delta = Newton-Raphson increment */
+    /* jacob_dec(J,JAC_EIGD); */
+
+sing = (fr==NR_SINGULAR);
   
-  done = 0;
-  for (i=0; i<p; i++) a[i] = alp[i] = 0.0;
-  sw0 = sw = updatea0(des,lf,z,p,a,alp,0.0,gam);
+    if (fr == NR_SINGULAR)
+    { J->st = JAC_RAW;
+if (j==0) printf("init singular\n");
+      f = updatesd(mm_des,mm_lf,delta,p,coef,old_coef,f,mm_gam);
+        fr = mmsums(coef,&f,f1,J);
+    }
+    else
+    { 
+      jacob_solve(J,f1);
+      memcpy(delta,f1,p*sizeof(double));
+/* printf("delta %8.5f %8.5f\n",f1[0],f1[1]); */
+      lambda = 1.0;
+      do
+      {
+        for (i=0; i<p; i++) coef[i] = old_coef[i] + lambda*delta[i];
+        J->st = JAC_RAW;
+        fr = mmsums(coef,&f,f1,J);
 
-  for (j=0; j<lf->mi[MMXIT]; j++)
-  { /* store initial coefficients */
-    for (i=0; i<p; i++) alp[i] = a[i];
+        lambda = lambda/2.0;
+/* if (fr==NR_SINGULAR) printf("singular\n"); */
+      } while (((lambda>0.000000001) & (f > old_f+0.001)) /* | (fr==NR_SINGULAR) */ );
 
-    /* compute z = Newton-Raphson increment */
-    sing = mmsums(des,lf,z,0);
-    if (debug) printf("sm %2d\n",des->xtwx.sm);
-    if ((debug) & (sing)) printf("SINGULAR!!!!\n");
-    sw0 = sw;
+      if (f>old_f+0.001) { printf("lambda prob\n"); *err = NR_NDIV; return(f); }
 
-    sw = (sing) ? updatesd(des,lf,z,p,a,alp,sw0,gam)
-                : updatenr(des,lf,z,p,a,alp,sw0,gam);
-    if (sw==0.0) return(0.0);
+    }
+    if (f==0.0)
+    { if (sing) printf("final singular - conv\n");
+      return(f);
+    }
 
     if (debug)
-    { for (i=0; i<p; i++) printf("%8.5f ",a[i]);
-      printf(" sw %8.5f\n",sw);
+    { for (i=0; i<p; i++) printf("%8.5f ",coef[i]);
+      printf(" f %8.5f\n",f);
     }
-    for (i=0; i<p; i++) alp[i] = a[i];
-    done = ((j>0) & (fabs(sw-sw0)<CONVTOL));
-    if (done) j = lf->mi[MMXIT];
+
+    if ((j>0) & (fabs(f-old_f)<tol)) return(f);
   }
-  if (!done) { WARN(("findab not converged")); return(0.0); }
+if (sing) printf("final singular\n");
+  WARN(("findab not converged"));
+  *err = NR_NCON;
+  return(f);
+}
+
+double findab(double gam)
+{ double *coef, sl;
+  int i, p, nr_stat;
+
+  mm_gam = gam;
+  p = mm_lf->mi[MP];
+
+  /* starting values for nr iteration */
+  coef = mm_des->cf;
+  for (i=0; i<p; i++) coef[i] = 0.0;
+  if (mm_initial(mm_des, mm_lf, mm_des->f1, p, coef))
+  { WARN(("findab: initial value divergence"));
+    return(0.0);
+  }
+  else
+    mmax(coef, mm_des->oc, mm_des->res, mm_des->f1,
+       &mm_des->xtwx, p, mm_lf->mi[MMXIT], CONVTOL, &nr_stat);
+
+  if (nr_stat != NR_OK) return(0.0);
+
   sl = 0.0;
-  for (i=0; i<n; i++) sl += fabs(des->w[i])*des->wd[i];
-  if (debug) printf("sl = %8.5f\n",sl);
-  return(sl);
+  for (i=0; i<mm_lf->mi[MN]; i++) sl += fabs(mm_des->w[i])*mm_des->wd[i];
+
+  return(sl-gam);
 }
 
-double findgam(lf,des)
-lfit *lf;
-design *des;
-{ double g[5], z[5], *a;
-  INT i, n;
-  n = lf->mi[MN];
-  a = des->xtwx.f2;
-  g[0] = 0.0;
-  a[0] = 1.0/n;
-  for (i=1; i<lf->mi[MP]; i++) a[i] = 0.0;
-  z[0] = findab(g[0],lf,des,a);
-  g[4] = 1.0;
-  z[4] = findab(g[4],lf,des,a);
-  while (z[4]>g[4])
-  { z[0] = z[4]; g[0] = g[4];
-    g[4] *= 2.0;
-    z[4] = findab(g[4],lf,des,a);
-  }
-  g[1] = g[0]; z[1] = z[0];
-  g[2] = g[4]; z[2] = z[4];
-  do
-  { g[3] = g[2] + (g[2]-g[1])*(z[2]-g[2])/(z[1]-g[1]-z[2]+g[2]);
-    if ((g[3]<=g[0]) | (g[3]>=g[4])) g[3] = (g[0]+g[4])/2;
-    z[3] = findab(g[3],lf,des,a);
-    if (z[3]>g[3]) { g[0] = g[3]; z[0] = z[3]; }
-        else { g[4] = g[3]; z[4] = z[3]; }
-    z[1] = z[2]; z[2] = z[3];
-    g[1] = g[2]; g[2] = g[3];
-  } while ((fabs(g[3]-z[3])>0.0000001) & (g[1] != g[2]));
-  return(g[3]);
-}
-
-double weightmm(di,ff,mi,gam)
-double di, *ff, gam;
+double weightmm(coef,di,ff,mi,gam)
+double *coef, di, *ff, gam;
 INT *mi;
 { double y1, y2, ip;
-  ip = innerprod(ff,alp,mi[MP]);
+  ip = innerprod(ff,coef,mi[MP]);
   y1 = ip-gam*di; if (y1>0) return(y1/ip);
   y2 = ip+gam*di; if (y2<0) return(y2/ip);
   return(0.0);
@@ -328,18 +260,37 @@ double minmax(lf,des)
 lfit *lf;
 design *des;
 { double h, u[MXDIM], gam;
-  INT i, j, m, p1;
+  int i, j, m, d1, p1, err_flag;
 
-  p1 = factorial(lf->mi[MDEG]+1);
+mmsm_ct = 0;
+  d1 = lf->mi[MDEG]+1;
+  p1 = factorial(d1);
   for (i=0; i<lf->mi[MN]; i++)
   { for (j=0; j<lf->mi[MDIM]; j++) u[j] = datum(lf,j,i);
-    des->wd[i] = lf->dp[DALP]/p1*ipower(des->di[i],1+lf->mi[MDEG]);
-    fitfun(lf,u,des->xev,&des->X[i*lf->mi[MP]],NULL,(INT)0);
+    des->wd[i] = lf->dp[DALP]/p1*ipower(des->di[i],d1);
+    des->ind[i] = i;
+    fitfun(lf,u,des->xev,d_xi(des,i),NULL,(INT)0);
   }
-  gam = findgam(lf,des);
+  /* designmatrix(lf,des); */
+
+/* find gamma (i.e. solve eqn 13.17 from book), using the secant method.
+ * As a side effect, this finds the other minimax coefficients.
+ * First, set some global pointers a, mm_lf, mm_des.
+ * Note that 13.17 is rewritten as
+ *   g2 = sum |l_i(x)| (||xi-x||^(p+1) M/(s*(p+1)!))
+ * where g2 = gamma * s * (p+1)! / M. The gam variable below is g2.
+ * The smoothing parameter is lf->dp[DALP] == M/s.
+ */
+  mm_lf = lf;
+  mm_des = des;
+  gam = solve_secant(findab, 0.0, 0.0,1.0, 0.0000001, BDF_EXPRIGHT, &err_flag);
+
+/*
+ * Set the smoothing weights, in preparation for the actual fit.
+ */
   h = 0.0; m = 0;
   for (i=0; i<lf->mi[MN]; i++)
-  { des->w[m] = weightmm(des->wd[i],&des->X[i*lf->mi[MP]],lf->mi,gam);
+  { des->w[m] = weightmm(des->cf, des->wd[i],&des->X[i*lf->mi[MP]],lf->mi,gam);
     if (des->w[m]>0)
     { if (des->di[i]>h) h = des->di[i];
       des->ind[m] = i;

@@ -6,6 +6,13 @@ Compute a Cp plot.
 \usage{
 cpplot(..., alpha, sig2)
 }
+\description{
+  The \code{cpplot} function loops through calls to the \code{\link{cp}}
+function (and hence to \code{link{locfit}}), using a different
+smoothing parameter for each call.
+The returned structure contains the Cp statistic for each fit, and can
+be used to produce an AIC plot.
+}
 \arguments{
   \item{...}{ arguments to the \code{\link{cp}}, \code{\link{locfit}}
      functions.}
@@ -17,7 +24,7 @@ cpplot(..., alpha, sig2)
     smoothing parameter.}
   \item{sig2}{ Residual variance. If not specified, the residual variance
     is computed using the fitted model with the fewest residual degrees
-    of freedom.
+    of freedom.}
 }
 
 \value{

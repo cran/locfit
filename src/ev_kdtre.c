@@ -1,14 +1,40 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  *
  *   Routines for building and interpolating the kd tree.
  *   Initially, this started from the loess code.
+ *
+ *   Todo: EKDCE isn't working.
  */
 
 #include "local.h"
 
 void newcell();
+static INT nterm;
+
+void kdtre_guessnv(nvm,ncm,vc,dp,mi)
+double *dp;
+INT *nvm, *ncm, *vc, *mi;
+{ int k;
+  if (mi[MEV] == EKDTR)
+  { nterm = (INT) (dp[DCUT]/4 * mi[MN] * MIN(dp[DALP],1.0) );
+    k = 2*mi[MN]/nterm;
+    *vc = 1<<mi[MDIM];
+    *ncm = 2*k+1;
+    *nvm = (k+2)**vc/2;
+    return;
+  }
+  if (mi[MEV] == EKDCE)
+  { nterm = (INT) (mi[MN] * dp[DALP]);
+    *vc = 1;
+    *nvm = 1+(INT)(2*mi[MN]/nterm);
+    *ncm = 2**nvm+1;
+    return;
+  }
+  *nvm = *ncm = *vc = 0;
+  return;
+}
 
 /*
   Split x[pi[l..r]] into two equal sized sets.
@@ -21,11 +47,11 @@ void newcell();
       If l+r is even, the low set is larger by 1.
     If there are ties, all ties go in the low set.
 */      
-INT ksmall(l, r, m, x, pi)
+int ksmall(l, r, m, x, pi)
 INT l, r, m, *pi;
 double *x;
 {
-  INT il, ir, jl, jr;
+  int il, ir, jl, jr;
   double t;
 
 
@@ -67,6 +93,8 @@ double *x;
     if (m>=ir) l = ir;
     if (m<=il) r = il;
   }
+  if (l==r) return(l);
+  ERROR(("ksmall failure"));
   return(0);
 }
 
@@ -113,23 +141,12 @@ double *split_val;
 void kdtre_start(des,tr)
 design *des;
 lfit *tr;
-{ INT i, j, vc, d, nc, nv, ncm, nvm, k, m, n, p, *pi, fc;
+{ INT i, j, vc, d, nc, nv, ncm, nvm, k, m, n, p, *pi;
   double sv;
   d = tr->mi[MDIM]; n = tr->mi[MN]; pi = des->ind;
-  switch(tr->mi[MEV])
-  { case EKDTR:
-      fc = (INT) (tr->dp[DCUT]/4*n*MIN(tr->dp[DALP],1.0));
-      k = 2*n/fc; vc = 1<<d;
-      ncm = 2*k+1; nvm = (k+2)*vc/2;
-      break;
-    case EKDCE:
-      fc = (INT) (n*tr->dp[DALP]); vc = 1;
-      nvm = 1+(INT)(2*n/fc);
-      ncm = 2*nvm+1;
-      break;
-    default: ERROR(("kdtree: invalid ev"));
-  }
+  kdtre_guessnv(&nvm,&ncm,&vc,tr->dp,tr->mi);
   trchck(tr,nvm,ncm,d,des->p,vc);
+
   nv = 0;
   if (tr->mi[MEV] != EKDCE)
   { for (i=0; i<vc; i++)
@@ -148,7 +165,7 @@ lfit *tr;
   tr->lo[p] = 0; tr->hi[p] = n-1;
   tr->s[p] = -1;
   while (p<nc)
-  { k = terminal(tr,p,pi,fc,d,&m,&sv);
+  { k = terminal(tr,p,pi,nterm,d,&m,&sv);
     if (k>=0)
     {
       if ((ncm<nc+2) | (2*nvm<2*nv+vc))

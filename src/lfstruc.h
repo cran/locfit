@@ -21,6 +21,7 @@ typedef struct {
   INT n, bytes, mode, stat;
   double *dpr; } vari;
 #define checkvarlen(v,n,name,mode) (createvar(name,STSYSTEM,n,mode))
+#define vmode(v) ((v)->mode)
 
 #else
 
@@ -34,7 +35,6 @@ typedef struct {
 #endif
 
 #define vlength(v) ((v)->n)
-#define vdptr(v) ((v)->dpr)
 
 typedef struct {
   char *arg, *val;
@@ -48,30 +48,19 @@ typedef struct {
 } device;
 
 typedef struct {
-  double *Z, *Q, *dg, *f2;
-  INT p, sm; } xtwxstruc;
-
-typedef struct {
   vari *wk;
   double *coef, *xbar, *f;
-  xtwxstruc xtwx; } paramcomp;
-
-typedef struct {
-  vari *dw, *index;
-  double *xev, *X, *w, *di, *res, *th, *wd, h, xb[MXDIM];
-  double *V, *P, *f1, *ss, *oc, *cf, llk;
-  xtwxstruc xtwx;
-  INT *ind, n, p, pref, (*itype)();
-  INT (*vfun)(); } design;
+  jacobian xtwx; } paramcomp;
 
 typedef struct {
   vari *tw, *L, *iw, *xxev;
-  double *x[MXDIM], *y, *w, *base, *c, *xl;
+  double *x[MXDIM], *y, *w, *base, *c;
   double *coef, *nlx, *t0, *lik, *h, *deg;
-  double *sv, *fl, *sca, *dp, kap[3];
+  double *sv, dp[LEND], kap[3];
+  double sca[MXDIM], fl[2*MXDIM], xl[2*MXDIM];
   INT *ce, *s, *lo, *hi, sty[MXDIM];
   INT *mg, nvm, ncm, vc;
-  INT nl, nv, nnl, nce, nk, nn, *mi, ord, deriv[MXDEG+2], nd;
+  INT nl, nv, nnl, nce, nk, nn, mi[LENM], ord, deriv[MXDEG+2], nd;
   paramcomp pc;
   varname yname, xname[MXDIM], wname, bname, cname; } lfit;
 

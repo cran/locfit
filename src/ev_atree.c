@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  *
  *   This file contains functions for constructing and
@@ -13,14 +13,14 @@
   Guess the number of fitting points.
   Needs improving!
 */
-void guessnv(nvm,ncm,dp,mi)
+void atree_guessnv(nvm,ncm,vc,dp,mi)
 double *dp;
-int *nvm, *ncm, *mi;
+INT *nvm, *ncm, *vc, *mi;
 { double a0, cu, ifl;
-  int i, vc, nv, nc;
+  int i, nv, nc;
 
   *ncm = 1<<30; *nvm = 1<<30;
-  vc = 1 << mi[MDIM];
+  *vc = 1 << mi[MDIM];
 
   if (dp[DALP]>0)
   { a0 = (dp[DALP] > 1) ? 1 : 1/dp[DALP];
@@ -30,14 +30,14 @@ int *nvm, *ncm, *mi;
     }
     cu = 1;
     for (i=0; i<mi[MDIM]; i++) cu *= MIN(1.0,dp[DCUT]);
-    nv = (int)((5*a0/cu+1)*vc);  /* this allows 10*a0/cu splits */
+    nv = (int)((5*a0/cu+1)**vc);  /* this allows 10*a0/cu splits */
     nc = (int)(10*a0/cu+1);      /* and 10*a0/cu cells */
     if (nv<*nvm) *nvm = nv;
     if (nc<*ncm) *ncm = nc;
   }
 
   if (*nvm == 1<<30) /* by default, allow 100 splits */
-  { *nvm = 102*vc;
+  { *nvm = 102**vc;
     *ncm = 201;
   }
 
@@ -134,9 +134,8 @@ lfit *lf;
 { INT i, j, vc, d, ncm, nvm, k;
   double ll[MXDIM], ur[MXDIM];
 
-  d = lf->mi[MDIM]; vc = 1<<d;
-
-  guessnv(&nvm,&ncm,lf->dp,lf->mi);
+  d = lf->mi[MDIM];
+  atree_guessnv(&nvm,&ncm,&vc,lf->dp,lf->mi);
   trchck(lf,nvm,ncm,d,des->p,vc);
 
   /* Set the lower left, upper right limits. */

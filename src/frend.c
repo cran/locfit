@@ -1,23 +1,12 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
 #include "local.h"
 
-extern INT ident;
+extern INT cvi;
 extern double robscale;
-
-INT calcp(mi,deg)
-INT *mi, deg;
-{ INT i, k;
-  if (mi[MUBAS]) return(mi[MDEG]);
-
-  if (mi[MKT]==KPROD) return(mi[MDIM]*deg+1);
-  k = 1;
-  for (i=1; i<=deg; i++) k = k*(mi[MDIM]+i)/i;
-  return(k);
-}
 
 double resp(lf,i)
 lfit *lf;
@@ -25,8 +14,6 @@ INT i;
 { if (lf->y==NULL) return(0.0);
   return(lf->y[i]);
 }
-
-extern INT cvi;
 
 double prwt(lf,i)
 lfit *lf;
@@ -50,126 +37,6 @@ INT i;
   return(lf->c[i]);
 }
 
-INT coefnumber(deriv,nd,kt,d,deg)
-INT *deriv, nd, kt, d, deg;
-{ INT d0, d1, t;
-  if (d==1)
-  { if (nd<=deg) return(nd);
-    return(-1);
-  }
-  if (nd==0) return(0);
-  if (deg==0) return(-1);
-  if (nd==1) return(1+deriv[0]);
-  if (deg==1) return(-1);
-  if (kt==KPROD) return(-1);
-  if (nd==2)
-  { d0 = deriv[0]; d1 = deriv[1];
-    if (d0<d1) { t = d0; d0 = d1; d1 = t; }
-    return((d+1)*(d0+1)-d0*(d0+3)/2+d1);
-  }
-  if (deg==2) return(-1);
-  ERROR(("coefnumber not programmed for nd>=3"));
-  return(-1);
-}
-
-void fitfunangl(dx,ff,sca,cd,deg)
-double dx, *ff, sca;
-INT deg, cd;
-{ switch(cd)
-  { case 0:
-      ff[0] = 1;
-      ff[1] = sin(dx/sca)*sca;
-      ff[2] = (1-cos(dx/sca))*sca*sca;
-      if (deg>=3)
-        WARN(("Can't handle angular model with deg>=3"));
-      return;
-    case 1:
-      ff[0] = 0;
-      ff[1] = cos(dx/sca);
-      ff[2] = sin(dx/sca)*sca;
-      return;
-    case 2:
-      ff[0] = 0;
-      ff[1] = -sin(dx/sca)/sca;
-      ff[2] = cos(dx/sca);
-      return;
-    default: WARN(("Can't handle angular model with >2 derivs"));
-  }
-}
-
-/* x is the data point.
-   t is the centre point.
-*/
-void fitfun(lf,x,t,f,der,nd)
-lfit *lf;
-double *x, *t, *f;
-INT *der, nd;
-{ INT d, deg, m, i, j, k, cd[MXDIM];
-  double ff[MXDIM][1+MXDEG], dx[MXDIM];
-
-#ifdef SVERSION
-  if (lf->mi[MUBAS])
-  { basis(x,t,f,lf->mi[MDIM],lf->mi[MP]);
-    return;
-  }
-#endif
-
-  d = lf->mi[MDIM];
-  deg = lf->mi[MDEG];
-  m = 0;
-  f[m++] = (nd==0);
-  if (deg==0) return;
-
-  for (i=0; i<d; i++)
-  { cd[i] = 0;
-    dx[i] = (t==NULL) ? x[i] : x[i]-t[i];
-  }
-  for (i=0; i<nd; i++) cd[der[i]]++;
-
-  for (i=0; i<d; i++)
-  { switch(lf->sty[i])
-    {
-      case STANGL:
-        fitfunangl(dx[i],ff[i],lf->sca[i],cd[i],lf->mi[MDEG]);
-        break;
-      default:
-        for (j=0; j<cd[i]; j++) ff[i][j] = 0.0;
-        ff[i][cd[i]] = 1.0;
-        for (j=cd[i]+1; j<=deg; j++)
-          ff[i][j] = ff[i][j-1]*dx[i]/(j-cd[i]);
-    }
-  }
-
-  for (i=0; i<d; i++) f[m++] = (cd[i]==nd) ? ff[i][1] : 0.0;
-  if (deg==1) return;
-
-  for (i=0; i<d; i++)
-  { f[m++] = (cd[i]==nd) ? ff[i][2] : 0.0;
-    if (lf->mi[MKT]!=KPROD)
-      for (j=i+1; j<d; j++)
-        f[m++] = (cd[i]+cd[j]==nd) ? ff[i][1]*ff[j][1] : 0.0;
-  }
-  if (deg==2) return;
-
-  for (i=0; i<d; i++)
-  { f[m++] = (cd[i]==nd) ? ff[i][3] : 0.0;
-    if (lf->mi[MKT]!=KPROD)
-    { for (k=i+1; k<d; k++)
-        f[m++] = (cd[i]+cd[k]==nd) ? ff[i][2]*ff[k][1] : 0.0;
-      for (j=i+1; j<d; j++)
-      { f[m++] = (cd[i]+cd[j]==nd) ? ff[i][1]*ff[j][2] : 0.0;
-        for (k=j+1; k<d; k++)
-          f[m++] = (cd[i]+cd[j]+cd[k]==nd) ? ff[i][1]*ff[j][1]*ff[k][1] : 0.0;
-  } } }
-  if (deg==3) return;
-
-  if (d==1)
-  { for (i=4; i<=deg; i++) f[m++] = ff[0][i];
-    return;
-  }
-  ERROR(("fitfun: can't handle deg=%d",deg));
-}
-
 double vocri(lk,t0,t2,pen)
 double lk, t0, t2, pen;
 { if (pen==0) return(-2*t0*lk/((t0-t2)*(t0-t2)));
@@ -181,13 +48,13 @@ design *des;
 lfit *lf;
 INT v;
 { INT lf_status;
-  double h;
+  int i;
+  double h, coef[1+MXDIM];
   des->xev = evpt(lf,v);
 
   lf_status = ainitband(des,lf);
-  if (lf_error) return(lf_status);
 
-  switch(lf->mi[MACRI])
+  if (!lf_error) switch(lf->mi[MACRI])
   { case AKAT:
     case ACP:
     case AMDI:
@@ -202,15 +69,26 @@ INT v;
   }
 
   lf->h[v] = des->h;
+  for (i=0; i<des->ncoef; i++) coef[i] = des->cf[cfn(des,i)];
 
-  if (lf_error) return(lf_status);
-  if (lf->mi[MDC]) dercor(lf,des,lf->h[v]);
-  subparcomp(des,lf,v);
+  if (!lf_error)
+  { if (lf->mi[MDC]) dercor(des,lf,coef);
+    subparcomp(des,lf,coef);
+    for (i=0; i<des->ncoef; i++) lf->coef[i*lf->nvm+v] =  coef[i];
+  }
+
   lf->deg[v] = lf->mi[MDEG];
+
   return(lf_status);
 }
 
-void prvsetz(lf,nvm,v,d)
+/*
+ * Set default values for the likelihood e.t.c. This
+ * is called in cases where the optimization for the fit
+ * has failed.
+ */
+
+void set_default_like(lf,nvm,v,d)
 lfit *lf;
 INT nvm, v;
 { INT i;
@@ -225,7 +103,7 @@ design *des;
 lfit *lf;
 INT v;
 { INT d, p, nvm, i, k;
-  double trc[6], t0[1+MXDIM];
+  double trc[6], t0[1+MXDIM], vari[1+MXDIM];
   k = procvraw(des,lf,v);
   if (lf_error) return(k);
    
@@ -241,51 +119,59 @@ INT v;
       WARN(("procv: parameters out of bounds"));
       break;
     case LF_PF:
-      WARN(("procv: perfect fit"));
-      prvsetz(lf,nvm,v,d);
+      if (lf->mi[MDEB]>1) WARN(("procv: perfect fit"));
+      set_default_like(lf,nvm,v,d);
       return(k);
     case LF_NOPT:
       WARN(("procv: no points with non-zero weight"));
-      prvsetz(lf,nvm,v,d);
+      set_default_like(lf,nvm,v,d);
       return(k);
     case LF_INFA:
-      WARN(("procv: initial value problem"));
-      prvsetz(lf,nvm,v,d);
+      if (lf->mi[MDEB]>1) WARN(("procv: initial value problem"));
+      set_default_like(lf,nvm,v,d);
       return(k);
     case LF_DEMP:
       WARN(("procv: density estimate, empty integration region"));
-      prvsetz(lf,nvm,v,d);
+      set_default_like(lf,nvm,v,d);
       return(k);
     case LF_XOOR:
       WARN(("procv: fit point outside xlim region"));
-      prvsetz(lf,nvm,v,d);
+      set_default_like(lf,nvm,v,d);
       return(k);
     case LF_DNOP:
-      WARN(("density estimation -- insufficient points in smoothing window"));
-      prvsetz(lf,nvm,v,d);
+      if (lf->mi[MDEB]>1)
+        WARN(("density estimation -- insufficient points in smoothing window"));
+      set_default_like(lf,nvm,v,d);
       return(k);
     case LF_FPROB:
       WARN(("procv: f problem; likelihood failure"));
-      prvsetz(lf,nvm,v,d);
+      set_default_like(lf,nvm,v,d);
       return(k);
     default:
       WARN(("procv: unknown return code %d",k));
+      set_default_like(lf,nvm,v,d);
       return(k);
   }
 
-  ldf(lf,des,trc,0,lf->mi,t0);
+  comp_vari(lf,des,trc,t0);
   lf->lik[v] = des->llk;
   lf->lik[nvm+v] = trc[2];
   lf->lik[2*nvm+v] = trc[0]-trc[2];
   lf->nlx[v] = sqrt(des->V[0]);
-  lf->t0[v] = sqrt(t0[0]);
-  if (p>1)
-  { if (lf->t0[v]==0)
-      for (i=1; i<=d; i++) lf->t0[i*nvm+v] = 0.0;
-    else
-      for (i=1; i<=d; i++) lf->t0[i*nvm+v] = t0[i]/lf->t0[v];
+
+  for (i=0; i<des->ncoef; i++)
+    vari[i] = des->V[p*cfn(des,0) + cfn(des,i)];
+  vari[0] = sqrt(vari[0]);
+  if (vari[0]>0) for (i=1; i<des->ncoef; i++) vari[i] /= vari[0];
+  t0[0] = sqrt(t0[0]);
+  if (t0[0]>0) for (i=1; i<des->ncoef; i++) t0[i] /= t0[0];
+
+  subparcomp2(des,lf,vari,t0);
+  for (i=0; i<des->ncoef; i++)
+  { lf->nlx[i*lf->nvm+v] = vari[i];
+    lf->t0[i*lf->nvm+v]  = t0[i];
   }
-  subparcomp2(des,lf,v);
+
   return(k);
 }
 
@@ -328,7 +214,7 @@ INT v;
   { mi[MDEG] = i; des->p = mi[MP] = calcp(mi,i);
     k = locfit(lf,des,lf->h[v],0);
 
-    ldf(lf,des,tr,1,lf->mi,NULL);
+    local_df(lf,des,tr);
     gcv = vocri(des->llk,tr[0],tr[2],ap);
     if ((i==mi[MDEG0]) || (gcv<g0)) { i0 = i; g0 = gcv; md = i; }
 
@@ -336,6 +222,7 @@ INT v;
     t2[i] = tr[2];
 
 #ifdef RESEARCH
+printf("variable order\n");
     if ((ip) && (i>mi[MDEG0]))
     { for (j=1; j<10; j++)
       { gcv = intvo(des,lf,coef[i-1],coef[i],j/10.0,des->p,tr[0],t2[i-1],t2[i]);

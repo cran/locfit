@@ -1,4 +1,5 @@
 \name{hatmatrix}
+\alias{hatmatrix}
 \title{
 Weight diagrams and the hat matrix for a local regression model.
 }

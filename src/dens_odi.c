@@ -3,11 +3,17 @@
  *   See README file for details.
  *
  *
-   routines for one-dimensional numerical integration
-   in density estimation. Entry point is
-   onedint(cf,mi,l0,l1,resp)
-   which evaluates int W(u)u^j exp(..), j=0..2*deg.
-   returns in resp vector.
+ *
+ *  Routines for one-dimensional numerical integration
+ *  in density estimation. The entry point is
+ *
+ *  onedint(cf,mi,l0,l1,resp)
+ *
+ *  which evaluates int W(u)u^j exp( P(u) ), j=0..2*deg.
+ *  P(u) = cf[0] + cf[1]u + cf[2]u^2/2 + ... + cf[deg]u^deg/deg!
+ *  l0 and l1 are the integration limits.
+ *  The results are returned through the vector resp.
+ *
  */
 
 #include "local.h"
@@ -56,8 +62,8 @@ double l0, l1, *cf, *I;
 INT p;
 { double y0, y1, f;
   INT j, k, k1;
-  y0 = exp(cf[0]+l0*cf[1]);
-  y1 = exp(cf[0]+l1*cf[1]);
+  y0 = lf_exp(cf[0]+l0*cf[1]);
+  y1 = lf_exp(cf[0]+l1*cf[1]);
   if (p<2*fabs(cf[1])) k = p; else k = (INT)fabs(cf[1]);
 
   if (k>0)
@@ -118,7 +124,7 @@ double *I, *cf, y0, y1, l0, l1;
   d = -cf[1]/(2*cf[2]); c = sqrt(2*fabs(cf[2]));
   a0 = c*(l0-d); a1 = c*(l1-d);
   if (cf[2]<0)
-  { bi = exp(cf[0]+cf[1]*d+cf[2]*d*d)/c;
+  { bi = lf_exp(cf[0]+cf[1]*d+cf[2]*d*d)/c;
     if (a0>0)
     { if (a0>6) I[0] = (y0*ptail(-a0)-y1*ptail(-a1))/c;
       else I[0] = S2PI*(pnorm(-a0,0.0,1.0)-pnorm(-a1,0.0,1.0))*bi;
@@ -148,8 +154,8 @@ if (debug) printf("side: %8.5f %8.5f %8.5f    limt %8.5f %8.5f  p %2d\n",cf[0],c
 
   if (debug) printf("k0 %2d  k1 %2d  k2 %2d  p %2d\n",k0,k1,k2,p);
 
-  y0 = exp(cf[0]+l0*(cf[1]+l0*cf[2]));
-  y1 = exp(cf[0]+l1*(cf[1]+l1*cf[2]));
+  y0 = lf_exp(cf[0]+l0*(cf[1]+l0*cf[2]));
+  y1 = lf_exp(cf[0]+l1*(cf[1]+l1*cf[2]));
   initi0i1(I,cf,y0,y1,l0,l1);
 if (debug) printf("i0 %8.5f  i1 %8.5f\n",I[0],I[1]);
 
@@ -188,8 +194,8 @@ double l0, l1, *cf, *I;
 INT p;
 { INT k, km;
   double y0, y1;
-  y0 = exp(cf[0]+l0*(cf[1]+cf[2]*l0));
-  y1 = exp(cf[0]+l1*(cf[1]+cf[2]*l1));
+  y0 = lf_exp(cf[0]+l0*(cf[1]+cf[2]*l0));
+  y1 = lf_exp(cf[0]+l1*(cf[1]+cf[2]*l1));
   km = p+10;
   for (k=0; k<=km; k++)
   { y1 *= l1; y0 *= l0;
@@ -206,8 +212,8 @@ INT p;
 { double y0, y1, f1, f2, f, ml2;
   INT k, ks;
 
-  y0 = exp(cf[0]+l0*l0*cf[2]);
-  y1 = exp(cf[0]+l1*l1*cf[2]);
+  y0 = lf_exp(cf[0]+l0*l0*cf[2]);
+  y1 = lf_exp(cf[0]+l1*l1*cf[2]);
   initi0i1(I,cf,y0,y1,l0,l1);
 
   ml2 = MAX(l0*l0,l1*l1);
@@ -257,8 +263,8 @@ INT p;
 { double y0, y1;
   INT k, ks, km;
 
-  y0 = exp(cf[0]+l0*(cf[1]+l0*cf[2]));
-  y1 = exp(cf[0]+l1*(cf[1]+l1*cf[2]));
+  y0 = lf_exp(cf[0]+l0*(cf[1]+l0*cf[2]));
+  y1 = lf_exp(cf[0]+l1*(cf[1]+l1*cf[2]));
   initi0i1(I,cf,y0,y1,l0,l1);
 
   ks = (INT)(3*fabs(cf[2]));
@@ -457,7 +463,7 @@ INT *mi;
 INT onedint(cf,mi,l0,l1,resp) /* int W(u)u^j exp(..), j=0..2*deg */
 double *cf, l0, l1, *resp;
 INT *mi;
-{ double d, u, y, ncf[4], rr[5];
+{ double u, uj, y, ncf[4], rr[5];
   INT deg, i, j;
 if (debug) printf("onedint: %f %f %f   %f %f\n",cf[0],cf[1],cf[2],l0,l1);
   deg = mi[MDEG];
@@ -486,12 +492,14 @@ if (debug) printf("onedint: %f %f %f   %f %f\n",cf[0],cf[1],cf[2],l0,l1);
     return(LF_OK);
   }
 
+  /* For degree >= 3, we use Simpson's rule. */
+  for (j=0; j<=2*deg; j++) resp[j] = 0.0;
   for (i=0; i<=mi[MMINT]; i++)
   { u = l0+(l1-l0)*i/mi[MMINT];
-    y = 0; d = 1;
-    for (j=0; j<=deg; j++)
-    { y += cf[j]*d;
-      d *= u/(j+1);
+    y = cf[0]; uj = 1;
+    for (j=1; j<=deg; j++)
+    { uj *= u;
+      y += cf[j]*uj/fact[j];
     }
     y = (4-2*(i%2==0)-(i==0)-(i==mi[MMINT])) *
           W(fabs(u),mi[MKER])*exp(MIN(y,300.0));

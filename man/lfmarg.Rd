@@ -1,4 +1,5 @@
 \name{lfmarg}
+\alias{lfmarg}
 \title{
 Generate grid margins.
 }

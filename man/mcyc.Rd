@@ -1,7 +1,7 @@
 \name{mcyc}
+\alias{mcyc}
 \title{Acc(De?)celeration of a Motorcycle Hitting a Wall}
 \usage{data(mcyc)}
-\alias{mcyc}
 \format{
   Data frame with time and accel variables.
 }

@@ -1,19 +1,19 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
+ * 
+ *
+ * functions for computing and subtracting, adding the
+ * parametric component
  */
-
-/* functions for computing and subtracting, adding the
-   parametric component
-*/
 
 #include "local.h"
 
 INT noparcomp(lf)
 lfit *lf;
 { INT tg;
-  if (lf->sty[0]==STUSER) return(1);
   if (lf->mi[MDEG0]<lf->mi[MDEG]) return(1);
+  if (lf->mi[MUBAS]) return(1);
   tg = lf->mi[MTG] & 63;
   if (tg<=THAZ) return(1);
   if (tg==TROBT) return(1);
@@ -26,9 +26,9 @@ lfit *lf;
 { return(lf->mi[MPC]);
 }
 
-INT lenpc(d,p,lc)
-INT d, p, lc;
-{ return((lc) ? d + 4*p + 2*p*p : 0);
+int pc_reqd(d,p)
+INT d, p;
+{ return(d + 2*p + jac_reqd(p));
 }
 
 void pcchk(pc,d,p,lc)
@@ -36,17 +36,15 @@ paramcomp *pc;
 INT d, p, lc;
 { INT k;
   double *z;
-  pc->wk = checkvarlen(pc->wk,lenpc(d,p,lc),"_pcwork",VDOUBLE);
+  pc->wk = checkvarlen(pc->wk,pc_reqd(d,p),"_pcwork",VDOUBLE);
   z = vdptr(pc->wk);
   k = 0;
-  pc->xbar = &z[k]; k = k+d;
-  pc->coef = &z[k]; k = k+p;
-  pc->f    = &z[k]; k = k+p;
 
-  pc->xtwx.Z = &z[k]; k += p*p;
-  pc->xtwx.Q = &z[k]; k += p*p;
-  pc->xtwx.dg = &z[k]; k += p;
-  pc->xtwx.f2 = &z[k]; k += p;
+  pc->xbar = z; z += d;
+  pc->coef = z; z += p;
+  pc->f    = z; z += p;
+
+  z = jac_alloc(&pc->xtwx,p,z);
   pc->xtwx.p = p;
 }
 
@@ -62,7 +60,8 @@ INT nopc;
   for (i=0; i<lf->mi[MDIM]; i++) pc->xbar[i] = 0.0;
   sw = 0.0;
   for (i=0; i<lf->mi[MN]; i++)
-  { wt = prwt(lf,i);
+  { 
+    wt = prwt(lf,i);
     sw += wt;
     for (j=0; j<lf->mi[MDIM]; j++)
       pc->xbar[j] += datum(lf,j,i)*wt;
@@ -97,13 +96,14 @@ INT nopc;
       for (i=0; i<lf->mi[MP]; i++)
       { pc->coef[i] = des->cf[i];
         pc->xtwx.dg[i] = des->xtwx.dg[i];
-        pc->xtwx.f2[i] = des->xtwx.f2[i];
+        pc->xtwx.wk[i] = des->xtwx.wk[i];
       }
       for (i=0; i<lf->mi[MP]*lf->mi[MP]; i++)
       { pc->xtwx.Z[i] = des->xtwx.Z[i];
         pc->xtwx.Q[i] = des->xtwx.Q[i];
       }
       pc->xtwx.sm = des->xtwx.sm;
+      pc->xtwx.st = des->xtwx.st;
       return;
     default:
       ERROR(("compparcomp: locfit unknown return status %d",k));
@@ -111,93 +111,67 @@ INT nopc;
   }
 }
 
-void subparcomp(des,lf,v)
+void subparcomp(des,lf,coef)
 design *des;
 lfit *lf;
-{ double coef[1+MXDIM];
-  INT d, deg, i, *deriv, nd, ncoef, *mi;
+double *coef;
+{ INT i, *deriv, nd;
 
-  mi = lf->mi;
-  deg = mi[MDEG];
-  d = mi[MDIM];
+  if (!hasparcomp(lf)) return;
+
   deriv = lf->deriv;
   nd = lf->nd;
-  ncoef = 1+d*(deg>nd);
+  fitfun(lf,des->xev,lf->pc.xbar,des->f1,deriv,nd);
+  coef[0] -= innerprod(lf->pc.coef,des->f1,lf->mi[MP]);
+  if (des->ncoef == 1) return;
 
-  coef[0] = des->cf[coefnumber(deriv,nd,mi[MKT],d,deg)];
-  for (i=0; i<d; i++)
+  for (i=0; i<lf->mi[MDIM]; i++)
   { deriv[nd] = i;
-    coef[i+1] = des->cf[coefnumber(deriv,nd+1,mi[MKT],d,deg)];
+    fitfun(lf,des->xev,lf->pc.xbar,des->f1,deriv,nd+1);
+    coef[i+1] -= innerprod(lf->pc.coef,des->f1,lf->mi[MP]);
   }
-
-  if (hasparcomp(lf)) /* subtract parametric component */
-  { fitfun(lf,evpt(lf,v),lf->pc.xbar,des->f1,deriv,nd);
-    coef[0] -= innerprod(lf->pc.coef,des->f1,lf->mi[MP]);
-    if (deg>0)
-      for (i=0; i<d; i++)
-      { deriv[nd] = i;
-        fitfun(lf,evpt(lf,v),lf->pc.xbar,des->f1,deriv,nd+1);
-        coef[i+1] -= innerprod(lf->pc.coef,des->f1,lf->mi[MP]);
-      }
-  }
-
-  /* store coefficients in lf->coef */
-  for (i=0; i<ncoef; i++)
-    lf->coef[i*lf->nvm+v] = coef[i];
 }
 
-void subparcomp2(des,lf,v)
+void subparcomp2(des,lf,vr,il)
 design *des;
 lfit *lf;
-{ double *coef, vcoef[1+MXDIM], t0, t1;
-  INT d, deg, i, *deriv, nd, ncoef, *mi;
+double *vr, *il;
+{ double t0, t1;
+  INT i, *deriv, nd, *mi;
+
+  if (!hasparcomp(lf)) return;
 
   mi = lf->mi;
-  deg = mi[MDEG];
-  d = mi[MDIM];
   deriv = lf->deriv;
   nd = lf->nd;
-  ncoef = 1+d*(deg>nd);
+  fitfun(lf,des->xev,lf->pc.xbar,des->f1,deriv,nd);
+  for (i=0; i<mi[MP]; i++) lf->pc.f[i] = des->f1[i];
+  jacob_solve(&lf->pc.xtwx,des->f1);
+  t0 = sqrt(innerprod(lf->pc.f,des->f1,mi[MP]));
+  vr[0] -= t0;
+  il[0] -= t0;
+  if ((t0==0) | (des->ncoef==1)) return;
 
-  coef = &des->V[mi[MP]*coefnumber(deriv,nd,mi[MKT],d,deg)];
-  vcoef[0] = sqrt(coef[coefnumber(deriv,nd,mi[MKT],d,deg)]);
-  if (vcoef[0]==0.0)
-    for (i=0; i<d; i++) vcoef[i] = 0.0;
-  else
-    for (i=0; i<d; i++)
-    { deriv[nd] = i;
-      vcoef[i+1] = coef[coefnumber(deriv,nd+1,mi[MKT],d,deg)]/vcoef[0];
-    }
-
-  if (hasparcomp(lf))
-  { fitfun(lf,evpt(lf,v),lf->pc.xbar,des->f1,deriv,nd);
-    for (i=0; i<mi[MP]; i++) lf->pc.f[i] = des->f1[i];
-    vxtwx(&lf->pc.xtwx,des->f1,mi[MP]);
-    t0 = sqrt(innerprod(lf->pc.f,des->f1,mi[MP]));
-    vcoef[0] -= t0;
-    lf->t0[v]  -= t0;
-    if ((deg>0) && (t0>0))
-      for (i=0; i<d; i++)
-      { deriv[nd] = i;
-        fitfun(lf,evpt(lf,v),lf->pc.xbar,lf->pc.f,deriv,nd+1);
-        t1 = innerprod(lf->pc.f,des->f1,mi[MP])/t0;
-        vcoef[i+1] -= t1;
-        lf->t0[(i+1)*lf->nvm+v]  -= t1;
-      }
+  for (i=0; i<mi[MDIM]; i++)
+  { deriv[nd] = i;
+    fitfun(lf,des->xev,lf->pc.xbar,lf->pc.f,deriv,nd+1);
+    t1 = innerprod(lf->pc.f,des->f1,mi[MP])/t0;
+    vr[i+1] -= t1;
+    il[i+1] -= t1;
   }
-
-  /* store coefficients in lf->nlx */
-  for (i=0; i<ncoef; i++)
-    lf->nlx[i*lf->nvm+v] = vcoef[i];
 }
 
 double addparcomp(lf,x,c)
 lfit *lf;
 double *x;
 int c;
-{ if (!hasparcomp(lf)) return(0.0);
+{ double y;
+  if (!hasparcomp(lf)) return(0.0);
   fitfun(lf,x,lf->pc.xbar,lf->pc.f,lf->deriv,lf->nd);
   if (c==PCOEF) return(innerprod(lf->pc.coef,lf->pc.f,lf->mi[MP]));
-  if ((c==PNLX)|(c==PT0)|(c==PVARI)) return(sqrt(vxtwxv(&lf->pc.xtwx,lf->pc.f)));
+  if ((c==PNLX)|(c==PT0)|(c==PVARI))
+  { y = sqrt(jacob_qf(&lf->pc.xtwx,lf->pc.f));
+    return(y);
+  }
   return(0.0);
 }

@@ -1,6 +1,8 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
- *   See README file for details.
+ *   Copyright (c) 1996-2001 Jiayang Sun, Catherine Loader.
+ *   This file is used by the simultaneous confidence band
+ *   additions to Locfit.
+ *
  */
 
 #include "local.h"
@@ -165,8 +167,8 @@ double *kap;
   mi = lf->mi;
   d = mi[MDIM];
   if (lf_error) return(0);
-  if ((ident!=1) && (lf->dp[DALP]>0))
-    WARN(("constants only work right for fixed h"));
+  if ((lf->mi[MKER] != WPARM) && (lf->dp[DALP]>0))
+    WARN(("constants are approximate for varying h"));
   mi[MP] = calcp(mi,mi[MDEG]);
   deschk(des,mi[MN],mi[MP]);
   preproc(des,lf,mi[MKER]!=WPARM);
@@ -207,7 +209,8 @@ double *kap;
 #endif
 
   while(1)
-  { wt = 1;
+  {
+    wt = 1;
     for (i=0; i<d; i++)
       wt *= (4-2*(index[i]%2==0)-(index[i]==0)-(index[i]==mi[MMINT]));
     if ((mi[MKER]!=WPARM) | (!hasparcomp(lf)))
@@ -260,6 +263,7 @@ double *kap;
       }
       else i = d;
     }
+
   }
 }
 

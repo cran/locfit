@@ -6,12 +6,20 @@ Fitted values for a `"locfit"' object.
 \usage{
 fitted(object, data, what="coef", cv=F, studentize=F, type="fit", tr)
 }
+\description{Evaluates the fitted values (i.e. evaluates the surface
+  at the original data points) for a Locfit object. This function works
+  by reconstructing the model matrix from the original formula, and
+  predicting at those points. The function may be fooled; for example,
+  if the original data frame has changed since the fit, or if the
+  model formula includes calls to random number generators.}
 \arguments{
 \item{object}{
 \code{"locfit"} object.
 }
 \item{data}{
-The data frame for the original fit. Usually, shouldn't be needed.
+The data frame for the original fit. Usually, this shouldn't be needed,
+especially when the function is called directly. It may be needed
+when called inside another function.
 }
 \item{what}{
 What to compute fitted values of. The default, \code{what="coef"}, works
@@ -45,5 +53,10 @@ Back transformation for likelihood models.
 \value{
 A numeric vector of the fitted values.
 }
-\keyword{locfit}
+\seealso{
+  \code{locfit},
+  \code{predict.locfit},
+  \code{residuals.locfit}
+}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

@@ -34,5 +34,6 @@ aic(x, \dots, pen=2)
   \code{\link{aicplot}}
 }
 
-\keyword{locfit}
+\keyword{smooth}
+\keyword{htest}
 % Converted by Sd2Rd version 0.2-a5.

@@ -6,10 +6,14 @@ Produce a cross-validation plot.
 \usage{
 plot.gcvplot(x,...)
 }
+\description{
+Plots the value of the GCV (or other statistic) in a \code{gcvplot} object
+against the degrees of freedom of the fit.
+}
 \arguments{
   \item{x}{ A "gcvplot" object, produced by \code{\link{gcvplot}},
-     \code{\link{aicplot}} etc.
-  \item{...}{ Other arguments to \code{\link{plot}} .} 
+     \code{\link{aicplot}} etc.}
+  \item{...}{ Other arguments to \code{\link{plot}} .}
 }
 
 \examples{
@@ -27,5 +31,4 @@ plot(gcvplot(NOx~E,data=ethanol,alpha=seq(0.2,1.0,by=0.05)))
   \code{\link{lcvplot}}
 }
 
-\keyword{locfit}
-% Converted by Sd2Rd version 0.2-a5.
+\keyword{methods}

@@ -1,10 +1,13 @@
 \name{summary.locfit}
 \alias{summary.locfit}
 \title{
-Prints a short summary of a "locfit" object.
+Print method for a locfit object.
 }
 \usage{
 summary(object, \dots)
+}
+\description{
+Prints a short summary of a \code{"locfit"} object.
 }
 \arguments{
 \item{object}{

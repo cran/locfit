@@ -1,4 +1,5 @@
 \name{plot.locfit}
+\alias{plot.locfit}
 \title{
 Plot an object of class locfit.
 }

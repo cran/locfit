@@ -6,6 +6,20 @@ Prediction from a Locfit object.
 \usage{
 predict(object, newdata, se.fit=F, \dots)
 }
+\description{
+  The \code{\link{locfit}} function computes a local fit at a selected set
+of points (as defined by the \code{ev} argument). The \code{predict.locfit}
+function is used to interpolate from these points to any other points.
+The method is based on cubic hermite polynomial interpolation, using the
+estimates and local slopes at each fit point.
+
+  The motivation for this two-step procedure is computational speed.
+Depending on the sample size, dimension and fitting procedure, the
+local fitting method can be expensive, and it is desirable to keep the
+number of points at which the direct fit is computed to a minimum.
+The interpolation method used by \code{predict.locfit()} is usually
+much faster, and can be computed at larger numbers of points.
+}
 \arguments{
 \item{object}{
 Fitted object from \code{\link{locfit}()}.
@@ -31,4 +45,3 @@ fit <- locfit(NOx~E,data=ethanol)
 predict(fit,c(0.6,0.8,1.0))
 }
 \keyword{locfit}
-% Converted by Sd2Rd version 0.2-a5.

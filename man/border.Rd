@@ -1,7 +1,7 @@
 \name{border}
+\alias{border}
 \title{Cricket Batting Dataset}
 \usage{data(border)}
-\alias{border}
 \format{
   A dataframe with day (decimalized); not out indicator and score.
   The not out indicator should be used as a censoring data.

@@ -1,7 +1,7 @@
 \name{ais}
+\alias{ais}
 \title{Australian Institute of Sport Dataset}
 \usage{data(ais)}
-\alias{ais}
 \format{
   A dataframe.
 }

@@ -1,4 +1,5 @@
 \name{plot.locfit.1d}
+\alias{plot.locfit.1d}
 \title{
 Plot a one dimensional "preplot.locfit" object.
 }

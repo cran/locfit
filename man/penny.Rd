@@ -1,7 +1,7 @@
 \name{penny}
+\alias{penny}
 \title{Penny Thickness Dataset}
 \usage{data(penny)}
-\alias{penny}
 \format{
   A dataframe.
 }

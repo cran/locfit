@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -89,7 +89,8 @@ double x, df;
   factor = exp(df*log(x) - x - LGAMMA(df));
 
   if (x > 1.0 && x >= df)
-  { pn[0] = 0.0;
+  {
+    pn[0] = 0.0;
     pn[2] = pn[1] = 1.0;
     pn[3] = x;
     count = 1;

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1998-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
  * 
  *
@@ -8,6 +8,9 @@
  *
  *
  */
+
+#ifndef I_LF_H
+#define I_LF_H
 
 #define RVERSION
 
@@ -61,6 +64,8 @@
    Usually this only makes a difference on 64 bit systems.
 */
 
+#ifndef SWINVERSION
+
 #ifdef RVERSION
 typedef int INT;
 #else
@@ -68,8 +73,10 @@ typedef int INT;
 typedef long int INT;
 #else
 typedef int INT;
-#endif
-#endif
+#endif /* SVERSION */
+#endif /* RVERSION */
+
+#endif /* SWINVERSION */
 
 /******** NOTHING BELOW HERE NEEDS CHANGING **********/
 
@@ -79,14 +86,21 @@ typedef int INT;
 #include <math.h>
 
 #ifdef RVERSION
-# undef LGAMMA
-# define LGAMMA(arg) Rf_lgammafn(arg)
-extern double LGAMMA(double);
-# define SVERSION
+#undef LGAMMA
+#define LGAMMA(arg) Rf_lgammafn(arg)
+extern double Rf_lgammafn();
+#define SVERSION
 #endif
 
+#ifdef SWINVERSION
+#define SVERSION
+#include "newredef.h"
+#endif
+
+#include "mutil.h"
 #include "lfcons.h"
 #include "lfstruc.h"
+#include "design.h"
 #include "lffuns.h"
 
 #ifdef CVERSION
@@ -111,8 +125,6 @@ extern int printe(const char *format, ...);
 #define MIN(a,b) (((a)<(b)) ? (a) : (b))
 #define SGN(x) (((x)>0) ? 1 : -1)
 #define SQR(x) ((x)*(x))
-#define FSWAP(a,b) { double zz; zz = a; a = b; b = zz; }
-#define ISWAP(a,b) { INT zz; zz = a; a = b; b = zz; }
 #define NOSLN 0.1278433
 #define GFACT 2.5
 #define EFACT 3.0
@@ -120,4 +132,11 @@ extern int printe(const char *format, ...);
 #define MAXCOLOR 20
 #define MAXWIN 5
 
+#ifdef SWINVERSION
+#define ISWAP(a,b) { int zz; zz = a; a = b; b = zz; }
+#else
+#define ISWAP(a,b) { INT zz; zz = a; a = b; b = zz; }
 extern INT lf_error;
+#endif
+
+#endif /* I_LF_H */

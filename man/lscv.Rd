@@ -4,7 +4,7 @@
 Least Squares Cross Validation Statistic.
 }
 \usage{
-lscv(x, \dots,en=2)
+lscv(x, \dots, exact=F)
 }
 \description{
   The calling sequence for \code{lscv} matches those for the
@@ -13,18 +13,34 @@ lscv(x, \dots,en=2)
   in one dimension. The returned object contains the
   least squares cross validation score for the fit.
 
-  The computation of \(\int \hat f(x)^2 dx\) is performed numerically.
+  The computation of \eqn{\int \hat f(x)^2 dx} is performed numerically.
   For kernel density estimation, this is unlikely to agree exactly
-  with other LSCV routines, which may perform the integrtion analytically.
+  with other LSCV routines, which may perform the integration analytically.
 }
 \arguments{
-  \item{x}{model formula}
-  \item{...}{other arguments to locfit}
+  \item{x}{model formula (or numeric vector, if \code{exact=T})}
+  \item{...}{other arguments to \code{\link{locfit}} or
+    \code{\link{lscv.exact}} }
+  \item{exact}{By default, the computation is approximate.
+    If \code{exact=TRUE}, exact computation using
+    \code{\link{lscv.exact}} is performed. This uses kernel density estimation
+    with a constant bandwidth.}
 }
-
+\value{
+  A vector consisting of the LSCV statistic and fitted degrees of freedom.
+}
+\examples{
+# approximate calculation for a kernel density estimate
+data(geyser)
+lscv(~geyser, alpha=cbind(0,1), ev="grid", mg=100, deg=0,
+  flim=c(1,6), kern="gauss")
+# same computation, exact
+lscv(geyser,alpha=1,exact=T)
+}
 \seealso{
   \code{\link{locfit}},
   \code{\link{locfit.raw}},
+  \code{\link{lscv.exact}}
   \code{\link{lscvplot}}
 }
 
