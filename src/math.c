@@ -1,9 +1,8 @@
 /*
- *   Copyright (c) 1998-1999 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
- */
-
-/*
+ *
+ *
   miscellaneous functions that may not be defined in the math
   libraries. The implementations are crude.
   lflgamma(x) -- log(gamma(x))
@@ -17,7 +16,7 @@
   ptail(x)    -- exp(x*x/2)*int_{-\infty}^x exp(-u^2/2)du for x < -6.
   logit(x)    -- logistic function.
   expit(x)    -- inverse of logit.
-*/
+ */
 
 #include "local.h"
 
@@ -30,8 +29,8 @@ double x;
     0.99959304798255499, 0.99997790950300125 };
   double h, xx, y, z, f0, f1, f2;
   int m, j;
-  if (x<0) return(-erf(-x));
-  if (x>3.2) return(1-erfc(x));
+  if (x<0) return(-lferf(-x));
+  if (x>3.2) return(1-lferfc(x));
   m = (int) (2*x+0.5);
   xx= ((double)m)/2;
   h = x-xx; y = h;
@@ -51,8 +50,8 @@ double x;
 
 double lferfc(x)
 double x;
-{ if (x<0) return(1+erf(-x));
-  if (x<2.5) return(1-erf(x));
+{ if (x<0) return(1+lferf(-x));
+  if (x<2.5) return(1-lferf(x));
   return(exp(-x*x)/(x*SQRPI));
 }
 
@@ -144,6 +143,10 @@ double x;
 
 double expit(x)
 double x;
-{ if (x<0) return(1-1/(1+exp(x)));
+{ double u;
+  if (x<0)
+  { u = exp(x);
+    return(u/(1+u));
+  }
   return(1/(1+exp(-x)));
 }

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1998 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -161,7 +161,7 @@ char band;
   j = getarg(vc,"what",0);
   pp->wh = (j>0) ? ppwhat(argval(vc,j)) : PCOEF;
 
-  preplot(&lf,&des,data,vdptr(pp->fit),vdptr(pp->se),band,mg,pp->gr,pp->wh);
+  preplot(&lf,&des,data,vdptrn(pp->fit),vdptrn(pp->se),band,mg,pp->gr,pp->wh);
 }
 
 INT setpppoints(pp,where,mg,xl)

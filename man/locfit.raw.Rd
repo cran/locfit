@@ -74,7 +74,7 @@ bandwidth selectors.
 }
 \item{kt}{
 Kernel type, \code{"sph"} (default); \code{"prod"}.
-In multivariate problems, \Co\{"prod"\} uses a 
+In multivariate problems, \code{"prod"\} uses a 
 simplified product model which speeds up computations.
 }
 \item{itype}{

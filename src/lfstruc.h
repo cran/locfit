@@ -1,25 +1,40 @@
 /*
- *   Copyright (c) 1998 Lucent Technologies.
+ *   Copyright (c) 1998-2000 Lucent Technologies.
  *   See README file for details.
+ *
+ *
+ *
+ *   Structures, typedefs etc used in Locfit
  */
-
-/*
-  Structures, typedefs etc used in Locfit
-*/
 
 typedef char varname[15];
 
+/*
+ *  Define the vari type for locfit variables and related macros.
+ *  For the C version, an enhanced vari type is needed;
+ *  for other versions a simple structure suffices.
+ */
 #ifdef CVERSION
+
 typedef struct {
   varname name;
-  INT n, len, mode, stat;
+  INT n, bytes, mode, stat;
   double *dpr; } vari;
+#define checkvarlen(v,n,name,mode) (createvar(name,STSYSTEM,n,mode))
+
 #else
+
 typedef struct {
   INT n;
   double *dpr;
 } vari;
+#define viptr(v,i) (&(v)->dpr[i])
+#define checkvarlen(v,len,name,mode) \
+   ((((v)!=NULL) && (vlength(v) >= (len))) ? (v) : createvar((name),0,(len),(mode)))
 #endif
+
+#define vlength(v) ((v)->n)
+#define vdptr(v) ((v)->dpr)
 
 typedef struct {
   char *arg, *val;
@@ -62,8 +77,8 @@ typedef struct {
 
 #define datum(lf,i,j) (lf)->x[i][j]
 #define dvari(lf,i)   (lf)->x[i]
-#define evpt(lf,i) (&(lf)->xxev->dpr[i*(lf)->mi[MDIM]])
-#define evptx(lf,i,k) ((lf)->xxev->dpr[i*(lf)->mi[MDIM]+k])
+#define evpt(lf,i) (&(lf)->xxev->dpr[(i)*(lf)->mi[MDIM]])
+#define evptx(lf,i,k) ((lf)->xxev->dpr[(i)*(lf)->mi[MDIM]+(k)])
 
 typedef struct {
   vari *data[MXDIM], *fit, *se;

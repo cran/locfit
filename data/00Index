@@ -1,0 +1,14 @@
+ais                      Australian Institute of Sport Dataset
+border                   Cricket Batting Dataset
+cltest                   Test dataset for classification
+cltrain                  Training dataset for classification
+ethanol                  Exhaust emissions
+geyser                   Old Faithful Geyser Dataset
+heart                    Survival Times of Heart Transplant Recipients
+iris                     Fisher's Iris Data (subset)
+mcyc                     Acc(De?)celeration of a Motorcycle Hitting a
+                         Wall
+mine                     Fracture Counts in Coal Mines
+morths                   Henderson and Sheppard Mortality Dataset
+penny                    Penny Thickness Dataset
+spencer                  Spencer's Mortality Dataset

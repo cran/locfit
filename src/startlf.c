@@ -1,9 +1,9 @@
 /*
- *   Copyright (c) 1998-1999 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
- */
-
-/*
+ *
+ *
+ *
   startlf(des,lf,vfun,nopc) -- starting point for locfit.
     des and lf are pointers to the design and fit structures.
     vfun is the vertex processing function.
@@ -17,7 +17,7 @@
 
   fitoptions()
   clocfit()  -- start point for CLocfit - interpret cmd line etc.
-*/
+ */
 
 #include "local.h"
 
@@ -53,6 +53,7 @@ double *dp;
     mi[MMXIT] = 20;
     mi[MN] = n; mi[MDIM] = d;
     mi[MDEB] = 0;
+    mi[MUBAS] = 0;
   }
 
   if (dp!=NULL)
@@ -177,7 +178,7 @@ INT (*vfun)(), nopc;
 { INT i, *mi;
   des->vfun = vfun;
   mi = lf->mi;
-  mi[MP] = calcp(mi[MDEG],mi[MDIM],mi[MKT]);
+  mi[MP] = calcp(mi,mi[MDEG]);
   des->pref = 0;
   cvi = -1; /* inhibit cross validation */
   deschk(des,mi[MN],mi[MP]);
@@ -194,13 +195,13 @@ INT (*vfun)(), nopc;
 
   if (mi[MDEB]>0) printf("call eval structure\n");
   switch(mi[MEV])
-  { case EPHULL: phull(des,lf); break;
+  { case EPHULL: triang_start(des,lf); break;
     case EDATA:  dataf(des,lf); break;
     case ECROS:  crossf(des,lf); break;
     case EGRID:  gridf(des,lf); break;
+    case ETREE:  atree_start(des,lf); break;
     case EKDCE:  mi[MKT] = KCE;
-    case ETREE:
-    case EKDTR:  kdtree(des,lf); break;
+    case EKDTR:  kdtre_start(des,lf); break;
     case EPRES:  preset(des,lf); break;
     case EXBAR:  xbarf(des,lf); break;
     case ENONE:  lf->nv = lf->nce = 0;

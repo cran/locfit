@@ -1,15 +1,9 @@
 /*
- *   Copyright (c) 1998 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
  */
 
 #include "local.h"
-
-#ifdef RVERSION
-extern double pgamma(), pbeta();
-#define igamma(x,p) pgamma(x,p,1.0)
-#define ibeta(x,a,b) pbeta(x,a,b)
-#endif
 
 #define HUBERC 2.0
 

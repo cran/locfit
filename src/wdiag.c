@@ -1,9 +1,8 @@
 /*
- *   Copyright (c) 1998-1999 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
- */
-
-/*
+ *
+ *
   Routines for computing weight diagrams.
   wdiag(lf,des,lx,deg,ty,exp)
   Must locfit() first, unless ker==WPARM and has par. comp.
@@ -11,12 +10,13 @@
   also, vertex processing function procvhatm().
 
   cwdiag() entry for CLOCFIT.
-*/
+ */
 
 #include "local.h"
 
 static double *wd;
 extern double robscale;
+extern void unitvec();
 
 void hvxtwx(xtwx,v,k) /* (X^T W X)^{-1/2} v */
 xtwxstruc *xtwx;
@@ -142,7 +142,9 @@ INT deg, ty, exp;
     { lxdd = &lxd[d*m];
       setzero(lxdd,m*d*d);
   } }
-  fitfun(lf,des->xev,des->xev,des->f1,deriv,nd); /* c(0) */
+  if (nd>0) fitfun(lf,des->xev,des->xev,des->f1,deriv,nd); /* c(0) */
+    else unitvec(des->f1,0,p);
+printf("%8.5f %8.5f %8.5f\n",des->f1[0],des->f1[1],des->f1[2]);
   vxtwx(&des->xtwx,des->f1,p);   /* c(0) (X^TWX)^{-1} */
   for (i=0; i<m; i++)
   { ii = des->ind[i];

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1998 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -8,12 +8,14 @@
 extern INT ident;
 extern double robscale;
 
-INT calcp(deg,dim,kt)
-INT deg, dim, kt;
+INT calcp(mi,deg)
+INT *mi, deg;
 { INT i, k;
-  if (kt==KPROD) return(dim*deg+1);
+  if (mi[MUBAS]) return(mi[MDEG]);
+
+  if (mi[MKT]==KPROD) return(mi[MDIM]*deg+1);
   k = 1;
-  for (i=1; i<=deg; i++) k = k*(dim+i)/i;
+  for (i=1; i<=deg; i++) k = k*(mi[MDIM]+i)/i;
   return(k);
 }
 
@@ -105,6 +107,13 @@ INT *der, nd;
 { INT d, deg, m, i, j, k, cd[MXDIM];
   double ff[MXDIM][1+MXDEG], dx[MXDIM];
 
+#ifdef SVERSION
+  if (lf->mi[MUBAS])
+  { basis(x,t,f,lf->mi[MDIM],lf->mi[MP]);
+    return;
+  }
+#endif
+
   d = lf->mi[MDIM];
   deg = lf->mi[MDEG];
   m = 0;
@@ -120,13 +129,6 @@ INT *der, nd;
   for (i=0; i<d; i++)
   { switch(lf->sty[i])
     {
-#ifdef SVERSION
-      case STUSER:
-        if (cd[i]>0)
-          WARN(("fitfun: can't handle derivatives with user basis\n"));
-        basis(x[i],t[i],ff[i],lf->mi[MDEG]+1,i);
-        break;
-#endif
       case STANGL:
         fitfunangl(dx[i],ff[i],lf->sca[i],cd[i],lf->mi[MDEG]);
         break;
@@ -224,7 +226,6 @@ lfit *lf;
 INT v;
 { INT d, p, nvm, i, k;
   double trc[6], t0[1+MXDIM];
-
   k = procvraw(des,lf,v);
   if (lf_error) return(k);
    
@@ -324,7 +325,7 @@ INT v;
   i0 = 0; g0 = 0;
   ip = 1;
   for (i=mi[MDEG0]; i<=d1; i++)
-  { mi[MDEG] = i; des->p = mi[MP] = calcp(i,mi[MDIM],mi[MKT]);
+  { mi[MDEG] = i; des->p = mi[MP] = calcp(mi,i);
     k = locfit(lf,des,lf->h[v],0);
 
     ldf(lf,des,tr,1,lf->mi,NULL);
@@ -345,7 +346,7 @@ INT v;
   }
 
   if (i0<d1) /* recompute the best fit */
-  { mi[MDEG] = i0; des->p = mi[MP] = calcp(i0,mi[MDIM],mi[MKT]);
+  { mi[MDEG] = i0; des->p = mi[MP] = calcp(mi,i0);
     k = locfit(lf,des,lf->h[v],0);
     for (i=mi[MP]; i<p1; i++) des->cf[i] = 0.0;
     i0 = (INT)md; if (i0==d1) i0--;

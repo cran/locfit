@@ -1,7 +1,7 @@
 Package: locfit
-Version: 1.00
+Version: 1.0-1
 Title: Local Regression, Likelihood and Density Estimation.
-Date: 14/2/2000
+Date: 2000-12-19
 Author: Clive Loader <clive@bell-labs.com>
 Description: Local Regression, Likelihood and density estimation.
 Depends:

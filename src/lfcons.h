@@ -28,15 +28,6 @@
 #define GOLDEN 0.61803398874989484820
 #define HL2PI 0.91893853320467267 /* log(2pi)/2 */
 #define SQRPI 1.77245385090552    /* sqrt(pi)   */
-#define LOG_2           0.6931471805599453094172321214581765680755 /*log(2)*/
-#define PI_HALF         1.5707963267948966192313216916397514420986 /*pi/2*/
-#define PI_QUARTER      0.7853981633974483096156608458198757210493 /*pi/4*/
-#define EXP78           1.0129030479320018583185514777512982888868 /*e^(1/78)*/
-#define PI128          40.7436654315252059568342434233636766808217 /*128/pi*/
-#define IBETA_LARGE     1.0e30
-#define IBETA_SMALL     1.0e-30
-#define IGAMMA_LARGE    1.0e30
-#define DOUBLE_EP     2.2204460492503131E-16
 
 /*
   Criteria for adaptive local fitting  mi[MACRI]
@@ -110,7 +101,8 @@
 #define MDEB  17
 #define MGETH 18
 #define MPC   19
-#define LENM  20
+#define MUBAS 20
+#define LENM  21
 
 /*
   Link functions mi[MLINK].
@@ -162,9 +154,9 @@
   KSPH (spherical)  KPROD (product)
   others shouldn't be used at present.
 */
-#define KSPH  1
-#define KPROD 2
-#define KCE   4
+#define KSPH   1
+#define KPROD  2
+#define KCE    4
 
 #define STANGL 3
 #define STLEFT 5

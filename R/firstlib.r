@@ -1,10 +1,6 @@
 .First.lib <- function(lib, pkg) {
-  cat("Locfit for R 0.99.0.\n")
-  cat("Feb 14, 2000.\n")
+  cat("Locfit for R 1.2.0.\n")
+  cat("2000-12-19.\n")
   library.dynam("locfit", pkg, lib)
   invisible(NULL)
 }
-
-print.gcvplot <- function(object, ...) plot.gcvplot(x=object,...)
-
-provide(locfit)

@@ -42,11 +42,13 @@ function(..., alpha = 0.7, deg = 2, scale = 1, kern = "tcub", ev = "tree", maxk
 }
 
 "lfbas"<- 
-function(x, basis = function(x, t)
-c(1, x - t))
+function(x, tt, ind)
 {
-  attr(x, "basis") <- basis
-  x
+  ind <- ind + 1
+  # C starst at 0, S at 1
+  x <- x[ind]
+  res <- basis(x, tt)
+  as.numeric(t(res))
 }
 
 "locfit"<- 
@@ -86,10 +88,6 @@ function(formula, data = sys.frame(sys.parent()), weights = 1, cens = 0, base = 
     sty[spec$cpar - nr] <- 7
     sty[spec$lfbas - nr] <- 8
   }
-  basisfun <- vector("list", d)
-  for(i in (1:d)[sty == 8]) {
-    basisfun[[i]] <- attr(frm[, vnames[i]], "basis")
-  }
   if(!missing(weights))
     weights <- model.extract(frm, weights)
   if(!missing(cens))
@@ -97,7 +95,7 @@ function(formula, data = sys.frame(sys.parent()), weights = 1, cens = 0, base = 
   if(!missing(base))
     base <- model.extract(frm, base)
   ret <- lfproc(x, y, weights = weights, cens = cens, base = base, geth = geth, 
-    sty = sty, basis = basisfun, ...)
+    sty = sty, ...)
   if(any(geth == 1:6))
     return(ret)
   ret$terms <- Terms
@@ -143,76 +141,18 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
   kt <- pmatch(kt, c("sph", "prod", "ang", "center", "left", "right"))
   if(any(kt == c(3, 5, 6)))
     stop("kt=ang,left,right no longer used. Use eg. y~ang(x) formula")
-  if(length(deg) >= 2) {
-    deg0 <- deg[1]
-    deg <- deg[2]
-  }
-  else deg0 <- deg
-  p <- ifelse(kt == 2, d * deg + 1, ifelse(deg == 0, 1, prod(d + (1:deg))/prod(
-    1:deg)))
-  if(is.character(deriv))
-    deriv <- match(deriv, vnames)
-  if(is.numeric(ev)) {
-    xev <- ev
-    vc <- ncm <- 0
-    nvm <- length(xev)/d
-    ev <- 8
-    if(nvm == 0)
-      stop(("Invalid ev argument"))
+  if(!missing(basis)) {
+    assign("basis", basis, 1)
+    p <- deg0 <- deg <- length(basis(0, d))
   }
   else {
-    ev <- pmatch(ev, c("tree", "phull", "data", "grid", "kdtree", "kdcenter", 
-      "crossval", "pres", "xbar"))
-    switch(ev,
-      {
-        vc <- 2^d
-        nvm <- ((maxk + 2) * vc)/2
-        ncm <- 1 + 2 * maxk
-      }
-      ,
-      {
-        vc <- d + 1
-        nvm <- ncm <- maxk * d
-      }
-      ,
-      {
-        vc <- ncm <- 0
-        nvm <- n
-      }
-      ,
-      {
-        vc <- 2^d
-        mg <- rep(mg, length = d)
-        nvm <- max(prod(mg), maxk)
-        ncm <- 0
-      }
-      ,
-      {
-        vc <- 2^d
-        fc <- floor((cut * n * min(alpha[1], 1))/4)
-        k <- floor((2 * n)/fc)
-        ncm <- 2 * k + 1
-        nvm <- ((k + 2) * vc)/2
-      }
-      ,
-      {
-        vc <- 1
-        fc <- floor(n * alpha[1])
-        nvm <- 1 + floor((2 * n)/fc)
-        ncm <- 2 * nvm + 1
-      }
-      ,
-      {
-        vc <- ncm <- 0
-        nvm <- n
-      }
-      ,
-      ,
-      {
-        vc <- ncm <- 0
-        nvm <- 1
-      }
-      )
+    if(length(deg) >= 2) {
+      deg0 <- deg[1]
+      deg <- deg[2]
+    }
+    else deg0 <- deg
+    p <- ifelse(kt == 2, d * deg + 1, ifelse(deg == 0, 1, prod(d + (1:deg))/
+      prod(1:deg)))
   }
   xl <- rep(0, 2 * d)
   lset <- 0
@@ -223,16 +163,90 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
   fl <- rep(0, 2 * d)
   if(!missing(flim))
     fl <- lflim(flim, vnames, fl)
+  if(is.numeric(ev)) {
+    xev <- ev
+    vc <- ncm <- 0
+    nvm <- length(xev)/d
+    ev <- pres
+    if(nvm == 0)
+      stop("Invalid ev argument")
+  }
+  evs <- c("tree", "phull", "data", "grid", "kdtree", "kdcenter", "crossval", 
+    "pres", "xbar", "none")
+  ev <- pmatch(ev, evs)
   mi <- c(n, p, deg0, deg, d, 0, 0, kt, 0, mint, maxit, renorm, ev, 0, 0, dc, 
-    maxk, debug, geth, 0)
+    maxk, debug, geth, 0, !missing(basis))
   if(any(is.na(mi)))
     print(mi)
   alpha <- c(alpha, 0, 0, 0)[1:3]
+  dp <- c(alpha, cut, 0, 0, 0, 0, 0, 0)
+  if(is.character(deriv))
+    deriv <- match(deriv, vnames)
+  switch(ev,
+    {
+      vc <- 2^d
+      guessnv <- .C("guessnv",
+        nvm = integer(1),
+        ncm = integer(1),
+        dp = as.numeric(dp),
+        mi = as.integer(mi))
+      nvm <- guessnv$nvm
+      ncm <- guessnv$ncm
+    }
+    ,
+    {
+      vc <- d + 1
+      nvm <- ncm <- maxk * d
+    }
+    ,
+    {
+      vc <- ncm <- 0
+      nvm <- n
+    }
+    ,
+    {
+      vc <- 2^d
+      mg <- rep(mg, length = d)
+      nvm <- max(prod(mg), maxk)
+      ncm <- 0
+    }
+    ,
+    {
+      vc <- 2^d
+      fc <- floor((cut * n * min(alpha[1], 1))/4)
+      k <- floor((2 * n)/fc)
+      ncm <- 2 * k + 1
+      nvm <- ((k + 2) * vc)/2
+      print(c(ncm, nvm))
+    }
+    ,
+    {
+      vc <- 1
+      fc <- floor(n * alpha[1])
+      nvm <- 1 + floor((2 * n)/fc)
+      ncm <- 2 * nvm + 1
+    }
+    ,
+    {
+      vc <- ncm <- 0
+      nvm <- n
+    }
+    ,
+    ,
+    {
+      vc <- ncm <- 0
+      nvm <- 1
+    }
+    ,
+    {
+      vc <- ncm <- 0
+      nvm <- 1
+    }
+    )
   if(is.logical(scale))
     scale <- 1 - as.numeric(scale)
   if(length(scale) == 1)
     scale <- rep(scale, d)
-  dp <- c(alpha, cut, 0, 0, 0, 0, 0, 0)
   lwdes <- n * (p + 5) + 4 * p * p + 6 * p
   nnl <- p + d
   lwtre <- nvm * (3 * d + 8) + ncm
@@ -263,12 +277,12 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
     deriv = as.integer(deriv),
     nd = as.integer(length(deriv)),
     sty = as.integer(sty),
-    basis = basis)
+    basis = list(basis, lfbas))
   nvc <- z$nvc
   names(nvc) <- c("nvm", "ncm", "nnl", "nv", "nc")
   nvm <- nvc["nvm"]
   ncm <- nvc["ncm"]
-  nv <- nvc["nv"]
+  nv <- max(nvc["nv"], 1)
   nc <- nvc["nc"]
   if(geth == 1)
     return(matrix(z$L[1:(nv * n)], ncol = nv))
@@ -280,7 +294,7 @@ function(x, y, weights = 1, cens = NULL, base = 0, subset, xlim, flim, scale =
   mi <- z$mi
   names(mi) <- c("n", "p", "deg0", "deg", "d", "acri", "ker", "kt", "it", 
     "mint", "mxit", "renorm", "ev", "tg", "link", "dc", "mk", "debug", "geth", 
-    "pc")
+    "pc", "ubas")
   names(dp) <- c("nnalph", "fixh", "adpen", "cut", "lk", "df1", "df2", "rv", 
     "swt", "rsc")
   if(geth == 4)
@@ -376,7 +390,8 @@ function(object, data = NULL, what = "coef", cv = F, studentize = F, type =
     deriv = as.integer(object$deriv),
     nd = as.integer(length(object$deriv)),
     sty = as.integer(object$sty),
-    what = as.character(c(what, type)))
+    what = as.character(c(what, type)),
+    basis = list(eval(object$call$basis)))
   tr(pred$fit)
 }
 
@@ -559,7 +574,8 @@ function(object, newdata, where, what, band)
     nd = as.integer(length(object$deriv)),
     sty = as.integer(object$sty),
     wh = as.integer(wh),
-    what = c(what, band))
+    what = c(what, band),
+    bs = list(eval(object$call$basis)))
 }
 
 "predict.locfit"<- 
@@ -1155,6 +1171,7 @@ function(formula, dc = T, cov = 0.95, ...)
   m$geth <- 2
   m[[1]] <- as.name("locfit")
   z <- eval(m, sys.frame(sys.parent()))
+  print("call crit")
   crit(const = z$const, d = z$d, cov = cov)
 }
 
@@ -1243,6 +1260,10 @@ function(x, y, xlab = "Fitted DF", ylab = x$cri, ...)
 {
   plot(x$df, x$values, xlab = xlab, ylab = ylab, ...)
 }
+
+"print.gcvplot"<- 
+function(object, ...)
+plot.gcvplot(x = object, ...)
 
 "summary.gcvplot"<- 
 function(object, ...)
@@ -1371,7 +1392,12 @@ function(..., alpha)
 function(...)
 {
   m <- match.call()
-  m[[1]] <- as.name("locfit")
+  if(is.numeric(x))
+    m[[1]] <- as.name("locfit.raw")
+  else {
+    m[[1]] <- as.name("locfit")
+    names(m)[2] <- "formula"
+  }
   m$geth <- 6
   eval(m, sys.frame(sys.parent()))
 }
@@ -1405,10 +1431,10 @@ function(z)
 "expit"<- 
 function(x)
 {
-  y <- numeric(length(x))
-  y[x > 0] <- 1/(1 + exp( - x[x > 0]))
-  z <- exp(x[x <= 0])
-  y[x <= 0] <- z/(1 + z)
+  y <- x
+  ix <- (x < 0)
+  y[ix] <- exp(x[ix])/(1 + exp(x[ix]))
+  y[!ix] <- 1/(1 + exp( - x[ix]))
   y
 }
 
@@ -1574,21 +1600,24 @@ function(x, y, f, data, col = 1:10, pch = "O", add = F, lg, xlab = deparse(
 "store"<- 
 function()
 {
-  dump(c("ang", "gam.lf", "gam.slist", "lf", "lfbas", "locfit", "locfit.raw", 
-    "left", "right", "cpar", "fitted.locfit", "formula.locfit", "lines.locfit", 
-    "plot.locfit", "points.locfit", "preplot.locfit", "preplot.locfit.raw", 
-    "predict.locfit", "print.locfit", "print.preplot.locfit", 
-    "residuals.locfit", "plot.locfit.1d", "plot.locfit.2d", "plot.locfit.3d", 
-    "panel.xyplot.lf", "plot.preplot.locfit", "panel.locfit", "lfmarg", 
-    "lfeval", "lflim", "plot.eval", "rv", "rv<-", "summary.locfit", 
-    "summary.preplot.locfit", "print.summary.locfit", "hatmatrix", "regband", 
-    "kdeb", "knots", "locfit.matrix", "kappa0", "crit", "crit<-", "gcv", 
-    "gcvplot", "plot.gcvplot", "summary.gcvplot", "aic", "aicplot", "cp", 
+  lffuns <- c("ang", "gam.lf", "gam.slist", "lf", "lfbas", "locfit", 
+    "locfit.raw", "left", "right", "cpar", "fitted.locfit", "formula.locfit", 
+    "lines.locfit", "plot.locfit", "points.locfit", "preplot.locfit", 
+    "preplot.locfit.raw", "predict.locfit", "print.locfit", 
+    "print.preplot.locfit", "residuals.locfit", "plot.locfit.1d", 
+    "plot.locfit.2d", "plot.locfit.3d", "panel.xyplot.lf", 
+    "plot.preplot.locfit", "panel.locfit", "lfmarg", "lfeval", "lflim", 
+    "plot.eval", "rv", "rv<-", "summary.locfit", "summary.preplot.locfit", 
+    "print.summary.locfit", "hatmatrix", "regband", "kdeb", "knots", 
+    "locfit.matrix", "kappa0", "crit", "crit<-", "gcv", "gcvplot", 
+    "plot.gcvplot", "print.gcvplot", "summary.gcvplot", "aic", "aicplot", "cp", 
     "cpplot", "lcv", "lcvplot", "lscv", "lscvplot", "dv", "expit", "fw", 
     "locfit.robust", "locfit.censor", "locfit.quasi", "locfit.add", 
-    "plotbyfactor", "store"), "locfit.s")
-  dump(c("bad", "cltest", "cltrain", "co2", "diab", "geyser", "ethanol", "mcyc",
-    "morths", "border", "heart", "trimod", "iris", "spencer", "stamp"), 
-    "locfit.dat")
+    "plotbyfactor", "store")
+  lfdata <- c("bad", "cltest", "cltrain", "co2", "diab", "geyser", "ethanol", 
+    "mcyc", "morths", "border", "heart", "trimod", "iris", "spencer", "stamp")
+  dump(lffuns, "S/locfit.s")
+  dump(lfdata, "S/locfit.dat")
+  dump(lffuns, "R/locfit.s")
 }
 

@@ -1,4 +1,5 @@
-/* *   Copyright (c) 1998-1999 Lucent Technologies.
+/*
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -166,7 +167,7 @@ double *kap;
   if (lf_error) return(0);
   if ((ident!=1) && (lf->dp[DALP]>0))
     WARN(("constants only work right for fixed h"));
-  mi[MP] = calcp(mi[MDEG],mi[MDIM],mi[MKT]);
+  mi[MP] = calcp(mi,mi[MDEG]);
   deschk(des,mi[MN],mi[MP]);
   preproc(des,lf,mi[MKER]!=WPARM);
   nnn = (ident==1) ? lf->mi[MP] : lf->mi[MN];
@@ -187,6 +188,8 @@ double *kap;
   k0[0] = k0[1] = k0[2] = 0.0;
   l0[0] = l0[1] = 0.0;
   m0[0] = 0.0;
+
+#ifdef CVERSION
   if (mi[MIT]==IMONT)
   { for (i=0; i<mi[MMINT]; i++)
     { for (j=0; j<d; j++) z[j] = lf->fl[j]+(lf->fl[j+d]-lf->fl[j])*runif();
@@ -201,6 +204,8 @@ double *kap;
     kap[0] = k0[0]/mi[MMINT];
     return(1);
   }
+#endif
+
   while(1)
   { wt = 1;
     for (i=0; i<d; i++)
@@ -314,7 +319,7 @@ INT m, d, it, s;
     td = taild(c,k0,m,d,nu);
     if (tp>0) c0 = c;
     if (tp<0) c1 = c;
-    cn = c - (tailp(c,k0,m,d,nu)-al)/taild(c,k0,m,d,nu);
+    cn = c - tp/td;
     if (cn<c0) cn = (c+c0)/2;
     if ((c1>0.0) && (cn>c1)) cn = (c+c1)/2;
     c = cn;

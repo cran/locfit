@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1998 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -16,30 +16,82 @@ lfit lf;
 INT lf_error;
 extern INT cvi;
 
-static void **bsfunc;
+#ifdef RVERSION
+#define CALL_S_FUNC char
+#define CALL_S_ARGS void
+#else
+#define CALL_S_FUNC void
+#define CALL_S_ARGS char
+#endif
+#define CALL_S_LEN  long int
+#define CALL_S_NARG long int
+#define CALL_S_MODE char
+#define CALL_S_NRES long int
+#define CALL_S_VALS char
 
-void basis(x,t,f,p,j)
-double x, t, *f;
-INT p, j;
-{ char *values[1], *mode[2], *args[2];
-  long length[2];
+static CALL_S_FUNC *bsfunc, *bsf2;
+
+void basis(x,t,f,dim,p)
+double *x, *t, *f;
+INT dim, p;
+{
+  CALL_S_ARGS *args[2];
+  CALL_S_LEN  length[2];
+  CALL_S_NARG nargs;
+  CALL_S_MODE *mode[2];
+  CALL_S_NRES nres;
+  CALL_S_VALS *values[1];
   double z0[1], z1[1], *vptr;
   int i;
 
-  args[0] = (char *)z0;
+  args[0] = (char *)x;
   mode[0] = "double";
-  length[0] = 1;
-  z0[0] = x;
+  length[0] = dim;
 
-  args[1] = (char *)z1;
+  args[1] = (char *)t;
   mode[1] = "double";
-  length[1] = 1;
-  z1[0] = t;
+  length[1] = dim;
 
-  call_S(bsfunc[j],2L,args,mode,length,0,1L,values);
+  nargs = 2;
+  nres = 1;
+
+  call_S(bsfunc,nargs,args,mode,length,(char **)NULL,nres,values);
 
   vptr = (double *)values[0];
   for (i=0; i<p; i++) f[i] = vptr[i];
+}
+
+double vbasis(x,t,n,d,ind,m,p,X)
+double **x, *t, *X;
+int n, d, m, p, *ind;
+{
+  CALL_S_ARGS *args[3];
+  CALL_S_LEN  length[3];
+  CALL_S_NARG nargs;
+  CALL_S_MODE *mode[3];
+  CALL_S_NRES nres;
+  CALL_S_VALS *values[1];
+  double *vptr;
+  int i;
+
+  args[0] = (char *)x[0];
+  mode[0] = "double";
+  length[0] = n;
+
+  args[1] = (char *)t;
+  mode[1] = "double";
+  length[1] = d;
+
+  args[2] = (char *)ind;
+  mode[2] = "integer";
+  length[2] = m;
+
+  nargs = 3;
+  nres = 1;
+
+  call_S(bsf2,nargs,args,mode,length,0,nres,values);
+  vptr = (double *)values[0];
+  for (i=0; i<m*p; i++) X[i] = vptr[i];
 }
 
 vari *setsvar(v,x,n)
@@ -56,10 +108,13 @@ void slocfit(x,y,c,w,b,lim,mi,dp,str,sca,xev,wdes,wtre,wpc,nvc,
 double *x, *y, *c, *w, *b, *lim, *dp, *sca, *xev, *L, *kap, *wdes, *wtre, *wpc;
 INT *mi, *nvc, *iwork, *lw, *mg, *deriv, *nd, *sty;
 char **str;
-void **bs;
+CALL_S_FUNC **bs;
 { INT n, d, i, kk;
   vari v1, v2, v3, vL, vi, vx, vxev;
-  bsfunc = bs;
+  if (mi[MUBAS])
+  { bsfunc = bs[0];
+    bsf2 = bs[1];
+  }
   lf_error = 0;
   n = mi[MN]; d = mi[MDIM];
   for (i=0; i<d; i++)
@@ -143,7 +198,8 @@ INT *ce, d, ev, *nvc;
     case EXBAR:
     case ECROS:
     case EDATA:
-    case EPRES: break;
+    case EPRES:
+    case ENONE: break;
     default: ERROR(("spreplot: Invalid ev"));
   }
   lf.vc = vc;
@@ -153,13 +209,15 @@ INT *ce, d, ev, *nvc;
   lf.hi = ce; ce += MAX(nvc[3],nvc[4]);
 }
 
-void spreplot(xev,coef,sv,ce,x,res,se,wpc,sca,m,nvc,mi,dp,mg,deriv,nd,sty,where,what)
+void spreplot(xev,coef,sv,ce,x,res,se,wpc,sca,m,nvc,mi,dp,mg,deriv,nd,sty,where,what,bs)
 double *xev, *coef, *sv, *x, *res, *se, *wpc, *sca, *dp;
 INT *ce, *m, *nvc, *mi, *mg, *deriv, *nd, *sty, *where;
 char **what;
+void **bs;
 { INT p, i, vc;
   double *xx[MXDIM];
   vari v3, vxev;
+  if (mi[MUBAS]) bsfunc = bs[0];
   lf_error = 0; p = mi[MP];
   lf.ncm = nvc[1]; lf.nv = lf.nvm = nvc[3]; lf.nce = nvc[4];
 
@@ -199,12 +257,14 @@ char **what;
   preplot(&lf,&des,xx,res,se,what[1][0],m,*where,ppwhat(what[0]));
 }
 
-void sfitted(x,y,w,c,ba,fit,cv,st,xev,coef,sv,ce,wpc,sca,nvc,mi,dp,mg,deriv,nd,sty,what)
+void sfitted(x,y,w,c,ba,fit,cv,st,xev,coef,sv,ce,wpc,sca,nvc,mi,dp,mg,deriv,nd,sty,what,bs)
 double *x, *y, *w, *c, *ba, *fit, *xev, *coef, *sv, *wpc, *sca, *dp;
 INT *cv, *st, *ce, *nvc, *mi, *mg, *deriv, *nd, *sty;
 char **what;
+void **bs;
 { INT i, n;
   vari v3, vxev;
+  if (mi[MUBAS]) bsfunc = bs[0];
   n = mi[MN];
   lf_error = 0; cvi = -1;
   lf.ncm = nvc[1]; lf.nv = lf.nvm = nvc[3]; lf.nce = nvc[4];
@@ -242,10 +302,10 @@ INT *ce, *lo, *hi, *nvc, *mi, *nt, *term;
   lf.dp = dp; lf.mi = mi; *nt = 0;
   d = mi[MDIM];
   if (mi[MEV]==ETREE)
-    growquad(NULL,&lf,lf.ce,nt,term,xev,&xev[d*((1<<d)-1)],lf.fl);
+    atree_grow(NULL,&lf,lf.ce,nt,term,xev,&xev[d*((1<<d)-1)],lf.fl);
   else
     for (i=0; i<nvc[4]; i++)
-      growtri(NULL,&lf,&lf.ce[i*lf.vc],nt,term);
+      triang_grow(NULL,&lf,&lf.ce[i*lf.vc],nt,term);
 }
 
 void kdeb(x,mi,band,ind,h0,h1,meth,nmeth,ker)

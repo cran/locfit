@@ -1,18 +1,24 @@
 /*
-   Which version of locfit is being built?
-   One of the following should be uncommented.
-   If you change this after building one version
-   of Locfit, then you'll also need to
-   touch *.c
-   at the unix prompt.
-   For R compilation, both RVERSION and SVERSION should be uncommented.
-   INTERFACE (not CVERSION) should be used, for user-written interfaces.
-*/
+ *   Copyright (c) 1998-2000 Lucent Technologies.
+ *   See README file for details.
+ * 
+ *
+ *  Most of the changes formerly needed here are handled through
+ *  the Makefiles and #ifdef's.
+ *
+ *
+ */
 
-/* #define CVERSION */
-/* #define RVERSION */
-#define SVERSION
-/* #define INTERFACE */
+#define RVERSION
+
+/*
+ *   DIRSEP: '/' for unix; '\\' for DOS
+ */
+#ifdef DOS
+#define DIRSEP '\\'
+#else
+#define DIRSEP '/'
+#endif
 
 
 /*
@@ -22,13 +28,18 @@
 
    If all else fails, you can also use lflgamma().
 
-   uncomment the definitions for erf, erfc and daws only if your
+   Use the definitions for erf, erfc and daws only if your
    math libraries don't include these functions.
-*/
+ */
+#ifdef DOS
+#define LGAMMA(arg) lflgamma(arg)
+#define erf(x) lferf(x)
+#define erfc(x) lferfc(x)
+#else
 #define LGAMMA(arg) lgamma(arg)
-/* #define erf(x) lferf(x)   */
-/* #define erfc(x) lferfc(x) */
+#endif
 #define daws(x) lfdaws(x)
+
 
 /*
    Does your system support popen() and pclose()
@@ -42,19 +53,23 @@
 
 
 /*
-   the INT type is used for all integers provided in .C() calls
-   from S.
-   For the S version on 64 bit systems, this should be long int.
+   (the #ifdef's below should now take care of this).
+   the INT type is used for all integers provided in .C() calls from S.
+   For the S version, this should be long int.
    For the R version, should be int.
    For the C version, either is adequate.
+   Usually this only makes a difference on 64 bit systems.
 */
 
+#ifdef RVERSION
+typedef int INT;
+#else
+#ifdef SVERSION
 typedef long int INT;
-
-/*
-  DIRSEP: '/' for unix; '\\' for DOS
-*/
-#define DIRSEP '/'
+#else
+typedef int INT;
+#endif
+#endif
 
 /******** NOTHING BELOW HERE NEEDS CHANGING **********/
 
@@ -62,6 +77,13 @@ typedef long int INT;
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+
+#ifdef RVERSION
+# undef LGAMMA
+# define LGAMMA(arg) Rf_lgammafn(arg)
+extern double LGAMMA(double);
+# define SVERSION
+#endif
 
 #include "lfcons.h"
 #include "lfstruc.h"

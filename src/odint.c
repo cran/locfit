@@ -1,16 +1,14 @@
 /*
- *   Copyright (c) 1998 Lucent Technologies.
+ *   Copyright (c) 1996-200 Lucent Technologies.
  *   See README file for details.
- */
-
-
-/*
+ *
+ *
    routines for one-dimensional numerical integration
    in density estimation. Entry point is
    onedint(cf,mi,l0,l1,resp)
    which evaluates int W(u)u^j exp(..), j=0..2*deg.
    returns in resp vector.
-*/
+ */
 
 #include "local.h"
 

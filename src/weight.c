@@ -1,14 +1,14 @@
 /*
- *   Copyright (c) 1998-1999 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
+ *
+ *
+ *  Defines the weight functions and related quantities used
+ *  in LOCFIT.
  */
 
 #include "local.h"
 
-/*
-  Defines the weight functions and related quantities used
-  in LOCFIT.
-*/
 
 /* The weight functions themselves.  Used everywhere. */
 double W(u,ker)

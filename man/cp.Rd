@@ -14,7 +14,7 @@ cp(x, \dots, sig2=1)
 
   Cp is usually computed using a variance estimate from the largest
   model under consideration, rather than sig2=1. This will be done
-  automatically when the \call{\link{cpplot}} function is used.
+  automatically when the \code{\link{cpplot}} function is used.
 
   The Cp score is exact (up to numerical roundoff) if the
   \code{ev="data"} argument is provided. Otherwise, the residual

@@ -1,30 +1,34 @@
 /*
-  strval() function for converting string arguments to Locfit's
-  numeric values.
-  a typical call will be setstrval(lf.mi,MKER,"gauss")
-
-  components that can be set in this manner are
-    MKER  (weight function)
-    MKT   (kernel type -- spherical or product)
-    MTG   (local likelihood family)
-    MLINK (link function)
-    MIT   (integration type for density estimation)
-    MEV   (evaluation structure)
-
-  INT ppwhat(str) interprets the preplot what argument.
-  INT restyp(str) interprets the residual type argument.
-
-  Also includes other misc. string functions.
-*/
+ *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   See README file for details.
+ *
+ *
+ *
+ *  strval() function for converting string arguments to Locfit's
+ *  numeric values.
+ *  a typical call will be setstrval(lf.mi,MKER,"gauss")
+ *
+ *  components that can be set in this manner are
+ *    MKER  (weight function)
+ *    MKT   (kernel type -- spherical or product)
+ *    MTG   (local likelihood family)
+ *    MLINK (link function)
+ *    MIT   (integration type for density estimation)
+ *    MEV   (evaluation structure)
+ *    MACRI (adaptive criterion)
+ *
+ *  INT ppwhat(str) interprets the preplot what argument.
+ *  INT restyp(str) interprets the residual type argument.
+ *
+ *  Also includes other misc. string functions.
+ */
 
 #include "local.h"
 
 INT stm(u,v,k)
 char *u, *v;
 INT k;
-{ int i;
-  for (i=0; i<k; i++) if (u[i]!=v[i]) return(0);
-  return(1);
+{ return((strncmp(u,v,k)==0));
 }
 
 INT lffamily(z)
@@ -140,7 +144,9 @@ char *z;
         case 'm':
           mi[v] = IMULT;
           if (z[1]=='l') mi[v] = IMLIN;
+#ifdef CVERSION
           if (z[1]=='o') mi[v] = IMONT;
+#endif
           return;
       }
       WARN(("unknown integration type %s",z));
@@ -182,9 +188,7 @@ char *z;
 
 INT restyp(z)
 char *z;
-{
-printf("restyp: %s\n",z); 
-  switch(z[0])
+{ switch(z[0])
   { case 'd':
       if (z[1]=='2') return(RDEV2);
                 else return(RDEV);

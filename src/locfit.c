@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1998 Lucent Technologies.
+ *   Copyright (c) 1996-2000 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -9,6 +9,7 @@ static double s0, s1;
 static INT lf_status;
 INT ident=0, (*like)();
 double robscale;
+extern void vbasis();
 
 void prefit() {}
 
@@ -72,7 +73,6 @@ double rs;
      -psi(ei/s) - log(s); s = e^{-th}
   */
   rs *= exp((sc-sw)/(sd+sc));
-printf("ns: %8.5f\n",rs);
   return(rs);
 }
 
@@ -92,7 +92,6 @@ INT tg;
   }
   rs = median(des->res,des->n);
   if (rs==0.0) rs = 1.0;
-printf("rs: %8.5f\n",rs);
   return(rs);
 }
 
@@ -390,10 +389,20 @@ design *des;
   X = des->X;
   des->xtwx.sm = 1+(mi[MDEG0]<mi[MDEG]);
 
-  for (i=0; i<des->n; i++)
-  { ii = des->ind[i];
-    for (j=0; j<d; j++) u[j] = datum(lf,j,ii);
-    fitfun(lf,u,des->xev,&X[i*p],NULL,0);
+  if ((mi[MUBAS]) && (lf->mi[MDIM]==1))
+  {
+#ifdef SVERSION
+ vbasis(lf->x,des->xev,lf->mi[MN],lf->mi[MDIM],des->ind,des->n,p,X);
+#else
+  ERROR(("user basis in S version only\n"));
+#endif
+  }
+  else
+  { for (i=0; i<des->n; i++)
+    { ii = des->ind[i];
+      for (j=0; j<d; j++) u[j] = datum(lf,j,ii);
+      fitfun(lf,u,des->xev,&X[i*p],NULL,0);
+    }
   }
 
   like = likereg;
@@ -489,7 +498,6 @@ INT noit;
       case TGEOM:
       case TWEIB:
       case TGAMM: oob = ((mi[MLINK]==LLOG) && (fabs(cf[0])>100));
-printf("s0 %8.5f  lk1 %8.5f\n",s0,lk1);
                   pf = lk1>-1.0e-5*s0;
                   cv = (fabs(lk1-lk0)<1.0e-6*s0);
                   break;
