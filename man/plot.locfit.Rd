@@ -76,9 +76,9 @@ by a call to \code{preplot.locfit}. The returned object is then passed to
 \examples{
 x <- rnorm(100)
 y <- dnorm(x)+rnorm(100)/5
-plot(locfit(y~x),vband=T)
-x <- cbind(rnorm(100),rnorm(100))
-plot(locfit(~x),type="persp")
+plot(locfit(y ~ x), vband=TRUE)
+x <- cbind(rnorm(100), rnorm(100))
+plot(locfit(~x), type="persp")
 }
 \seealso{
 \code{\link{locfit}}, \code{\link{plot.locfit.1d}},
