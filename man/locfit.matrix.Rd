@@ -17,9 +17,8 @@ locfit.matrix(fit, data)
 \arguments{
 \item{fit}{Locfit object}
 \item{data}{ Data Frame.}
-}
-\item{...}{
-Other arguments to \code{\link{locfit.raw}()} (or the \code{lfproc}).
+\item{...}{Other arguments to \code{\link{locfit.raw}()} (or the
+  \code{lfproc}).}
 }
 \value{
 A list with variables \code{x} (the model matrix); \code{y} (the response);
