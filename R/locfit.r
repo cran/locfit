@@ -844,39 +844,49 @@ function(x, ...)
 function(object, ...)
 object$trans(object$fit)
 
+## Deepayan Sarkar's patched version:
 "panel.locfit"<-
-function(x, y, subscripts, z, xyz.labs, xyz.axes, xyz.mid, xyz.minmax,
-  xyz.range, col.regions, at, drape, contour, region, groups, ...)
+    function(x, y, subscripts, z,
+             xyz.labs, xyz.axes, xyz.mid, xyz.minmax, xyz.range,
+             col.regions, at, drape, contour, region, groups,
+             ...)
 {
-  if(!missing(z)) {
-    zs <- z[subscripts]
-    fit <- locfit.raw(cbind(x, y), zs, ...)
-    marg <- lfmarg(fit, m = 10)
-    zp <- predict(fit, marg)
-    if(!missing(contour)) {
-      print("contour")
-      print(range(zp))
-      render.contour.trellis(marg[[1]], marg[[2]], zp, at = at)
+    if(!missing(z)) {
+        zs <- z[subscripts]
+        fit <- locfit.raw(cbind(x, y), zs, ...)
+        marg <- lfmarg(fit, m = 10)
+        zp <- predict(fit, marg)
+        if(!missing(contour)) {
+            print("contour")
+            print(range(zp))
+            render.contour.trellis(marg[[1]], marg[[2]], zp, at = at)
+        }
+        else {
+            loc.dat <-
+                cbind(as.matrix(expand.grid(x = marg[[1]],
+                                            y = marg[[1]])),
+                      z = zp)
+            render.3d.trellis(cbind(x = x, y = y, z = z[subscripts]),
+                              type = "cloud",
+                              xyz.labs = xyz.labs,
+                              xyz.axes = xyz.axes,
+                              xyz.mid = xyz.mid,
+                              xyz.minmax = xyz.minmax,
+                              xyz.range = xyz.range,
+                              col.regions = col.regions,
+                              at = at,
+                              drape = drape)
+        }
     }
     else {
-      loc.dat <- cbind(as.matrix(expand.grid(x = marg[[1]], y = marg[[1]])), z
-         = zp)
-      render.3d.trellis(cbind(x = x, y = y, z = z[subscripts]), type = "cloud",
-        xyz.labs = xyz.labs, xyz.axes = xyz.axes, xyz.mid = xyz.mid, xyz.minmax
-         = xyz.minmax, xyz.range = xyz.range, col.regions = col.regions, at =
-        at, drape = drape)
+        panel.xyplot(x, y, ...)
+        args <- list(x = x, y = y, ...)
+        ok <- names(formals(locfit.raw))
+        llines.locfit(do.call("locfit.raw",
+                              args[ok[ok %in% names(args)]]))
     }
-  }
-  else {
-    panel.xyplot(x, y)
-    browser()
-    args <- list(...)
-    ## This is a super-ugly fix--- I don't really know what else to do here.
-    args <- args[substr(names(args), 1, 5) != "panel"]
-    args <- c(list(x=x), list(y=y), args)
-    llines.locfit(do.call("locfit.raw", args))
-  }
 }
+
 llines.locfit <-
 function (x, m = 100, tr = x$trans, ...)
 {

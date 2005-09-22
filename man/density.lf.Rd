@@ -45,7 +45,7 @@ density.lf(x, n=50, window="gaussian", width, from, to, cut, ev="grid", deg=0, f
 \code{\link{locfit.raw}}
 }
 \examples{
-data(geyser)
+data(geyser, package="locfit")
 density.lf(geyser, window="tria")
 # the same result with density, except less precision.
 density(geyser, window="tria")

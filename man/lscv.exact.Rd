@@ -27,7 +27,7 @@ lscv.exact(x, alpha, ...)
   A vector of the LSCV statistic and the fitted degrees of freedom.
 }
 \examples{
-data(geyser)
+data(geyser, package="locfit")
 lscv.exact(geyser,alpha=0.25)
 # equivalent form using lscv
 lscv(geyser,alpha=0.25,exact=TRUE)

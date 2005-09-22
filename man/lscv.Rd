@@ -31,7 +31,7 @@ lscv(x, ..., exact=FALSE)
 }
 \examples{
 # approximate calculation for a kernel density estimate
-data(geyser)
+data(geyser, package="locfit")
 lscv(~geyser, alpha=cbind(0,1), ev="grid", mg=100, deg=0,
   flim=c(1,6), kern="gauss")
 # same computation, exact

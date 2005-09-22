@@ -33,8 +33,8 @@ be used to produce an GCV plot.
 }
 
 \examples{
-data(ethanol)
-plot(gcvplot(NOx~E,data=ethanol,alpha=seq(0.2,1.0,by=0.05)))
+data(ethanol, package="locfit")
+plot(gcvplot(NOx~E, data=ethanol, alpha=seq(0.2, 1.0, by=0.05)))
 }
 
 \seealso{
