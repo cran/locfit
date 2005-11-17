@@ -4,7 +4,7 @@
 Critical Values for Simultaneous Confidence Bands.
 }
 \usage{
-kappa0(formula, cov=0.95, \dots)
+kappa0(formula, cov=0.95, ev=lfgrid(20), \dots)
 }
 \arguments{
 \item{formula}{
@@ -13,7 +13,9 @@ kappa0(formula, cov=0.95, \dots)
   from this object.
 }
 \item{cov}{ Coverage Probability for critical values.  }
-\item{...}{ Other arguments to \code{\link{locfit}}. Important arguments
+\item{ev}{ Locfit evaluation structure. Should usually be a grid --
+  this specifies the integration rule. }
+\item{\dots}{Other arguments to \code{\link{locfit}}. Important arguments
   include \code{flim} and \code{alpha}. }
 }
 \description{
@@ -25,8 +27,8 @@ kappa0(formula, cov=0.95, \dots)
   The method requires both the weight diagrams l(x), the
   derivative l'(x) and (in 2 or more dimensions) the second
   derivatives l''(x).
-  These are implemented exactly for a constant bandwidth; that
-  is, \code{alpha=c(0,h)} for some \code{h}. For nearest
+  These are implemented exactly for a constant bandwidth.
+  For nearest
   neighbor bandwidths, the computations are approximate and a warning
   is produced.
 

@@ -4,13 +4,15 @@
 Local Regression, Likelihood and Density Estimation.
 }
 \usage{
-locfit.raw(x, y, weights=1, cens=NULL, base=0,
-  scale=FALSE, alpha=0.7, deg=2, kern="tricube", kt="sph", acri="none",
-  basis=list(NULL), deriv=numeric(0), dc=FALSE,
-  family, link="default", xlim, renorm=FALSE,
-  ev="tree", flim, mg=10, cut=0.8,
+locfit.raw(x, y, weights=1, cens=0, base=0,
+  scale=FALSE, alpha=0.7, deg=2, kern="tricube", kt="sph",
+    acri="none", basis=list(NULL),
+  deriv=numeric(0), dc=FALSE,
+  family, link="default",
+  xlim, renorm=FALSE,
+  ev=rbox(),
   maxk=100, itype="default", mint=20, maxit=20, debug=0,
-  geth=FALSE, sty=rep(1,d))
+  geth=FALSE, sty="none")
 }
 \description{
   \code{locfit.raw} is an interface to Locfit using numeric vectors
@@ -24,7 +26,9 @@ locfit.raw(x, y, weights=1, cens=NULL, base=0,
 
   Another set (\code{scale}, \code{alpha}, \code{deg}, \code{kern},
     \code{kt}, \code{acri} and \code{basis}) control the amount of smoothing:
-    bandwidth, smoothing weights and the local model.
+    bandwidth, smoothing weights and the local model. Most of these arguments
+    are deprecated - they'll currently still work, but should be provided through
+    the \code{lp()} model term instead.
 
   \code{deriv} and \code{dc} relate to derivative (or local slope)
     estimation.
@@ -33,8 +37,7 @@ locfit.raw(x, y, weights=1, cens=NULL, base=0,
 
   \code{xlim} and \code{renorm} may be used in density estimation.
 
-  \code{ev}, \code{flim}, \code{mg} and \code{cut}
-     control the set of evaluation points.
+  \code{ev} specifies the evaluation structure or set of evaluation points.
 
   \code{maxk},  \code{itype}, \code{mint}, \code{maxit} and \code{debug}
     control the Locfit algorithms, and will be rarely used.
@@ -44,14 +47,15 @@ locfit.raw(x, y, weights=1, cens=NULL, base=0,
 }
 \arguments{
 \item{x}{
-Vector (or matrix) of the independent variable(s).
+Vector (or matrix) of the independent variable(s). Can be constructed using the
+\code{lp()} function.
 }
 \item{y}{
 Response variable for regression models. For density families,
 \code{y} can be omitted.
 }
 \item{weights}{
-Prior weights for observations (reciprocal of variance, or sample size).
+Prior weights for observations (reciprocal of variance, or sample size).  
 }
 \item{cens}{
 Censoring indicators for hazard rate or censored regression. The coding
@@ -66,17 +70,9 @@ the \eqn{m(x)} term. For regression models, this effectively subtracts
 is that it extends to likelihood regression models.
 }
 
-\item{scale}{
-A scale to apply to each variable. This is especially important for
-multivariate fitting, where variables may be measured in
-non-comparable units. It is also used to specify the frequency
-for \code{\link{ang}} terms. If \code{scale=F} (the default) no scaling
-is performed. If \code{scale=T}, marginal standard deviations are used.
-Alternatively, a numeric vector can provide scales for the
-individual variables.
-}
-\item{alpha}{
-Smoothing parameter. A single number (e.g. \code{alpha=0.7})
+\item{scale}{ Deprecated - see \code{\link{lp}()}. }
+\item{alpha}{Deprecated - see \code{\link{lp}()}.
+A single number (e.g. \code{alpha=0.7})
 is interpreted as a nearest neighbor fraction. With two
 componentes (e.g. \code{alpha=c(0.7,1.2)}), the first component
 is a nearest neighbor fraction, and the second component is
@@ -84,9 +80,7 @@ a fixed component. A third component is the penalty term in locally
 adaptive smoothing.
 }
 \item{deg}{
-  Degree of local polynomial. Default: 2 (local quadratic). Degrees
-  0 to 3 are supported by almost all parts of the Locfit code. Higher
-  degrees may work in some cases.
+  Degree of local polynomial. Deprecated - see \code{\link{lp}()}.
 }
 \item{kern}{
   Weight function, default = \code{"tcub"}.
@@ -97,10 +91,10 @@ adaptive smoothing.
 }
 \item{kt}{
   Kernel type, \code{"sph"} (default); \code{"prod"}.
-  In multivariate problems, \code{"prod"} uses a
+  In multivariate problems, \code{"prod"} uses a 
   simplified product model which speeds up computations.
 }
-\item{acri}{Criterion for adaptive bandwidth selection.}
+\item{acri}{Deprecated - see \code{\link{lp}().}}
 \item{basis}{User-specified basis functions. See
   \code{\link{lfbas}} for more details on this argument.}
 
@@ -113,9 +107,9 @@ adaptive smoothing.
 \item{dc}{ Derivative adjustment.  }
 
 \item{family}{
-  Local likelihood family; \code{"gaussian"};
+  Local likelihood family; \code{"gaussian"}; 
   \code{"binomial"}; \code{"poisson"}; \code{"gamma"} and \code{"geom"}.
-  Density and rate estimation families are \code{"dens"}, \code{"rate"} and
+  Density and rate estimation families are \code{"dens"}, \code{"rate"} and 
   \code{"hazard"} (hazard rate). If the family is preceded by a \code{'q'}
   (for example, \code{family="qbinomial"}), quasi-likelihood variance
   estimates are used. Otherwise, the residual variance (\code{\link{rv}})
@@ -123,7 +117,7 @@ adaptive smoothing.
   \code{y} is provided; \code{"density"} if no response is provided.
 }
 \item{link}{
-  Link function for local likelihood fitting. Depending on the family,
+  Link function for local likelihood fitting. Depending on the family, 
   choices may be \code{"ident"}, \code{"log"}, \code{"logit"},
   \code{"inverse"}, \code{"sqrt"} and \code{"arcsin"}.
 }
@@ -143,25 +137,17 @@ adaptive smoothing.
 }
 
 \item{ev}{
-  Evaluation Structure, default = \code{"tree"}. Also available are
-  \code{"phull"}, \code{"data"}, \code{"grid"}, \code{"kdtree"},
-  \code{"kdcenter"} and \code{"crossval"}. \code{ev="none"} gives no
-  evaluation points, effectively producing the global parametric fit.
-  A vector or matrix of evaluation points can also be provided.
-}
-\item{flim}{
-  A vector of lower and upper bounds for the evaluation structure,
-  specified as \code{c(ll,ur)}. This should not be confused with
-  \code{xlim}. It defaults to the data range.
-}
-\item{mg}{
-  For the \code{"grid"} evaluation structure, \code{mg} specifies the
-  number of points on each margin. Default 10. Can be either a single
-  number or vector.
-}
-\item{cut}{
-  Refinement parameter for adaptive partitions. Default 0.8; smaller
-  values result in more refined partitions.
+  The evaluation structure,
+  \code{\link{rbox}()} for tree structures;
+  \code{\link{lfgrid}()} for grids;
+  \code{\link{dat}()} for data points;
+  \code{\link{none}()} for none.
+  A vector or matrix of evaluation points can also be provided,
+  although in this case you may prefer to use the
+  \code{\link{smooth.lf}()} interface to Locfit.
+  Note that arguments \code{flim}, \code{mg} and \code{cut} are now
+  given as arguments to the evaluation structure function, rather
+  than to \code{locfit.raw()} directly (change effective 12/2001).
 }
 
 \item{maxk}{
@@ -186,17 +172,13 @@ adaptive smoothing.
 }
 \item{debug}{If > 0; prints out some debugging information.}
 
-\item{geth}{ Don't use!  }
-\item{sty}{Style for special terms (\code{\link{left}},
-  \code{\link{ang}} e.t.c.). Do not try to set this directly;
-  call \code{\link{locfit}} instead.
-}
+\item{geth}{Don't use!}
+\item{sty}{ Deprecated - see \code{\link{lp}()}. }
 }
 \value{
 An object with class "locfit". A standard set of methods for printing, ploting, etc. these objects is provided.
 }
 \references{
-Consult the Web page \url{http://cm.bell-labs.com/stat/project/locfit/}.
+Consult the Web page \url{http://www.locfit.info/}.
 }
 \keyword{smooth}
-% Converted by Sd2Rd version 0.2-a4.

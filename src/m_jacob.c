@@ -48,7 +48,7 @@ int meth;
       J->st = JAC_EIGD;
       return;
     case JAC_CHOL:
-      chol_dec(J->Z,J->p);
+      chol_dec(J->Z,J->p,J->p);
       return;
     default: printf("jacob_dec: unknown method %d",meth);
   }
@@ -70,7 +70,7 @@ double *v;
       for (i=0; i<J->p; i++) v[i] *= J->dg[i];
       return(rank);
     case JAC_CHOL:
-      return(chol_solve(J->Z,v,J->p));
+      return(chol_solve(J->Z,v,J->p,J->p));
   }
   printf("jacob_solve: unknown method %d",J->st);
   return(0);
@@ -90,7 +90,7 @@ double *v;
       for (i=0; i<J->p; i++) v[i] *= J->dg[i];
       return(eig_hsolve(J,v));
     case JAC_CHOL:
-      return(chol_hsolve(J->Z,v,J->p));
+      return(chol_hsolve(J->Z,v,J->p,J->p));
   }
   printf("jacob_hsolve: unknown method %d",J->st);
   return(0);
@@ -110,7 +110,7 @@ double *v;
       for (i=0; i<J->p; i++) v[i] *= J->dg[i];
       return(eig_qf(J,v));
     case JAC_CHOL:
-      return(chol_qf(J->Z,v,J->p));
+      return(chol_qf(J->Z,v,J->p,J->p));
     default:
       printf("jacob_qf: invalid method\n");
       return(0.0);

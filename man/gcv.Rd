@@ -6,6 +6,10 @@ Compute generalized cross-validation statistic.
 \usage{
 gcv(x, \dots)
 }
+\arguments{
+  \item{x, \dots}{Arguments passed on to \code{\link{locfit}} or
+    \code{\link{locfit.raw}}.}
+}
 \description{
   The calling sequence for \code{gcv} matches those for the
   \code{\link{locfit}} or \code{\link{locfit.raw}} functions.
@@ -23,16 +27,11 @@ gcv(x, \dots)
   this extension.
 }
 
-\arguments{
-   \item{x}{either a numeric vector or a data frame (same as the
-   arguments to \code{\link{locfit}}).}
-   \item{...}{other argument to \code{\link{locfit}}.}
-}
 \seealso{
   \code{\link{locfit}},
   \code{\link{locfit.raw}},
   \code{\link{gcvplot}}
 }
 
-\keyword{smooth}
+\keyword{htest}
 % Converted by Sd2Rd version 0.2-a5.

@@ -14,13 +14,13 @@ displayed as \code{O}; pseudo-vertices as \code{*}.
 \arguments{
 \item{x}{\code{"locfit"} object. }
 \item{add}{If \code{TRUE}, add to existing plot.}
-\item{text}{If \code{T}, numbers will be added indicating the order points
+\item{text}{If \code{TRUE}, numbers will be added indicating the order points
   were added.}
-  \item{...}{other graphics parameters.}
+\item{...}{Arguments passed to and from other methods.}
 }
 \examples{
-data(ethanol)
-fit <- locfit(NOx~E+C,data=ethanol,scale=0)
+data(ethanol, package="locfit")
+fit <- locfit(NOx ~ E + C, data=ethanol, scale=0)
 plot.eval(fit)
 }
 \seealso{

@@ -4,11 +4,14 @@
 Density estimation using Locfit
 }
 \usage{
-density.lf(x, n=50, window="gaussian", width, from, to, cut, ev="grid", deg=0, family="density", link="ident", ...)
+density.lf(x, n = 50, window = "gaussian", width, from, to,
+  cut = if(iwindow == 4.) 0.75 else 0.5,
+  ev = lfgrid(mg = n, ll = from, ur = to),
+  deg = 0, family = "density", link = "ident", ...)
 }
 \description{
   This function provides an interface to Locfit, in the syntax of
-  the standard S-Plus \code{density} function. This can reproduce
+  (a now old version of) the S-Plus \code{density} function. This can reproduce
   \code{density} results, but allows additional
   \code{\link{locfit.raw}} arguments, such as the degree of fit, to be given.
 
@@ -28,7 +31,7 @@ density.lf(x, n=50, window="gaussian", width, from, to, cut, ev="grid", deg=0, f
 \item{from}{Lower limit for estimation domain.}
 \item{to}{Upper limit for estimation domain.}
 \item{cut}{Controls default expansion of the domain.}
-\item{ev}{Locfit evaluation structure -- default \code{"grid"}.}
+\item{ev}{Locfit evaluation structure -- default \code{\link{lfgrid}()}.}
 \item{deg}{Fitting degree -- default 0 for kernel estimation.}
 \item{family}{Fitting family -- default is \code{"density"}.}
 \item{link}{Link function -- default is the \code{"identity"}.}
@@ -45,10 +48,9 @@ density.lf(x, n=50, window="gaussian", width, from, to, cut, ev="grid", deg=0, f
 \code{\link{locfit.raw}}
 }
 \examples{
-data(geyser, package="locfit")
+data(geyser)
 density.lf(geyser, window="tria")
 # the same result with density, except less precision.
 density(geyser, window="tria")
 }
 \keyword{smooth}
-% Converted by Sd2Rd version 0.2-a5.

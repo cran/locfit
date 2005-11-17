@@ -4,98 +4,109 @@
  *
  *
  *   Evaluate the locfit fitting functions.
- *     calcp(mi,deg)
+ *     calcp(sp,d)
  *       calculates the number of fitting functions.
- *     makecfn(des,lf)
+ *     makecfn(sp,des,dv,d)
  *       makes the coef.number vector.
- *     fitfun(lf,x,t,f,der,nd)
- *       lf is the local fit structure.
+ *     fitfun(lfd, sp, x,t,f,dv)
+ *       lfd is the local fit structure.
+ *       sp  smoothing parameter structure.
  *       x is the data point.
  *       t is the fitting point.
  *       f is a vector to return the results.
- *       deriv is a vector of derivative variables.
- *       nd is the number of derivatives.
- *     designmatrix(lf, des)
+ *       dv derivative structure.
+ *     designmatrix(lfd, sp, des)
  *       is a wrapper for fitfun to build the design matrix.
  *
  */
 
 #include "local.h"
 
-INT calcp(mi,deg)
-INT *mi, deg;
-{ INT i, k;
+int calcp(sp,d)
+smpar *sp;
+int d;
+{ int i, k;
 
-  if (mi[MUBAS]) return(mi[MP]);
+  if (ubas(sp))
+{ printf("calcp-ubas\n");
+  return(npar(sp));
+}
 
-  switch (mi[MKT])
+  switch (kt(sp))
   { case KSPH:
     case KCE:
       k = 1;
-      for (i=1; i<=deg; i++) k = k*(mi[MDIM]+i)/i;
+      for (i=1; i<=deg(sp); i++) k = k*(d+i)/i;
       return(k);
-    case KPROD: return(mi[MDIM]*deg+1);
-    case KLM: return(mi[MDIM]);
+    case KPROD: return(d*deg(sp)+1);
+    case KLM: return(d);
+    case KZEON: return(1);
   }
-  lfERROR(("calcp: invalid kt %d",mi[MKT]));
+  ERROR(("calcp: invalid kt %d",kt(sp)));
   return(0);
 }
 
-INT coefnumber(deriv,nd,kt,d,deg)
-INT *deriv, nd, kt, d, deg;
-{ INT d0, d1, t;
+int coefnumber(dv,kt,d,deg)
+int kt, d, deg;
+deriv *dv;
+{ int d0, d1, t;
 
   if (d==1)
-  { if (nd<=deg) return(nd);
+  { if (dv->nd<=deg) return(dv->nd);
     return(-1);
   }
 
-  if (nd==0) return(0);
+  if (dv->nd==0) return(0);
   if (deg==0) return(-1);
-  if (nd==1) return(1+deriv[0]);
+  if (dv->nd==1) return(1+dv->deriv[0]);
   if (deg==1) return(-1);
   if (kt==KPROD) return(-1);
 
-  if (nd==2)
-  { d0 = deriv[0]; d1 = deriv[1];
+  if (dv->nd==2)
+  { d0 = dv->deriv[0]; d1 = dv->deriv[1];
     if (d0<d1) { t = d0; d0 = d1; d1 = t; }
     return((d+1)*(d0+1)-d0*(d0+3)/2+d1);
   }
   if (deg==2) return(-1);
 
-  lfERROR(("coefnumber not programmed for nd>=3"));
+  ERROR(("coefnumber not programmed for nd>=3"));
   return(-1);
 }
 
-void makecfn(des,lf)
+void makecfn(sp,des,dv,d)
+smpar *sp;
 design *des;
-lfit *lf;
-{ int i;
-  INT *mi, nd;
+deriv *dv;
+int d;
+{ int i, nd;
   
-  nd = lf->nd;
-  mi = lf->mi;
+  nd = dv->nd;
 
-  des->cfn[0] = coefnumber(lf->deriv,nd,mi[MKT],mi[MDIM],mi[MDEG]);
+  des->cfn[0] = coefnumber(dv,kt(sp),d,deg(sp));
   des->ncoef = 1;
-  if (nd >= mi[MDEG]) return;
-  if (mi[MDIM]>1)
+  if (nd >= deg(sp)) return;
+  if (kt(sp)==KZEON) return;
+
+  if (d>1)
   { if (nd>=2) return;
-    if ((nd>=1) && (mi[MKT]==KPROD)) return;
+    if ((nd>=1) && (kt(sp)==KPROD)) return;
   }
 
-  for (i=0; i<mi[MDIM]; i++)
-  { lf->deriv[nd] = i;
-    des->cfn[i+1] = coefnumber(lf->deriv,nd+1,mi[MKT],mi[MDIM],mi[MDEG]);
+  dv->nd = nd+1;
+  for (i=0; i<d; i++)
+  { dv->deriv[nd] = i;
+    des->cfn[i+1] = coefnumber(dv,kt(sp),d,deg(sp));
   }
-  des->ncoef = 1+mi[MDIM];
+  dv->nd = nd;
+
+  des->ncoef = 1+d;
 }
 
 void fitfunangl(dx,ff,sca,cd,deg)
 double dx, *ff, sca;
-INT deg, cd;
+int deg, cd;
 {
-  if (deg>=3) lfWARN(("Can't handle angular model with deg>=3"));
+  if (deg>=3) WARN(("Can't handle angular model with deg>=3"));
 
   switch(cd)
   { case 0:
@@ -113,30 +124,36 @@ INT deg, cd;
       ff[1] = -sin(dx/sca)/sca;
       ff[2] = cos(dx/sca);
       return;
-    default: lfWARN(("Can't handle angular model with >2 derivs"));
+    default: WARN(("Can't handle angular model with >2 derivs"));
   }
 }
 
-void fitfun(lf,x,t,f,deriv,nd)
-lfit *lf;
+void fitfun(lfd,sp,x,t,f,dv)
+lfdata *lfd;
+smpar *sp;
 double *x, *t, *f;
-INT *deriv, nd;
-{ INT d, deg, m, i, j, k, ct_deriv[MXDIM];
-  double ff[MXDIM][1+MXDEG], dx[MXDIM];
+deriv *dv;
+{ int d, deg, nd, m, i, j, k, ct_deriv[MXDIM];
+  double ff[MXDIM][1+MXDEG], dx[MXDIM], *xx[MXDIM];
 
-#ifdef SVERSION
-  if (lf->mi[MUBAS])
-  { if (nd>0) lfWARN(("User basis does not take derivatives"));
-    basis(x,t,f,lf->mi[MDIM],lf->mi[MP]);
+  if (ubas(sp))
+  { for (i=0; i<lfd->d; i++) xx[i] = &x[i];
+    i = 0;
+    sp->vbasis(xx,t,1,lfd->d,&i,1,npar(sp),f);
     return;
   }
-#endif
 
-  d = lf->mi[MDIM];
-  deg = lf->mi[MDEG];
+  d = lfd->d;
+  deg = deg(sp);
   m = 0;
+  nd = (dv==NULL) ? 0 : dv->nd;
 
-  if (lf->mi[MKT]==KLM)
+  if (kt(sp)==KZEON)
+  { f[0] = 1.0;
+    return;
+  }
+
+  if (kt(sp)==KLM)
   { for (i=0; i<d; i++) f[m++] = x[i];
     return;
   }
@@ -148,13 +165,13 @@ INT *deriv, nd;
   { ct_deriv[i] = 0;
     dx[i] = (t==NULL) ? x[i] : x[i]-t[i];
   }
-  for (i=0; i<nd; i++) ct_deriv[deriv[i]]++;
+  for (i=0; i<nd; i++) ct_deriv[dv->deriv[i]]++;
 
   for (i=0; i<d; i++)
-  { switch(lf->sty[i])
+  { switch(lfd->sty[i])
     {
       case STANGL:
-        fitfunangl(dx[i],ff[i],lf->sca[i],ct_deriv[i],lf->mi[MDEG]);
+        fitfunangl(dx[i],ff[i],lfd->sca[i],ct_deriv[i],deg(sp));
         break;
       default:
         for (j=0; j<ct_deriv[i]; j++) ff[i][j] = 0.0;
@@ -169,7 +186,7 @@ INT *deriv, nd;
  *  there is differentiation wrt another variable, and all components
  *  involving x[i] are 0.
  */
-  if ((d==1) || (lf->mi[MKT]==KPROD))
+  if ((d==1) || (kt(sp)==KPROD))
   { for (j=1; j<=deg; j++)
       for (i=0; i<d; i++)
         f[m++] = (ct_deriv[i]==nd) ? ff[i][j] : 0.0;
@@ -214,7 +231,7 @@ INT *deriv, nd;
   }
   if (deg==3) return;
 
-  lfERROR(("fitfun: can't handle deg=%d for spherical kernels",deg));
+  ERROR(("fitfun: can't handle deg=%d for spherical kernels",deg));
 }
 
 /*
@@ -222,8 +239,9 @@ INT *deriv, nd;
  *  the required data points; des->n the number of points; des->xev
  *  the fitting point.
  */
-void designmatrix(lf,des)
-lfit *lf;
+void designmatrix(lfd,sp,des)
+lfdata *lfd;
+smpar *sp;
 design *des;
 { int i, ii, j, p;
   double *X, u[MXDIM];
@@ -231,19 +249,15 @@ design *des;
   X = d_x(des);
   p = des->p;
 
-  if (lf->mi[MUBAS])
+  if (ubas(sp))
   {
-#ifdef SVERSION
-    vbasis(lf->x,des->xev,lf->mi[MN],lf->mi[MDIM],des->ind,des->n,p,X);
-#else
-    lfERROR(("user basis in S version only\n"));
-#endif
+    sp->vbasis(lfd->x,des->xev,lfd->n,lfd->d,des->ind,des->n,p,X);
     return;
   }
 
   for (i=0; i<des->n; i++)
   { ii = des->ind[i];
-    for (j=0; j<lf->mi[MDIM]; j++) u[j] = datum(lf,j,ii);
-    fitfun(lf,u,des->xev,&X[i*p],NULL,(INT)0);
+    for (j=0; j<lfd->d; j++) u[j] = datum(lfd,j,ii);
+    fitfun(lfd,sp,u,des->xev,&X[i*p],NULL);
   }
 }

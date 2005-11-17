@@ -54,14 +54,18 @@ int bd_flag, *err;
   switch(bd_flag)
   { case BDF_EXPRIGHT:
       while (yhi*ylo > 0)
-      { xhi += xhi-xlo;
-        yhi = f(xhi)-c;
+      { x1 = xhi + (xhi-xlo);
+        y1 = f(x1) - c;
+        xlo = xhi; xhi = x1;
+        ylo = yhi; yhi = y1;
       }
       break;
     case BDF_EXPLEFT:
       while (yhi*ylo > 0)
-      { xlo -= xhi-xlo;
-        ylo = f(xlo)-c;
+      { x1 = xlo - (xhi-xlo);
+        y1 = f(x1) - c;
+        xhi = xlo; xlo = x1;
+        yhi = ylo; ylo = y1;
       }
       break;
     case BDF_NONE:

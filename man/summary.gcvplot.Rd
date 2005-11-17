@@ -11,9 +11,8 @@ Summary method for a gcvplot structure.
 }
 \arguments{
   \item{object}{A \code{gcvplot} structure produced by a call to
-    \code{\link{gcvplot}}, \code{\link{cpplot}} etc.
-}
-  \item{...}{currently ignored.}
+    \code{\link{gcvplot}}, \code{\link{cpplot}} e.t.c.}
+  \item{...}{arugments to and from other methods.}
 }
 
 \value{
@@ -25,7 +24,7 @@ Summary method for a gcvplot structure.
 
 \examples{
 data(ethanol)
-summary(gcvplot(NOx ~ E, data=ethanol, alpha=seq(0.2, 1.0, by=0.05)))
+summary(gcvplot(NOx~E,data=ethanol,alpha=seq(0.2,1.0,by=0.05)))
 }
 
 \seealso{
@@ -34,5 +33,5 @@ summary(gcvplot(NOx ~ E, data=ethanol, alpha=seq(0.2, 1.0, by=0.05)))
   \code{\link{gcvplot}}
 }
 
-\keyword{smooth}
+\keyword{methods}
 % Converted by Sd2Rd version 0.2-a5.

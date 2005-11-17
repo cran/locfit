@@ -1,4 +1,0 @@
-2004-09-13: Fixed locfit.matrix.Rd.
-
-From 1.1-6 to 1.1-7:
-*  Fixed documentation inconsistencies in locfit.raw.Rd and residuals.locfit.Rd.

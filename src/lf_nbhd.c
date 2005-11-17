@@ -10,13 +10,11 @@
 
 #include "local.h"
 
-extern vari *vb;
-
 double rho(x,sc,d,kt,sty) /* ||x|| for appropriate distance metric */
 double *x, *sc;
-INT d, kt, *sty;
+int d, kt, *sty;
 { double rhoi[MXDIM], s;
-  INT i;
+  int i;
   for (i=0; i<d; i++)
   { if (sty!=NULL)
     { switch(sty[i])
@@ -44,14 +42,15 @@ INT d, kt, *sty;
     return(sqrt(s));
   }
 
-  lfERROR(("rho: invalid kt"));
+  ERROR(("rho: invalid kt"));
   return(0.0);
 }
 
 double kordstat(x,k,n,ind)
 double *x;
-INT k, n, *ind;
-{ INT i, i0, i1, l, r;
+int k, n;
+Sint *ind;
+{ int i, i0, i1, l, r;
   double piv;
   if (k<1) return(0.0);
   i0 = 0; i1 = n-1;
@@ -75,31 +74,30 @@ INT k, n, *ind;
 }
 
 /* check if i'th data point is in limits */
-INT inlim(lf,xlim,i,d)
-lfit *lf;
-double *xlim;
-INT i, d;
-{ INT j, k;
+int inlim(lfd,i)
+lfdata *lfd;
+int i;
+{ int d, j, k;
+  double *xlim;
+
+  xlim = lfd->xl;
+  d = lfd->d;
   k = 1;
   for (j=0; j<d; j++)
   { if (xlim[j]<xlim[j+d])
-      k &= ((datum(lf,j,i)>=xlim[j]) & (datum(lf,j,i)<=xlim[j+d]));
+      k &= ((datum(lfd,j,i)>=xlim[j]) & (datum(lfd,j,i)<=xlim[j+d]));
   }
   return(k);
 }
 
 double compbandwid(di,ind,x,n,d,nn,fxh)
 double *di, *x, fxh;
-INT n, d, *ind, nn;
-{ INT i;
+Sint *ind;
+int n, d, nn;
+{ int i;
   double nnh;
 
-#ifdef CVERSION
-  if (nn<0)
-    return(dareval(vb,0,x));
-#endif
-
-  if (nn<=0) return(fxh);
+  if (nn==0) return(fxh);
 
   if (nn<n)
     nnh = kordstat(di,nn,n,ind);
@@ -114,16 +112,18 @@ INT n, d, *ind, nn;
 /*
   fast version of nbhd for ordered 1-d data
 */
-double nbhd1(lf,des,k,fxh)
-lfit *lf;
+void nbhd1(lfd,sp,des,k)
+lfdata *lfd;
+smpar *sp;
 design *des;
-INT k;
-double fxh;
-{ double x, h, *xd;
-  INT i, l, r, m, n, z;
-  n = lf->mi[MN];
+int k;
+{ double x, h, *xd, sc;
+  int i, l, r, m, n, z;
+
+  n = lfd->n;
   x = des->xev[0];
-  xd = dvari(lf,0);
+  xd = dvari(lfd,0);
+  sc = lfd->sca[0];
 
   /* find closest data point to x */
   if (x<=xd[0]) z = 0;
@@ -141,36 +141,41 @@ double fxh;
   }
   /* closest point to x is xd[z] */
 
-  if (k>0) /* set h to nearest neighbor bandwidth */
-  { l = r = z;
-    if (l==0) r = k-1;
-    if (r==n-1) l = n-k;
-    while (r-l<k-1)
-    { if ((x-xd[l-1])<(xd[r+1]-x)) l--; else r++;
+  if (nn(sp)<0)  /* user bandwidth */
+    h = sp->vb(des->xev);
+  else
+  { if (k>0) /* set h to nearest neighbor bandwidth */
+    { l = r = z;
       if (l==0) r = k-1;
       if (r==n-1) l = n-k;
+      while (r-l<k-1)
+      { if ((x-xd[l-1])<(xd[r+1]-x)) l--; else r++;
+        if (l==0) r = k-1;
+        if (r==n-1) l = n-k;
+      }
+      h = x-xd[l];
+      if (h<xd[r]-x) h = xd[r]-x;
     }
-    h = x-xd[l];
-    if (h<xd[r]-x) h = xd[r]-x;
-  } else h = 0;
-
-  if (h<fxh) h = fxh;
+    else h = 0;
+    h /= sc;
+    if (h<fixh(sp)) h = fixh(sp);
+  }
 
   m = 0;
   if (xd[z]>x) z--; /* so xd[z]<=x */
   /* look left */
-  for (i=z; i>=0; i--) if (inlim(lf,lf->xl,i,1))
-  { des->di[i] = x-xd[i];
-    des->w[m] = weight(lf,&xd[i],&x,h,1,des->di[i]);
+  for (i=z; i>=0; i--) if (inlim(lfd,i))
+  { des->di[i] = (x-xd[i])/sc;
+    des->w[m] = weight(lfd, sp, &xd[i], &x, h, 1, des->di[i]);
     if (des->w[m]>0)
     { des->ind[m] = i;
       m++; 
     } else i = 0;
   }
   /* look right */
-  for (i=z+1; i<n; i++) if (inlim(lf,lf->xl,i,1))
-  { des->di[i] = xd[i]-x;
-    des->w[m] = weight(lf,&xd[i],&x,h,1,des->di[i]);
+  for (i=z+1; i<n; i++) if (inlim(lfd,i))
+  { des->di[i] = (xd[i]-x)/sc;
+    des->w[m] = weight(lfd, sp, &xd[i], &x, h, 1, des->di[i]);
     if (des->w[m]>0)
     { des->ind[m] = i;
       m++; 
@@ -178,49 +183,93 @@ double fxh;
   }
 
   des->n = m;
-  return(h);
+  des->h = h;
 }
 
-double nbhd(lf,des,nn,fxh,redo)
-lfit *lf;
+void nbhd_zeon(lfd,des)
+lfdata *lfd;
 design *des;
-double fxh;
-INT redo, nn;
-{ INT d, i, j, m, n, *mi;
+{ int i, j, m, eq;
+
+  m = 0;
+  for (i=0; i<lfd->n; i++)
+  { eq = 1;
+    for (j=0; j<lfd->d; j++) eq = eq && (des->xev[j] == datum(lfd,j,i));
+    if (eq)
+    { des->w[m] = 1;
+      des->ind[m] = i;
+      m++;
+    }
+  }
+  des->n = m;
+  des->h = 1.0;
+}
+
+void nbhd(lfd,des,nn,redo,sp)
+lfdata *lfd;
+design *des;
+int redo, nn;
+smpar *sp;
+{ int d, i, j, m, n;
   double h, u[MXDIM];
 
-  mi = lf->mi;
+  if (lf_debug>1) printf("nbhd: nn %d  fixh %8.5f\n",nn,fixh(sp));
+  
+  d = lfd->d; n = lfd->n;
 
-  if (mi[MKT]==KCE) return(0.0);
-  d = mi[MDIM]; n = mi[MN];
+  if (ker(sp)==WPARM)
+  { for (i=0; i<n; i++)
+    { des->w[i] = 1.0;
+      des->ind[i] = i;
+    }
+    des->n = n;
+    return;
+  }
+
+  if (kt(sp)==KZEON)
+  { nbhd_zeon(lfd,des);
+    return;
+  }
+
+  if (kt(sp)==KCE)
+  { des->h = 0.0;
+    return;
+  }
 
   /* ordered 1-dim; use fast searches */
-  if ((nn<=n) & (lf->ord) & (mi[MKER]!=WMINM) & (lf->sty[0]!=STANGL))
-    return(nbhd1(lf,des,nn,fxh));
+  if ((nn<=n) & (lfd->ord) & (ker(sp)!=WMINM) & (lfd->sty[0]!=STANGL))
+  { nbhd1(lfd,sp,des,nn);
+    return;
+  }
 
   if (!redo)
   { for (i=0; i<n; i++)
-    { for (j=0; j<d; j++) u[j] = datum(lf,j,i)-des->xev[j];
-      des->di[i] = rho(u,lf->sca,d,mi[MKT],lf->sty);
+    { for (j=0; j<d; j++) u[j] = datum(lfd,j,i)-des->xev[j];
+      des->di[i] = rho(u,lfd->sca,d,kt(sp),lfd->sty);
       des->ind[i] = i;
     }
   }
   else
     for (i=0; i<n; i++) des->ind[i] = i;
 
-  if (mi[MKER]==WMINM) return(minmax(lf,des));
+  if (ker(sp)==WMINM)
+  { des->h = minmax(lfd,des,sp);
+    return;
+  }
 
-  h = compbandwid(des->di,des->ind,des->xev,n,mi[MDIM],nn,fxh);
-
+  if (nn<0)
+    h = sp->vb(des->xev);
+  else
+    h = compbandwid(des->di,des->ind,des->xev,n,lfd->d,nn,fixh(sp));
   m = 0;
-  for (i=0; i<n; i++) if (inlim(lf,lf->xl,i,d))
-  { for (j=0; j<d; j++) u[j] = datum(lf,j,i);
-    des->w[m] = weight(lf,u,des->xev,h,1,des->di[i]);
+  for (i=0; i<n; i++) if (inlim(lfd,i))
+  { for (j=0; j<d; j++) u[j] = datum(lfd,j,i);
+    des->w[m] = weight(lfd, sp, u, des->xev, h, 1, des->di[i]);
     if (des->w[m]>0)
     { des->ind[m] = i;
       m++;
     }
   }
   des->n = m;
-  return(h);
+  des->h = h;
 }

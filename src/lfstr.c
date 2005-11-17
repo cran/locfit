@@ -4,24 +4,50 @@
  *
  *
  *
- *  setstrval() is a  function for converting string arguments to Locfit's
- *    numeric values.  A typical call will be setstrval(lf.mi,MKER,"gauss").
+ *  Functions for converting string arguments to Locfit's numeric values.
+ *  Typically, these will be assigned to appopriate place on one of locfit's structures:
+ *    fam(sp) = lffamily(z)
+ *    ker(sp) = lfkernel(z)
+ *    kt(sp)  = lfketype(z)
+ *    link(sp)= lflink(z)
+ *    de_itype= deitype(z)
+ *    ev(evs) = lfevstr(z)
+ *    acri(sp)= lfacri(z)
+ *  sp is a pointer to the smpar structure, &lf->sp.
+ *  evs is a pointer to the evaluation structure, &lf->evs.
+ *  int ppwhat(str) interprets the preplot what argument.
+ *  int restyp(str) interprets the residual type argument.
  *
- *  components that can be set in this manner are
- *    MKER  (weight function)
- *    MKT   (kernel type -- spherical or product)
- *    MTG   (local likelihood family)
- *    MLINK (link function)
- *    MIT   (integration type for density estimation)
- *    MEV   (evaluation structure)
- *    MACRI (adaptive criterion)
- *
- *  INT ppwhat(str) interprets the preplot what argument.
- *  INT restyp(str) interprets the residual type argument.
- *
+ *  return values of -1 indicate failure/unknown string.
  */
 
 #include "local.h"
+
+int ct_match(z1, z2)
+char *z1, *z2;
+{ int ct = 0;
+  while (z1[ct]==z2[ct])
+  { if (z1[ct]=='\0') return(ct+1);
+    ct++;
+  }
+  return(ct);
+}
+
+int pmatch(z, strings, vals, n, def)
+char *z, **strings;
+int *vals, n, def;
+{ int i, ct, best, best_ct;
+  best = -1;
+  best_ct = 0;
+
+  for (i=0; i<n; i++)
+  { ct = ct_match(z,strings[i]);
+    if (ct==strlen(z)+1) return(vals[i]);
+    if (ct>best_ct) { best = i; best_ct = ct; }
+  }
+  if (best==-1) return(def);
+  return(vals[best]);
+}
 
 static char *famil[17] =
   { "density", "ate",   "hazard",    "gaussian", "binomial",
@@ -31,10 +57,9 @@ static int   fvals[17] =
   { TDEN,  TRAT,  THAZ,  TGAUS, TLOGT,
     TPOIS, TGAMM, TGEOM, TCIRC, TROBT, TROBT,
     TWEIB, TCAUC, TPROB, TLOGT, TGEOM, TCIRC };
-
-INT lffamily(z)
+int lffamily(z)
 char *z;
-{ INT quasi, robu, f;
+{ int quasi, robu, f;
   quasi = robu = 0;
   while ((z[0]=='q') | (z[0]=='r'))
   { quasi |= (z[0]=='q');
@@ -44,18 +69,12 @@ char *z;
   f = pmatch(z,famil,fvals,16,-1);
   if ((z[0]=='o') | (z[0]=='a')) robu = 0;
   if (f==-1)
-  { lfWARN(("unknown family %s",z));
+  { WARN(("unknown family %s",z));
     f = TGAUS;
   }
   if (quasi) f += 64;
   if (robu)  f += 128;
   return(f);
-}
-
-void getlffam(z,x)
-char **z;
-INT *x;
-{ *x = lffamily(z[0]);
 }
 
 static char *wfuns[13] = {
@@ -64,63 +83,44 @@ static char *wfuns[13] = {
   "6cub",        "minimax",      "exponential", "maclean", "parametric" };
 static int wvals[13] = { WRECT, WEPAN, WBISQ, WTCUB,
   WTRWT, WGAUS, WTRIA, WQUQU, W6CUB, WMINM, WEXPL, WMACL, WPARM };
+int lfkernel(char *z)
+{ return(pmatch(z, wfuns, wvals, 13, WTCUB));
+}
 
-static char *ktype[3] = { "spherical", "product", "center" };
-static int   kvals[3] = { KSPH, KPROD, KCE };
+static char *ktype[5] = { "spherical", "product", "center", "lm", "zeon" };
+static int   kvals[5] = { KSPH, KPROD, KCE, KLM, KZEON };
+int lfketype(char *z)
+{ return(pmatch(z, ktype, kvals, 5, KSPH));
+}
 
 static char *ltype[8] = { "default", "canonical", "identity", "log",
                           "logi",    "inverse",   "sqrt",     "arcsin" };
 static int   lvals[8] = { LDEFAU, LCANON, LIDENT, LLOG,
                           LLOGIT, LINVER, LSQRT,  LASIN };
+int lflink(char *z)
+{ return(pmatch(z, ltype, lvals, 8, LDEFAU));
+}
 
-static char *etype[9] = { "tree",     "phull", "data", "grid", "kdtree",
-                          "kdcenter", "cross", "xbar", "none" };
-static int   evals[9] = { ETREE, EPHULL, EDATA, EGRID, EKDTR,
-                          EKDCE, ECROS,  EXBAR, ENONE };
+static char *etype[11]= { "tree",     "phull", "data", "grid", "kdtree",
+                          "kdcenter", "cross", "preset", "xbar", "none",
+                          "sphere" };
+static int   evals[11]= { ETREE, EPHULL, EDATA, EGRID, EKDTR,
+                          EKDCE, ECROS,  EPRES, EXBAR, ENONE, ESPHR };
+int lfevstr(char *z)
+{ return(pmatch(z, etype, evals, 11, ETREE));
+}
 
-static char *itype[6] = { "default", "multi", "product", "mlinear",
-                          "hazard",  "monte" };
-static int   ivals[6] = { IDEFA, IMULT, IPROD, IMLIN, IHAZD, IMONT };
+static char *itype[7] = { "default", "multi", "product", "mlinear",
+                          "hazard",  "sphere", "monte" };
+static int   ivals[7] = { IDEFA, IMULT, IPROD, IMLIN, IHAZD, ISPHR, IMONT };
+int deitype(char *z)
+{ return(pmatch(z, itype, ivals, 6, IDEFA));
+}
 
 static char *atype[5] = { "none", "cp", "ici", "mindex", "ok" };
 static int   avals[5] = { ANONE, ACP, AKAT, AMDI, AOK };
-
-void setstrval(mi,v,z)
-INT *mi, v;
-char *z;
-{ 
-  switch(v)
-  { case MKER:
-      mi[v] = pmatch(z, wfuns, wvals, 13, WTCUB);
-      return;
-
-    case MKT:
-      mi[v] = pmatch(z, ktype, kvals, 3, KSPH);
-      return;
-
-    case MTG:
-      mi[v] = lffamily(z);
-      return;
-
-    case MLINK:
-      mi[v] = pmatch(z, ltype, lvals, 8, LDEFAU);
-      return;
-
-    case MIT:
-      mi[v] = pmatch(z, itype, ivals, 6, IDEFA);
-      return;
-
-    case MEV:
-      mi[v] = pmatch(z, etype, evals, 9, ETREE);
-      return;
-
-    case MACRI:
-      mi[v] = pmatch(z, atype, avals, 5, ANONE);
-      return;
-  }
-
-  lfWARN(("setstrval: invalid value %d",v));
-  return;
+int lfacri(char *z)
+{ return(pmatch(z, atype, avals, 5, ANONE));
 }
 
 static char *rtype[8] = { "deviance", "d2",    "pearson", "raw",
@@ -131,20 +131,20 @@ static char *whtyp[8] = { "coef", "nlx", "infl", "band",
                           "degr", "like", "rdf", "vari" };
 static int   whval[8] = { PCOEF, PNLX, PT0, PBAND, PDEGR, PLIK, PRDF, PVARI };
 
-INT restyp(z)
+int restyp(z)
 char *z;
 { int val;
   
   val = pmatch(z, rtype, rvals, 8, -1);
-  if (val==-1) lfERROR(("Unknown type = %s",z));
-  return((INT)val);
+  if (val==-1) ERROR(("Unknown type = %s",z));
+  return(val);
 }
 
-INT ppwhat(z)
+int ppwhat(z)
 char *z;
 { int val;
   
   val = pmatch(z, whtyp, whval, 8, -1);
-  if (val==-1) lfERROR(("Unknown what = %s",z));
-  return((INT)val);
+  if (val==-1) ERROR(("Unknown what = %s",z));
+  return(val);
 }

@@ -29,7 +29,7 @@ sjpi(x, a)
 }
 \examples{
 # Fig 10.2 (S-J parts) from Loader (1999).
-data(geyser, package="locfit")
+data(geyser)
 gf <- 2.5
 a <- seq(0.05, 0.7, length=100)
 z <- sjpi(geyser, a)
@@ -53,5 +53,5 @@ legend(gf*0.05, gf*0.4, lty = 1:2, legend = c("Plug-in", "SJ assumed"))
   \code{\link{lcvplot}}
 }
 
-\keyword{smooth}
+\keyword{htest}
 % Converted by Sd2Rd version 0.2-a5.

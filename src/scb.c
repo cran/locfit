@@ -1,14 +1,7 @@
-/*
- *   Copyright (c) 1996-2001 Jiayang Sun, Catherine Loader.
- *   This file is used by the simultaneous confidence band
- *   additions to Locfit.
- *
- */
-
 #include "local.h"
-extern int cvi;
 static double scb_crit, *x, c[10], kap[5], kaq[5], max_p2;
-static int type, side;
+static int side, type;
+design *scb_des;
 
 double covar_par(lf,des,x1,x2)
 lfit *lf;
@@ -19,8 +12,8 @@ double x1, x2;
   int i, j, p, ispar;
 
   v1 = des->f1; v2 = des->ss; wk = des->oc;
-  ispar = (lf->mi[MKER]==WPARM) && (hasparcomp(lf));
-  p = lf->mi[MP];
+  ispar = (ker(&lf->sp)==WPARM) && (haspc(&lf->pc));
+  p = npar(&lf->sp);
 
 /*  for parametric models, the covariance is
  *  A(x1)^T (X^T W V X)^{-1} A(x2)
@@ -28,8 +21,8 @@ double x1, x2;
  */
   if (ispar)
   { pc = &lf->pc;
-    fitfun(lf,&x1,pc->xbar,v1,NULL,0);
-    fitfun(lf,&x2,pc->xbar,v2,NULL,0);
+    fitfun(&lf->lfd, &lf->sp, &x1,pc->xbar,v1,NULL);
+    fitfun(&lf->lfd, &lf->sp, &x2,pc->xbar,v2,NULL);
     jacob_hsolve(&lf->pc.xtwx,v1);
     jacob_hsolve(&lf->pc.xtwx,v2);
   }
@@ -39,12 +32,12 @@ double x1, x2;
  *  des->P = M2^{1/2} M1^{-1}.
  */
   if (!ispar)
-  { fitfun(lf,&x1,des->xev,wk,NULL,0);
+  { fitfun(&lf->lfd, &lf->sp, &x1,des->xev,wk,NULL);
     for (i=0; i<p; i++)
     { v1[i] = 0;
       for (j=0; j<p; j++) v1[i] += des->P[i*p+j]*wk[j];
     }
-    fitfun(lf,&x2,des->xev,wk,NULL,0);
+    fitfun(&lf->lfd, &lf->sp, &x2,des->xev,wk,NULL);
     for (i=0; i<p; i++)
     { v2[i] = 0;
       for (j=0; j<p; j++) v2[i] += des->P[i*p+j]*wk[j];
@@ -60,10 +53,9 @@ design *des;
 double sd;
 { double b2i, b3i, b3j, b4i;
   double ss, si, sj, uii, uij, ujj, k1;
-  INT ii, i, j, jj, *mi;
+  int ii, i, j, jj;
   for (i=1; i<10; i++) c[i] = 0.0;
   k1 = 0;
-  mi = lf->mi;
 
   /* ss = sd*sd; */
   ss = covar_par(lf,des,des->xev[0],des->xev[0]);
@@ -73,13 +65,13 @@ double sd;
  * the sums would have to include weights. Still have to work
  * out the right way.
  */
-  for (i=0; i<mi[MN]; i++)
+  for (i=0; i<lf->lfd.n; i++)
   { ii = des->ind[i];
-    b2i = b2(des->th[i],mi[MTG],prwt(lf,ii));
-    b3i = b3(des->th[i],mi[MTG],prwt(lf,ii));
-    b4i = b4(des->th[i],mi[MTG],prwt(lf,ii));
-    si = covar_par(lf,des,des->xev[0],datum(lf,0,ii));
-    uii= covar_par(lf,des,datum(lf,0,ii),datum(lf,0,ii));
+    b2i = b2(des->th[i],fam(&lf->sp),prwt(&lf->lfd,ii));
+    b3i = b3(des->th[i],fam(&lf->sp),prwt(&lf->lfd,ii));
+    b4i = b4(des->th[i],fam(&lf->sp),prwt(&lf->lfd,ii));
+    si = covar_par(lf,des,des->xev[0],datum(&lf->lfd,0,ii));
+    uii= covar_par(lf,des,datum(&lf->lfd,0,ii),datum(&lf->lfd,0,ii));
     if (lf_error) return;
 
     c[2] += b4i*si*si*uii;
@@ -95,12 +87,12 @@ double sd;
     c[3] += b3i*b3i*si*si*si*si*uii;
     c[4] += b3i*b3i*si*si*uii*uii;
 
-    for (j=i+1; j<mi[MN]; j++)
+    for (j=i+1; j<lf->lfd.n; j++)
     { jj = des->ind[j];
-      b3j = b3(des->th[j],mi[MTG],prwt(lf,jj));
-      sj = covar_par(lf,des,des->xev[0],datum(lf,0,jj));
-      uij= covar_par(lf,des,datum(lf,0,ii),datum(lf,0,jj));
-      ujj= covar_par(lf,des,datum(lf,0,jj),datum(lf,0,jj));
+      b3j = b3(des->th[j],fam(&lf->sp),prwt(&lf->lfd,jj));
+      sj = covar_par(lf,des,des->xev[0],datum(&lf->lfd,0,jj));
+      uij= covar_par(lf,des,datum(&lf->lfd,0,ii),datum(&lf->lfd,0,jj));
+      ujj= covar_par(lf,des,datum(&lf->lfd,0,jj),datum(&lf->lfd,0,jj));
 
       c[1] += 2*b3i*b3j*si*sj*uij*uij;
       c[3] += 2*b3i*b3j*si*si*sj*sj*uij;
@@ -140,187 +132,161 @@ double u;
      + c[8]*((u*u-10)*u*u+15) ) / 72 );
 }
 
-void procvscb2(des,lf,v)
+extern int likereg();
+double gldn_like(a)
+double a;
+{ int err;
+
+  scb_des->fix[0] = 1;
+  scb_des->cf[0] = a;
+  max_nr(likereg, scb_des->cf, scb_des->oc, scb_des->res, scb_des->f1,
+    &scb_des->xtwx, scb_des->p, lf_maxit, 1.0e-6, &err); 
+  scb_des->fix[0] = 0;
+
+  return(scb_des->llk);
+}
+
+/* v1/v2 is correct for deg=0 only */
+void get_gldn(fp,des,lo,hi,v)
+fitpt *fp;
+design *des;
+double *lo, *hi;
+int v;
+{ double v1, v2, c, tlk;
+  int err;
+
+  v1 = fp->nlx[v];
+  v2 = fp->t0[v];
+  c = scb_crit * v1 / v2;
+  tlk = des->llk - c*c/2;
+printf("v %8.5f %8.5f  c %8.5f  tlk %8.5f   llk %8.5f\n",v1,v2,c,tlk,des->llk);
+
+  /* want: { a : l(a) >= l(a-hat) - c*c/2 } */
+  lo[v] = fp->coef[v] - scb_crit*v1;
+  hi[v] = fp->coef[v] + scb_crit*v1;
+
+  err = 0;
+
+printf("lo %2d\n",v);
+  lo[v] = solve_secant(gldn_like,tlk,lo[v],fp->coef[v],1e-8,BDF_EXPLEFT,&err);
+  if (err>0) printf("solve_secant error\n");
+printf("hi %2d\n",v);
+  hi[v] = solve_secant(gldn_like,tlk,fp->coef[v],hi[v],1e-8,BDF_EXPRIGHT,&err);
+  if (err>0) printf("solve_secant error\n");
+}
+
+int procvscb2(des,lf,v)
 design *des;
 lfit *lf;
-INT v;
+int v;
 { double thhat, sd, *lo, *hi, u;
-  int err, tmp;
-  x = des->xev = evpt(lf,v);
-  tmp = lf->mi[MPC];
-  if ((lf->mi[MKER]==WPARM) && (hasparcomp(lf)))
+  int err, st, tmp;
+  x = des->xev = evpt(&lf->fp,v);
+  tmp = haspc(&lf->pc);
+  /* if ((ker(&lf->sp)==WPARM) && (haspc(&lf->pc)))
   { lf->coef[v] = thhat = addparcomp(lf,des->xev,PCOEF);
-    lf->nlx[v] = sd = addparcomp(lf,des->xev,PNLX);
+    lf->nlx[v] = lf->t0[v] = sd = addparcomp(lf,des->xev,PNLX);
   }
-  else
-  { lf->mi[MPC] = 0;
-    procv(des,lf,v);
-    thhat = lf->coef[v];
-    sd = lf->nlx[v];
+  else */
+  { haspc(&lf->pc) = 0;
+    st = procv(des,lf,v);
+    thhat = lf->fp.coef[v];
+    sd = lf->fp.nlx[v];
   }
-  if (type >= 2)
-  { if (lf->mi[MKER] != WPARM)
-      lfWARN(("nonparametric fit; correction is invalid"));
+  if ((type==GLM2) | (type==GLM3) | (type==GLM4))
+  { if (ker(&lf->sp) != WPARM)
+      WARN(("nonparametric fit; correction is invalid"));
     cumulant(lf,des,sd);
   }
-  lf->mi[MPC] = tmp;
-  lo = vdptr(lf->L);
-  hi = &lo[lf->nvm];
+  haspc(&lf->pc) = tmp;
+  lo = lf->fp.L;
+  hi = &lo[lf->fp.nvm];
   switch(type)
-  { case 0:
-    case 1: /* basic scr */
-      lo[v] = thhat - scb_crit * sd;
-      hi[v] = thhat + scb_crit * sd;
-      return;
-    case 2: /* centered scr */
-      lo[v] = thhat - kap[1]*sd - scb_crit*sd*sqrt(kap[2]);
-      hi[v] = thhat - kap[1]*sd + scb_crit*sd*sqrt(kap[2]);
-      return;
-    case 3: /* corrected 2 */
-      u = solve_secant(q2,scb_crit,0.0,2*scb_crit,0.000001,BDF_NONE,&err);
-      lo[v] = thhat - u*sd;
-      hi[v] = thhat + u*sd;
-      return;
-    case 4: /* corrected 2' */
+  {
+    case GLM1:
+      return(st);
+    case GLM2: /* centered scr */
+      lo[v] = kap[1];
+      hi[v] = sqrt(kap[2]);
+      return(st);
+    case GLM3: /* corrected 2 */
+      lo[v] = solve_secant(q2,scb_crit,0.0,2*scb_crit,0.000001,BDF_NONE,&err);
+      return(st);
+    case GLM4: /* corrected 2' */
       u = fabs(p2(scb_crit));
       max_p2 = MAX(max_p2,u);
-      lo[v] = thhat;
-      hi[v] = thhat;
-      return;
+      return(st);
+    case GLDN:
+      get_gldn(&lf->fp,des,lo,hi,v);
+      return(st);
   }
-  lfERROR(("procvscb2: invalid type"));
+  ERROR(("procvscb2: invalid type"));
+  return(st);
 }
 
 void scb(des,lf)
 design *des;
 lfit *lf;
-{ double kap[10], *lo, *hi;
-  INT i, *mi, nterms;
-  mi = lf->mi;
-  mi[MP] = calcp(mi,mi[MDEG]);
-  type = mi[MGETH] - 70;
-  deschk(des,mi[MN],mi[MP]);
-  des->pref = 0;
-  cvi = -1; /* inhibit cross validation */
-  mi[MLINK] = defaultlink(mi[MLINK],mi[MTG]);
+{ double k1, k2, kap[10], *lo, *hi, sig, thhat, nlx;
+  int i, nterms;
 
-  if (type==0)
-  { kap[0] = 1;
-    scb_crit = critval(kap,1,0,0.05,10,2,0.0);
+  scb_des= des;
+
+  npar(&lf->sp) = calcp(&lf->sp,lf->lfd.d);
+  des_init(des,lf->lfd.n,npar(&lf->sp));
+  link(&lf->sp) = defaultlink(link(&lf->sp),fam(&lf->sp));
+
+  type = geth(&lf->fp);
+
+  if (type >= 80) /* simultaneous */
+  {
+    nterms = constants(des,lf);
+    scb_crit = critval(0.05,lf->fp.kap,nterms,lf->lfd.d,TWO_SIDED,0.0,GAUSS);
+    type -= 10;
   }
-  else
-  { compparcomp(des,lf,0);
-    nterms = constants(des,lf,kap);
-    scb_crit = critval(kap,nterms,mi[MDIM],0.05,10,2,0.0);
+  else /* pointwise */
+  { lf->fp.kap[0] = 1;
+    scb_crit = critval(0.05,lf->fp.kap,1,lf->lfd.d,TWO_SIDED,0.0,GAUSS);
   }
 
   max_p2 = 0.0;
   startlf(des,lf,procvscb2,0);
-  if (type==4)
-  { lo = vdptr(lf->L);
-    hi = &lo[lf->nvm];
-    for (i=0; i<lf->nv; i++)
+
+  if ((fam(&lf->sp)&64)==64)
+  { i = haspc(&lf->pc); haspc(&lf->pc) = 0;
+    ressumm(lf,des);
+    haspc(&lf->pc) = i;
+    sig = sqrt(rv(&lf->fp));
+  }
+  else sig = 1.0;
+
+  lo = lf->fp.L;
+  hi = &lo[lf->fp.nvm];
+  for (i=0; i<lf->fp.nv; i++)
+  { thhat = lf->fp.coef[i];
+    nlx = lf->fp.nlx[i];
+    switch(type)
     {
-      lo[i] -= (scb_crit-max_p2)*lf->nlx[i];
-      hi[i] += (scb_crit-max_p2)*lf->nlx[i];
+      case GLM1:  /* basic scb */
+        lo[i] = thhat - scb_crit * sig * nlx;
+        hi[i] = thhat + scb_crit * sig * nlx;
+        break;
+      case GLM2:
+        k1 = lo[i];
+        k2 = hi[i];
+        lo[i] = thhat - k1*nlx - scb_crit*nlx*k2;
+        hi[i] = thhat - k1*nlx + scb_crit*nlx*k2;
+        break;
+      case GLM3:
+        k1 = lo[i];
+        lo[i] = thhat - k1*nlx;
+        hi[i] = thhat + k1*nlx;
+      case GLM4:  /* corrected 2' */
+        lo[i] = thhat - (scb_crit-max_p2)*lf->fp.nlx[i];
+        hi[i] = thhat + (scb_crit-max_p2)*lf->fp.nlx[i];
+        break;
+      case GLDN:
+        break;
     }
   }
 }
-
-#ifdef CVERSION
-extern lfit lf;
-extern design des;
-extern vari *aru;
-
-lfit *lf_sim;
-design *des_sim;
-
-double scbsim_fun(x)
-double x;
-{ double y;
-  evptx(lf_sim,0,0) = x;
-  procv(des_sim,lf_sim,0);
-
-  if (type>=2)
-  { if (lf_sim->mi[MKER] != WPARM)
-      lfWARN(("nonparametric fit; correction is invalid"));
-    cumulant(lf_sim,des_sim,lf_sim->nlx[0]);
-  }
-
-  y = lf_link(dareval(aru,0,&x),lf_sim->mi[MLINK]);
-  y = (lf_sim->coef[0] - y) / lf_sim->nlx[0];
-
-  switch(type)
-  {
-    case 2:
-      y = (y-kap[1]) / sqrt(kap[2]);
-      break;
-    case 3:
-      y = (y-kap[1])/sqrt(kap[2]);
-      y = (y>0) ? y+q2(y) : y - q2(y);
-      break;
-  }
-
-  switch(side)
-  { case -1: return(-y);
-    case  1: return(y);
-    default: return(fabs(y));
-  }
-}
-
-static double max;
-
-void do_scbsim(des,lf)
-design *des;
-lfit *lf;
-{ double y;
-  int err;
-
-  lf_sim = lf;
-  des_sim = des;
-
-  trchck(lf,1,1,lf->mi[MDIM],lf->mi[MP],1);
-  y = max_quad(scbsim_fun,lf->fl[0],lf->fl[1],10,0.00001,&err,'y');
-  max = y;
-}
-
-void scbsim(lf,des)
-lfit *lf;
-design *des;
-{ double kap[5];
-  int nterms;
-
-  lf->mi[MEV] = 100;
-  startlf(des,lf,scbsim_fun,1);
-
-  nterms = constants(des,lf,kap);
-  printf("xmx: %10.6f  max: %10.6f  k0 %10.6f %10.6f  pr %10.6f\n",0.0,max,kap[0],kap[1],tailp(max,kap,nterms,lf->mi[MDIM],0.0));
-}
-
-void cscbsim(v)
-vari *v;
-{ int i;
-  side = 0; type = 1;
-  fitoptions(&lf,v,0);
-
-  i = getarg(v,"mean",1);
-  if (i==0)
-  { lfWARN(("cscbsim: no mean function; setting = 0"));
-    aru = arbuild("0",0,0,NULL,0,1);
-  }
-  else
-  { aru = arbuild(argval(v,i),0,strlen(argval(v,i))-1,NULL,0,1);
-    setvarname(aru,"_aru");
-  }
-
-  i = getarg(v,"corr",1);
-  if (i>0) type = getlogic(v,i);
-  if (lf_error) return;
-
-  i = getarg(v,"side",1);
-  if (i>0) sscanf(argval(v,i),"%d",&side);
-  if (lf_error) return;
-
-  scbsim(&lf,&des);
-}
-#endif

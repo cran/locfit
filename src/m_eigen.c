@@ -115,10 +115,12 @@ double *v;
     for (j=0; j<p; j++) w[i] += Q[j*p+i]*v[j];
   }
   for (i=0; i<p; i++)
-    if (D[i*p+i]>tol)
-    { w[i] /= sqrt(D[i*(p+1)]);
+  { if (D[i*p+i]>tol)
+    { v[i] = w[i]/sqrt(D[i*(p+1)]);
       rank++;
     }
+    else v[i] = 0.0;
+  }
   return(rank);
 }
 

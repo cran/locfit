@@ -17,6 +17,6 @@
 \references{
   Bliss (1935).
   The calculation of the dosage-mortality curve.
-  Annals of Applied Biology 22, 134-167.
+  \emph{Annals of Applied Biology} 22, 134-167.
 }
 \keyword{datasets}

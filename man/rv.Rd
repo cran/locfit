@@ -1,7 +1,7 @@
 \name{rv}
 \alias{rv}
 \title{
-Residual variance from a "locfit" object.
+Residual variance from a locfit object.
 }
 \usage{
 rv(fit)

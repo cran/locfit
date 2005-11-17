@@ -4,7 +4,8 @@
 Local Regression, Likelihood and Density Estimation.
 }
 \usage{
-locfit(formula, data, weights, cens, base, subset, geth, ..., lfproc)
+locfit(formula, data=sys.frame(sys.parent()), weights=1, cens=0, base=0,
+       subset, geth=FALSE, \dots, lfproc=locfit.raw)
 }
 \description{
   \code{locfit} is the model formula-based interface to the Locfit
@@ -16,8 +17,9 @@ locfit(formula, data, weights, cens, base, subset, geth, ..., lfproc)
 }
 \arguments{
 \item{formula}{
-Model Formula; e.g. \code{y~x} for a regression model; \code{~x} for a
-density estimation model
+Model Formula; e.g. \code{y~lp(x)} for a regression model; \code{~lp(x)} for a
+density estimation model. Use of \code{lp()} on the RHS is recommended, especially
+when non-default smoothing parameters are used.
 }
 \item{data}{
 Data Frame.
@@ -58,17 +60,17 @@ ploting, etc. these objects is provided.
 }
 \examples{
 # fit and plot a univariate local regression
-data(ethanol)
-fit <- locfit(NOx~E,data=ethanol)
-plot(fit,get.data=TRUE)
+data(ethanol, package="locfit")
+fit <- locfit(NOx ~ E, data=ethanol)
+plot(fit, get.data=TRUE)
 
 # a bivariate local regression with smaller smoothing parameter
-fit <- locfit(NOx~E+C, data=ethanol, scale=0, alpha=0.5)
+fit <- locfit(NOx~lp(E,C,nn=0.5,scale=0), data=ethanol)
 plot(fit)
 
 # density estimation
-data(geyser, package="locfit")
-fit <- locfit(~geyser, alpha=c(0.1,0.8))
+data(geyser, data="locfit")
+fit <- locfit( ~ lp(geyser, nn=0.1, h=0.8))
 plot(fit,get.data=TRUE)
 }
 \references{

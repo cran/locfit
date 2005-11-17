@@ -10,10 +10,8 @@ Print a Locfit summary object.
   Print method for \code{"summary.locfit"} objects.
 }
 \arguments{
-\item{x}{
-Object from \code{\link{summary.locfit}()}.
-}
-\item{...}{not used.}
+  \item{x}{Object from \code{\link{summary.locfit}}.}
+  \item{...}{Arguments passed to and from methods.}
 }
 \seealso{
 \code{\link{summary.locfit}()}

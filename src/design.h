@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1998-2000 Lucent Technologies.
+ *   Copyright (c) 1998-2001 Lucent Technologies.
  *   See README file for details.
  *
  *
@@ -7,16 +7,23 @@
  */
 
 typedef struct {
-  vari *dw, *index;
-  double *xev;       /* fit point length p               */
-  double *X;         /* design matrix, length n*p        */
-  double *w, *di, *res, *th, *wd, h, xb[MXDIM];
-  double *V, *P, *f1, *ss, *oc, *cf, llk;
+  int des_init_id;
+  double *wk;
+  Sint *ind;
+  int lwk, lind;
+
+  double *xev;                /* fitting point, length p          */
+  double *X;                  /* design matrix, length n*p        */
+  double *w, *di, *res, *th, *wd, h;
+  double *V, *P;              /* matrices with length p*p         */
+  double *f1, *ss, *oc, *cf;  /* work vectors, length p  */
+  double llk, smwt;
   jacobian xtwx;     /* to store X'WVX and decomposition */
   int cfn[1+MXDIM], ncoef;
-  int *fix;          /* indicator vector, showing fixed variables. */
-  INT *ind, n, p, pref, (*itype)();
-  INT (*vfun)();     /* pointer to the vertex processing function. */
+  Sint *fix;         /* integer vector for fixed coefficients. */
+  int (*itype)();    /* density integration function     */
+  int n, p;
+  int (*vfun)();     /* pointer to the vertex processing function. */
 } design;
 
 #define cfn(des,i) (des->cfn[i])
@@ -24,5 +31,6 @@ typedef struct {
 #define d_xi(des,i) (&(des)->X[i*((des)->p)])
 #define d_xij(des,i,j) ((des)->X[i*((des)->p)+j])
 #define is_fixed(des,i) ((des)->fix[i]==1)
+#define DES_INIT_ID 34988372
 
 extern int des_reqd(), des_reqi();

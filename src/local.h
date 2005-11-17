@@ -1,28 +1,23 @@
 /*
- *   Copyright (c) 1996-2000 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  * 
  *
  *  Most of the changes formerly needed here are handled through
  *  the Makefiles and #ifdef's.
- *
- *
  */
 
 #ifndef I_LF_H
 #define I_LF_H
 
-#define RVERSION
-
 /*
  *   DIRSEP: '/' for unix; '\\' for DOS
  */
 #ifdef DOS
-  #define DIRSEP '\\'
+#define DIRSEP '\\'
 #else
-  #define DIRSEP '/'
+#define DIRSEP '/'
 #endif
-
 
 /*
    Some older math libraries have no lgamma() function, and gamma(arg)
@@ -35,49 +30,13 @@
    math libraries don't include these functions.
  */
 #ifdef DOS
-  #define LGAMMA(arg) lflgamma(arg)
-  #define erf(x) lferf(x)
-  #define erfc(x) lferfc(x)
+#define LGAMMA(arg) lflgamma(arg)
+#define erf(x) lferf(x)
+#define erfc(x) lferfc(x)
 #else
-  #define LGAMMA(arg) lgamma(arg)
+#define LGAMMA(arg) lgamma(arg)
 #endif
 #define daws(x) lfdaws(x)
-
-
-/*
-   Does your system support popen() and pclose()
-   for pipes? For most flavours of unix, yes.
-   For other OS's, usually not, and you'll need to
-   uncomment the following line.
-
-   (This is only relevant if making the C version).
-*/
-/* #define NOPIPES */
-
-
-/*
-   (the #ifdef's below should now take care of this).
-   the INT type is used for all integers provided in .C() calls from S.
-   For the S version, this should be long int.
-   For the R version, should be int.
-   For the C version, either is adequate.
-   Usually this only makes a difference on 64 bit systems.
-*/
-
-#ifndef SWINVERSION
-
-#ifdef RVERSION
-#include "R.h"
-typedef int INT;
-#else
-#ifdef SVERSION
-typedef long int INT;
-#else
-typedef int INT;
-#endif /* SVERSION */
-#endif /* RVERSION */
-
-#endif /* SWINVERSION */
 
 /******** NOTHING BELOW HERE NEEDS CHANGING **********/
 
@@ -86,6 +45,43 @@ typedef int INT;
 #include <string.h>
 #include <math.h>
 
+#define RVERSION
+
+#ifdef SWINVERSION
+#define SVERSION
+#include "newredef.h"
+#endif
+
+#ifdef RVERSION
+
+/* #typedef int Sint is defined in R.h */
+#include <R.h>
+#include <Rdefines.h>
+#include <Rinternals.h>
+#define list_elt(ev,i) VECTOR_PTR(ev)[i]
+#define dval2(ev,i,j) NUMERIC_POINTER(list_elt(ev,i))[j]
+#define dvec2(ev,i)   NUMERIC_POINTER(list_elt(ev,i))
+#define ivec2(ev,i)   INTEGER_POINTER(list_elt(ev,i))
+#undef pmatch
+#define printf Rprintf
+#define printe REprintf
+
+#else
+
+#ifdef SVERSION
+#include <S.h>
+typedef long int Sint;
+typedef s_object * SEXP;
+#define list_elt(ev,i) LIST_POINTER(ev)[i]
+#define dval2(ev,i,j) NUMERIC_POINTER(list_elt(ev,i))[j]
+#define dvec2(ev,i)   NUMERIC_POINTER(list_elt(ev,i))
+#define ivec2(ev,i)   INTEGER_POINTER(list_elt(ev,i))
+#else
+typedef int Sint;
+#endif
+
+#endif
+
 #ifdef RVERSION
 #undef LGAMMA
 #define LGAMMA(arg) Rf_lgammafn(arg)
@@ -93,13 +89,17 @@ extern double Rf_lgammafn();
 #define SVERSION
 #endif
 
-#ifdef SWINVERSION
-#define SVERSION
-#include "newredef.h"
+#include "mutil.h"
+#include "tube.h"
+
+#include "lfcons.h"
+
+typedef char varname[15];
+
+#ifdef CVERSION
+#include "cversion.h"
 #endif
 
-#include "mutil.h"
-#include "lfcons.h"
 #include "lfstruc.h"
 #include "design.h"
 #include "lffuns.h"
@@ -109,24 +109,20 @@ extern double Rf_lgammafn();
 #define printf lfprintf
 extern int lfprintf(const char *format, ...);
 extern int printe(const char *format, ...);
+/* #else
+   #define printe printf */
 #endif
 
-#ifdef SVERSION
-#define printe printf
+#ifdef ERROR
+#undef ERROR
 #endif
 
-#ifdef RVERSION
-#define printf Rprintf
-#undef printe
-#define printe REprintf
+#ifdef WARN
+#undef WARN
 #endif
 
-#ifdef INTERFACE
-#define printe printf
-#endif
-
-#define lfERROR(args) printe("Error: "), printe args , printe("\n"), lf_error=1
-#define lfWARN(args)  printe("Warning: "),printe args, printe("\n")
+#define ERROR(args) {printe("Error: "); printe args; printe("\n"); lf_error=1;}
+#define WARN(args)  {printe("Warning: "); printe args; printe("\n"); }
 
 #define MAX(a,b) (((a)>(b)) ? (a) : (b))
 #define MIN(a,b) (((a)<(b)) ? (a) : (b))
@@ -139,11 +135,7 @@ extern int printe(const char *format, ...);
 #define MAXCOLOR 20
 #define MAXWIN 5
 
-#ifdef SWINVERSION
 #define ISWAP(a,b) { int zz; zz = a; a = b; b = zz; }
-#else
-#define ISWAP(a,b) { INT zz; zz = a; a = b; b = zz; }
-extern INT lf_error;
-#endif
+extern int lf_error;
 
 #endif /* I_LF_H */

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1998-2000 Lucent Technologies.
+ *   Copyright (c) 1998-2001 Lucent Technologies.
  *   See README file for details.
  *
  *
@@ -7,96 +7,101 @@
  *   Structures, typedefs etc used in Locfit
  */
 
-typedef char varname[15];
-
-/*
- *  Define the vari type for locfit variables and related macros.
- *  For the C version, an enhanced vari type is needed;
- *  for other versions a simple structure suffices.
- */
-#ifdef CVERSION
+typedef struct {
+  double *wk, *coef, *xbar, *f;
+  jacobian xtwx;
+  int lwk, haspc;
+} paramcomp;
+#define haspc(pc) ((pc)->haspc)
 
 typedef struct {
-  varname name;
-  INT n, bytes, mode, stat;
-  double *dpr; } vari;
-#define checkvarlen(v,n,name,mode) (createvar(name,STSYSTEM,n,mode))
-#define vmode(v) ((v)->mode)
-
-#else
-
-typedef struct {
-  INT n;
-  double *dpr;
-} vari;
-#define viptr(v,i) (&(v)->dpr[i])
-#define checkvarlen(v,len,name,mode) \
-   ((((v)!=NULL) && (vlength(v) >= (len))) ? (v) : createvar((name),0,(len),(mode)))
-#endif
-
-#define vlength(v) ((v)->n)
-
-typedef struct {
-  char *arg, *val;
-  vari *result;
-  INT used; } carg;
+  double *x[MXDIM];
+  double *y;
+  double *w;
+  double *b;
+  double *c;
+  double sca[MXDIM];
+  double xl[2*MXDIM];
+  int n, d, ord;
+  int sty[MXDIM];
+  varname yname, xname[MXDIM], wname, bname, cname;
+} lfdata;
+#define resp(lfd,i) (((lfd)->y==NULL) ? 0.0 : (lfd)->y[i])
+#define base(lfd,i) (((lfd)->b==NULL) ? 0.0 : (lfd)->b[i])
+#define prwt(lfd,i) (((lfd)->w==NULL) ? 1.0 : (lfd)->w[i])
+#define cens(lfd,i) (((lfd)->c==NULL) ? 0 : (int)(lfd)->c[i])
+#define datum(lfd,i,j) ((lfd)->x[i][j])
+#define dvari(lfd,i)   ((lfd)->x[i])
 
 typedef struct {
-  void (*AddColor)(), (*SetColor)(), (*ClearScreen)(), (*TextDim)(), (*DoText)();
-  void (*DrawPoint)(), (*DrawLine)(), (*DrawPatch)(), (*wrapup)();
-  INT (*makewin)(), ticklength, defth, deftw;
-} device;
+  double nn, fixh, adpen;
+  int ker, kt;
+  int deg, deg0, p;
+  int acri;
+  int fam, lin;
+  int ubas;
+  double (*vb)();
+  void (*vbasis)();
+} smpar;
+#define nn(sp)   ((sp)->nn)
+#define fixh(sp) ((sp)->fixh)
+#define pen(sp)  ((sp)->adpen)
+#define ker(sp)  ((sp)->ker)
+#define kt(sp)   ((sp)->kt)
+#define deg(sp)  ((sp)->deg)
+#define deg0(sp) ((sp)->deg0)
+#define npar(sp) ((sp)->p)
+#define acri(sp) ((sp)->acri)
+#define ubas(sp) ((sp)->ubas)
+#define fam(sp)  ((sp)->fam)
+#define link(sp) ((sp)->lin)
 
 typedef struct {
-  vari *wk;
-  double *coef, *xbar, *f;
-  jacobian xtwx; } paramcomp;
+  int deriv[MXDEG+2];
+  int nd;
+} deriv;
 
 typedef struct {
-  vari *tw, *L, *iw, *xxev;
-  double *x[MXDIM], *y, *w, *base, *c;
-  double *coef, *nlx, *t0, *lik, *h, *deg;
-  double *sv, dp[LEND], kap[3];
-  double sca[MXDIM], fl[2*MXDIM], xl[2*MXDIM];
-  INT *ce, *s, *lo, *hi, sty[MXDIM];
-  INT *mg, nvm, ncm, vc;
-  INT nl, nv, nnl, nce, nk, nn, mi[LENM], ord, deriv[MXDEG+2], nd;
+  int ev;
+  double *sv;
+  double cut;
+  double fl[2*MXDIM];
+  Sint *iwk, *ce, *s, *lo, *hi;
+  int liw, nce, ncm, maxk;
+  int mg[MXDIM];
+  void (*espec)();
+} evstruc;
+#define ev(evs)   ((evs)->ev)
+#define cut(evs)  ((evs)->cut)
+#define mk(evs)   ((evs)->maxk)
+#define mg(evs)   ((evs)->mg)
+
+typedef struct {
+  double *xev, *coef, *nlx, *t0, *lik, *h, *deg, *L;
+  int lev, lwk, ll;
+  int d, dcor, geth, hasd;
+  int nv, nvm;
+  double df0, df1, llk, rv, rsc;
+  double kap[10];
+} fitpt;
+#define evp(fp)     ((fp)->xev)
+#define evpt(fp,i)  (&(fp)->xev[(i)*(fp)->d])
+#define evptx(fp,i,k) ((fp)->xev[(i)*(fp)->d+(k)])
+#define df0(fp) ((fp)->df0)
+#define df1(fp) ((fp)->df1)
+#define llk(fp) ((fp)->llk)
+#define dc(fp)  ((fp)->dcor)
+#define geth(fp) ((fp)->geth)
+#define rv(fp)  ((fp)->rv)
+#define rsc(fp) ((fp)->rsc)
+
+typedef struct {
+  int       lf_init_id;
+  lfdata    lfd;
+  smpar     sp;
+  evstruc   evs;
+  fitpt     fp;
+  deriv     dv;
   paramcomp pc;
-  varname yname, xname[MXDIM], wname, bname, cname; } lfit;
-
-#define datum(lf,i,j) (lf)->x[i][j]
-#define dvari(lf,i)   (lf)->x[i]
-#define evpt(lf,i) (&(lf)->xxev->dpr[(i)*(lf)->mi[MDIM]])
-#define evptx(lf,i,k) ((lf)->xxev->dpr[(i)*(lf)->mi[MDIM]+(k)])
-
-typedef struct {
-  vari *data[MXDIM], *fit, *se;
-  INT d, wh, gr;
-} pplot;
-
-typedef struct {
-  char cmd;
-  double x, *v, (*f)();
-  INT m, nx[3];
-  vari *vv; } arstruct;
-
-typedef struct {
-  vari *x, *y, *z;
-  char type;
-  INT id, t, n, nx, ny, pch; } plxyz;
-
-typedef struct {
-  double theta, phi, xl[2], yl[2], zl[2], sl[10];
-  INT id, ty, nsl;
-  char main[50], xlab[50], ylab[50], zlab[50];
-  vari *track, *xyzs; } plots;
-
-#define PLNONE 0
-#define PLDATA 1
-#define PLFIT  2
-#define PLTRK  4
-
-struct lfcol {
-  char name[10];
-  INT n, r, g, b;
-};
+  } lfit;
+#define LF_INIT_ID 34897239

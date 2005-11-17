@@ -12,8 +12,8 @@ print.gcvplot(x, ...)
   \code{\link{scb}} function.
 }
 \arguments{
-\item{x}{ \code{"gcvplot"} object.  }
-\item{...}{other graphical parameters.}
+\item{x}{ \code{gcvplot} object.  }
+  \item{...}{Arguments passed to and from other methods.}
 }
 \seealso{
 \code{\link{gcvplot}},

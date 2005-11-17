@@ -1,33 +1,33 @@
-
-
+/*
+ *   Copyright (c) 1998-2001 Lucent Technologies.
+ *   See README file for details.
+ *
+ *
+ *
+ *   Function definitions for Locfit.
+ */
 
 /* FILES IN THE src DIRECTORY */
 
 /* adap.c */
-extern double afit(), aband2(), aband3();
-extern INT ainitband();
+extern int alocfit();
 
 /* band.c */
-extern void band(), kdeselect();
+extern void band(), kdeselect(), kdecri();
 
 /* density.c */
-extern INT densinit();
-extern INT fact[];
-extern int likeden();
-extern void prodint_resp(), prresp();
+extern int densinit(), likeden();
+extern int fact[];
+extern void prodintresp(), prresp();
+extern int de_mint, de_itype, de_renorm;
 
 /* dens_haz.c */
 extern void haz_init();
-extern INT hazint();
+extern int hazint();
 
 /* dens_int.c */
 extern double dens_integrate();
 extern void dens_renorm(), dens_lscv(), lforder();
-
-/* dist.c */
-extern double igamma(), ibeta();
-extern double pf(), pchisq(), pnorm();
-extern double df(), dchisq();
 
 /* ev_atree.c */
 extern void atree_start(), atree_grow(), atree_guessnv();
@@ -36,71 +36,64 @@ extern double atree_int();
 /* ev_interp.c */
 extern double dointpoint(), cubintd();
 extern double linear_interp(), cubic_interp(), rectcell_interp();
-extern INT exvval();
+extern int exvval();
 extern void exvvalpv(), hermite2();
 
 /* ev_kdtre.c */
 extern void kdtre_start(), kdtre_guessnv();
 extern double kdtre_int();
 
+/* ev_sphere.c */
+extern void sphere_start(), sphere_guessnv();
+extern double sphere_int();
+
 /* ev_main.c */
-extern void trchck(), guessnv();
+extern void trchck(), guessnv(), lfit_alloc();
 extern void dataf(), gridf(), crossf(), xbarf(), preset();
-extern INT newsplit();
-extern int lfit_reqd(), lfit_reqi();
-#ifndef CVERSION
-extern vari *createvar();
-#endif
+extern int findpt(), newsplit(), lfit_reqd(), lfit_reqi();
 
 /* ev_trian.c */
-extern void triang_start(), triang_grow();
+extern void triang_start(), triang_grow(), triang_guessnv();
 extern double triang_int();
 
 /* family.c */
-extern INT links(), stdlinks(), defaultlink(), validlinks();
+extern int links(), stdlinks(), defaultlink(), validlinks();
 extern double b2(), b3(), b4(), lf_link(), invlink();
 
-/* frend.c */
-extern void fitfun(), degfree(), ressumm(), makecfn();
-extern INT procv(), procvraw(), procvvord();
-extern double base(), cens(), prwt(), resp(), getxi(), rss();
-extern INT calcp();
+/* fitted.c */
+extern void fitted();
 
-/* kappa0.c */
-extern double critval(), critvalc(), tailp(), taild();
-extern INT constants();
+/* frend.c */
+extern void ressumm();
+extern double rss();
 
 /* lf_dercor.c */
 extern void dercor();
 
 /* lf_fitfun.c */
-extern void fitfun(), designmatrix();
-extern INT calcp(), coefnumber();
+extern void fitfun(), makecfn(), designmatrix();
+extern int calcp(), coefnumber();
+
+/* lf_nbhd.c */
+extern double kordstat(), rho();
+extern void nbhd();
 
 /* lf_robust.c */
 extern double median();
 extern void lf_robust();
 
 /* lfstr.c */
-extern void setstrval();
-extern INT ppwhat(), restyp();
+extern int lffamily(), lfkernel(), lfketype(), lflink();
+extern int deitye(), lfevstr(), lfacri();
+extern int ppwhat(), restyp();
 
 /* lf_vari.c */
-extern void comp_vari(), local_df();
-extern double comp_infl();
+extern void lf_vcov(), comp_vari(), local_df();
 
-/* linalg.c */
-extern void svd(), hsvdsolve();
-extern void addouter(), multmatscal();
-extern void QRupd(), QR1(), bacK(), bacT(), solve(), grsc();
-extern void setzero(), unitvec();
-extern void transpose();
-extern double innerprod(), m_trace();
-extern INT svdsolve();
-
-/* locfit.c or parfit.c (most) */
-extern int ident, locfit();
-extern void lfiter();
+/* locfit.c */
+extern int locfit(), des_reqd(), des_reqi();
+extern void lfdata_init(), smpar_init(), deriv_init(), des_init(), lfiter();
+extern int lf_maxit, lf_debug;
 
 /* math.c */
 extern double lflgamma(), lferf(), lferfc(), lfdaws(), lf_exp();
@@ -111,127 +104,47 @@ extern int factorial();
 /* minmax.c */
 extern double ipower(), minmax();
 
-/* nbhd.c */
-extern double kordstat(), nbhd(), rho();
-
 /* odint.c */
-extern INT onedint();
+extern int onedint();
 extern void recurint();
 
 /* pcomp.c */
 extern double addparcomp();
 extern void compparcomp(), subparcomp(), subparcomp2(), pcchk();
-extern int pc_reqd();
-extern INT noparcomp(), hasparcomp();
+extern int pc_reqd(), noparcomp();
 
 /* preplot.c */
 extern void preplot(), cpreplot();
-extern INT setpppoints();
+extern int setpppoints();
+
+/* procv.c */
+extern int procvhatm(), procv(), procvraw(), procvvord(), calcp();
 
 /* resid.c */
 extern double resid();
-extern void cfitted();
-extern vari *vfitted(), *vresid();
 
 /* scb.c */
 extern void scb(), cscbsim();
+
+/* scb_iface.c */
+extern int constants();
 
 /* simul.c */
 extern void liksim(), scbsim(), scbmax(), regband(), rband();
 
 /* startlf.c */
-extern void bbox(), deschk(), startlf(), preproc(), fitdefault();
+extern void set_flim(), set_scales(), startlf(), lfit_init();
 extern void fitoptions(), clocfit(), endfit();
-extern INT nofit();
+extern int nofit();
 
 /* strings.c */
 extern int stm(), pmatch(), matchlf(), matchrt(), checkltor(), checkrtol();
 extern void strip();
 
 /* wdiag.c */
-extern INT wdiag(), procvhatm();
-extern void cwdiag();
+extern int wdiag(), wdiagp();
 
 /* weight.c */
 extern double W(), weight(), weightd(), Wd(), Wdd(), wint();
 extern double Wconv(), Wconv1(), Wconv4(), Wconv5(), Wconv6(), Wikk();
-extern INT iscompact(), wtaylor();
-
-/* FILES IN THE src-s DIRECTORY */
-
-#ifdef SVERSION
-
-/* S_enter.c */
-extern void basis(), vbasis();
-
-#endif
-
-
-
-/* FILES IN THE src-c DIRECTORY */
-
-#ifdef CVERSION
-/* arith.c */
-extern INT arvect(), intitem();
-extern double areval(), arith(), darith(), dareval();
-extern vari *varith(), *saveresult(), *arbuild();
-
-/* c_args.c */
-#define argused(v,i) (((carg *)viptr(v,i))->used)
-#define setused(v,i) { ((carg *)viptr(v,i))->used = 1; }
-#define setunused(v,i) { ((carg *)viptr(v,i))->used = 0; }
-#define argarg(v,i) (((carg *)viptr(v,i))->arg)
-#define argvalis(v,i,z) (strcmp(argval(v,i),z)==0)
-extern char *argval(), *getargval();
-extern int getarg(), readilist(), getlogic();
-
-/* cmd.c */
-extern INT dispatch();
-extern void setuplf(), recondat(), cmdint();
-extern double backtr(), docrit();
-
-/* c_plot.c */
-extern void plotdata(), plotfit(), plottrack(), plotopt(), setplot();
-
-/* help.c */
-extern void example();
-
-/* lfd.c */
-extern void doreaddata(), dosavedata(), dosavefit();
-extern INT  setfilename();
-
-/* main.c */
-extern void SetWinDev();
-
-/* makecmd.c */
-extern vari *getcmd();
-extern void makecmd(), del_lines(), inc_forvar(), dec_forvar();
-
-/* post.c */
-extern void SetPSDev();
-
-/* pout.c */
-extern INT pretty();
-extern void displayplot();
-extern void plotmaple(), plotmathe(), plotmatlb(), plotgnup(), plotxwin();
-
-/* random.c */
-extern double rnorm(), rexp(), runif(), rpois();
-extern void rseed();
-
-/* readfile.c */
-extern void readfile();
-
-/* scbmax.c */
-extern void cscbmax();
-
-/* vari.c */
-extern INT vbytes();
-extern vari *createvar(), *findvar(), *growvar();
-extern void initdb(), deletevar(), deletename(), deleteifhidden(), setvarname();
-extern void *viptr(), vassn();
-extern double *vdptr(), vitem();
-
-#else
-#define vdptr(z) z->dpr
-#endif
+extern int iscompact(), wtaylor();

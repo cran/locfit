@@ -1,11 +1,9 @@
 /*
- *   Copyright (c) 1998 Lucent Technologies.
+ *   Copyright (c) 1998-2001 Lucent Technologies.
  *   See README file for details.
+ *
+ *   Numeric values for constants used in locfit
  */
-
-/*
-  Numeric values for constants used in locfit
-*/
 
 /*
   MXDIM and MXDEG are maximum dimension and local polynomial
@@ -23,7 +21,6 @@
 #endif
 #define S2PI  2.506628274631000502415765
 #define SQRT2 1.4142135623730950488
-#define SQRPI 1.77245385090552
 #define LOGPI 1.144729885849400174143427
 #define GOLDEN 0.61803398874989484820
 #define HL2PI 0.91893853320467267 /* log(2pi)/2 */
@@ -75,7 +72,9 @@
 #define EPRES  8
 #define EXBAR  9
 #define ENONE  10
+#define ESPHR  11
 #define EFITP  50
+#define ESPEC  100
 
 /*
   integer parameters: sample size; dimension; number of local parameters etc.
@@ -158,6 +157,7 @@
 #define KPROD  2
 #define KCE    3
 #define KLM    4
+#define KZEON  5
 
 #define STANGL 4
 #define STLEFT 5
@@ -194,6 +194,7 @@
 #define IPROD 3
 #define IMLIN 4
 #define IHAZD 5
+#define ISPHR 6
 #define IMONT 7
 
 /*
@@ -239,7 +240,7 @@
 #define CPA2 9
 
 /*
-  variable types: double, INT, char, argument list
+  variable types: double, int, char, argument list
 */
 #define VDOUBLE 0
 #define VINT    1
@@ -278,3 +279,27 @@
 #define LF_LNK  82  /* invalid link */
 #define LF_FAM  83  /* invalid family */
 #define LF_ERR  99  /* error */
+
+/*
+ *  mi[MGETH] codes
+ *  scb(), pointwise codes are 71,...,75.
+ *         add 10 for simultaneous codes.
+ */
+#define GSTD 0
+#define GHAT 1
+#define GKAP 2
+#define GRBD 3
+#define GAMF 4
+#define GAMP 5
+#define GLSC 6
+#define GSMP 7
+#define GLM1 71
+#define GLM2 72
+#define GLM3 73
+#define GLM4 74
+#define GLDN 75
+
+/* bandwidth criteria */
+#define BGCV 1
+#define BCP  2
+#define BIND 3

@@ -7,8 +7,7 @@ Plot a "preplot.locfit" object.
 \method{plot}{preplot.locfit}(x, ...)
 }
 \arguments{
-\item{x}{
-A \code{"preplot.locfit"} object, produced by
+\item{x}{A \code{preplot.locfit} object, produced by
 \code{\link{preplot.locfit}()}.
 }
 \item{...}{

@@ -5,29 +5,25 @@
 
 #include "local.h"
 
-extern lfit lf;
-extern design des;
 extern void fitoptions();
 
 static double hmin, gmin, sig2, pen, vr, tb;
+static lfit *blf;
+static design *bdes;
 
-#define BGCV 1
-#define BCP  2
-#define BIND 3
-
-INT procvbind(des,lf,v)
+int procvbind(des,lf,v)
 design *des;
 lfit *lf;
-INT v;
+int v;
 { double s0, s1, bi;
   int i, ii, k;
   k = procvraw(des,lf,v);
-  wdiag(lf,des,des->wd,0,1,0);
+  wdiag(&lf->lfd, &lf->sp, des,des->wd,&lf->dv,0,1,0);
   s0 = s1 = 0.0;
   for (i=0; i<des->n; i++)
   { ii = des->ind[i];
-    s0+= prwt(lf,ii)*des->wd[i]*des->wd[i];
-    bi = prwt(lf,ii)*fabs(des->wd[i]*ipower(des->di[ii],lf->mi[MDEG]+1));
+    s0+= prwt(&lf->lfd,ii)*des->wd[i]*des->wd[i];
+    bi = prwt(&lf->lfd,ii)*fabs(des->wd[i]*ipower(des->di[ii],deg(&lf->sp)+1));
     s1+= bi*bi;
   }
   vr += s0;
@@ -37,36 +33,39 @@ INT v;
 
 double bcri(h,c,cri)
 double h;
-INT c, cri;
+int c, cri;
 { double num, den;
-  INT (*pv)();
-  lf.dp[c] = h;
+  int (*pv)();
+  if (c==DALP)
+    blf->sp.nn = h;
+  else
+    blf->sp.fixh = h;
   if ((cri&63)==BIND)
   { pv = procvbind;
     vr = tb = 0.0;
   }
   else pv = procv;
-  if (cri<64) startlf(&des,&lf,pv,0);
+  if (cri<64) startlf(bdes,blf,pv,0);
   switch(cri&63)
   { case BGCV:
-      ressumm(&lf,&des);
-      num = -2*lf.mi[MN]*lf.dp[DLK];
-      den = lf.mi[MN]-lf.dp[DT0];
+      ressumm(blf,bdes);
+      num = -2*blf->lfd.n*llk(&blf->fp);
+      den = blf->lfd.n-df0(&blf->fp);
       return(num/(den*den));
     case BCP:
-      ressumm(&lf,&des);
-      return(-2*lf.dp[DLK]/sig2-lf.mi[MN]+pen*lf.dp[DT0]);
+      ressumm(blf,bdes);
+      return(-2*llk(&blf->fp)/sig2-blf->lfd.n+pen*df0(&blf->fp));
     case BIND:
       return(vr+pen*pen*tb);
   } 
-  lfERROR(("bcri: unknown criterion"));
+  ERROR(("bcri: unknown criterion"));
   return(0.0);
 }
 
 void bsel2(h0,g0,ifact,c,cri)
 double h0, g0, ifact;
-INT c, cri;
-{ INT done, inc;
+int c, cri;
+{ int done, inc;
   double h1, g1;
   h1 = h0; g1 = g0;
   done = inc = 0;
@@ -78,7 +77,7 @@ INT c, cri;
     if (g1>g0) inc++; else inc = 0;
     switch(cri)
     { case BIND:
-        done = (inc>=4) & (vr<lf.nv);
+        done = (inc>=4) & (vr<blf->fp.nv);
         break;
       default:
         done = (inc>=4);
@@ -88,9 +87,9 @@ INT c, cri;
 
 void bsel3(h0,g0,ifact,c,cri)
 double h0, g0, ifact;
-INT c, cri;
+int c, cri;
 { double h1, g1;
-  INT i;
+  int i;
   hmin = h0; gmin = g0;
   for (i=-1; i<=1; i++) if (i!=0)
   { h1 = h0*(1+i*ifact);
@@ -100,21 +99,25 @@ INT c, cri;
   return;
 }
 
-void bselect(c,cri,pn)
-INT c, cri;
+void bselect(lf,des,c,cri,pn)
+lfit *lf;
+design *des;
+int c, cri;
 double pn;
 { double h0, g0, ifact;
-  INT i;
+  int i;
   pen = pn;
-  if (cri==BIND) pen /= factorial((int)lf.mi[MDEG]+1);
-  hmin = h0 = lf.dp[c];
-  if (h0==0) lfERROR(("bselect: initial bandwidth is 0"));
+  blf = lf;
+  bdes = des;
+  if (cri==BIND) pen /= factorial(deg(&lf->sp)+1);
+  hmin = h0 = (c==DFXH) ? fixh(&lf->sp) : nn(&lf->sp);
+  if (h0==0) ERROR(("bselect: initial bandwidth is 0"));
   if (lf_error) return;
   sig2 = 1.0;
 
   gmin = g0 = bcri(h0,c,cri);
   if (cri==BCP)
-  { sig2 = lf.dp[DRV];
+  { sig2 = rv(&lf->fp);
     g0 = gmin = bcri(h0,c,cri+64);
   }
   
@@ -125,16 +128,19 @@ double pn;
   { ifact = ifact/2;
     bsel3(hmin,gmin,ifact,c,cri);
   }
-  lf.dp[c] = hmin;
-  startlf(&des,&lf,procv,0);
-  ressumm(&lf,&des);
+  if (c==DFXH)
+    fixh(&lf->sp) = hmin;
+  else
+    nn(&lf->sp) = hmin;
+  startlf(des,lf,procv,0);
+  ressumm(lf,des);
 }
 
 double compsda(x,h,n)
 double *x, h;
-INT n;
+int n;
 /* n/(n-1) * int( fhat''(x)^2 dx ); bandwidth h */
-{ INT i, j;
+{ int i, j;
   double ik, sd, z;
   ik = wint(1,NULL,0,WGAUS);
   sd = 0;
@@ -150,9 +156,9 @@ INT n;
 
 double widthsj(x,lambda,n)
 double *x, lambda;
-INT n;
+int n;
 { double ik, a, b, td, sa, z, c, c1, c2, c3;
-  INT i, j;
+  int i, j;
   a = GFACT*0.920*lambda*exp(-log((double)n)/7)/SQRT2;
   b = GFACT*0.912*lambda*exp(-log((double)n)/9)/SQRT2;
   ik = wint(1,NULL,0,WGAUS);
@@ -176,11 +182,11 @@ INT n;
 
 void kdecri(x,h,res,c,k,ker,n)
 double *x, h, *res, c;
-INT k, ker, n;
-{ INT i, j;
+int k, ker, n;
+{ int i, j;
   double degfree, dfd, pen, s, r0, r1, d0, d1, ik, wij;
 
-  if (h<=0) lfWARN(("kdecri, h = %6.4f",h));
+  if (h<=0) WARN(("kdecri, h = %6.4f",h));
 
   res[0] = res[1] = 0.0;
   ik = wint(1,NULL,0,ker);
@@ -275,15 +281,15 @@ INT k, ker, n;
       res[1] = exp(log(Wikk(WGAUS,0)/(d0*n))/5)-h;
       return;
   }
-  lfERROR(("kdecri: what???"));
+  ERROR(("kdecri: what???"));
   return;
 }
 
 double esolve(x,j,h0,h1,k,c,ker,n)
 double *x, h0, h1, c;
-INT j, k, ker, n;
+int j, k, ker, n;
 { double h[7], d[7], r[7], res[4], min, minh, fact;
-  INT i, nc;
+  int i, nc;
   min = 1.0e30; minh = 0.0;
   fact = 1.00001;
   h[6] = h0; kdecri(x,h[6],res,c,j,ker,n);
@@ -322,57 +328,14 @@ INT j, k, ker, n;
 
 void kdeselect(band,x,ind,h0,h1,meth,nm,ker,n)
 double h0, h1, *band, *x;
-INT *ind, *meth, nm, ker, n;
+Sint *ind;
+int nm, ker, n, *meth;
 { double scale, c;
-  INT i, k;
+  int i, k;
   k = n/4;
   for (i=0; i<n; i++) ind[i] = i;
   scale = kordstat(x,n+1-k,n,ind) - kordstat(x,k,n,ind);
   c = widthsj(x,scale,n);
-  for (k=0; k<nm; k++)
-    band[k] = esolve(x,meth[k],h0,h1,10,c,ker,n);
+  for (i=0; i<nm; i++)
+    band[i] = esolve(x,meth[i],h0,h1,10,c,ker,n);
 }
-
-#ifdef CVERSION
-void band(v)
-vari *v;
-{ INT i, c, cri;
-  double pen;
-  char *z;
-  fitoptions(&lf,v,0);
-
-  c = DALP;
-  i = getarg(v,"comp",1);
-  if (i>0)
-  { z = argval(v,i);
-    if (z[0]=='h') c = DFXH;
-  }
-
-  cri = BGCV;
-  i = getarg(v,"bcri",1);
-  if (i>0)
-  { z = argval(v,i);
-    if (z[0]=='c') cri = BCP;
-    if (z[0]=='i') cri = BIND;
-  }
-
-  pen = 2.0;
-  i = getarg(v,"pen",1);
-  if (i>0)
-    pen = darith(argval(v,i));
-
-  bselect(c,cri,pen);
-}
-#endif
-
-#ifdef SVERSION
-void slscv(x,n,h,z)
-double *x, *h, *z;
-int *n;
-{ INT i;
-  double res[4];
-  kdecri(x,*h,res,0.0,3,WGAUS,*n);
-  z[0] = res[0];
-  z[1] = res[2];
-}
-#endif

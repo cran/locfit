@@ -18,21 +18,21 @@
 #include "local.h"
 extern double robscale;
 
-void dercor(des,lf,coef)
+void dercor(lfd,sp,des,coef)
+lfdata *lfd;
+smpar *sp;
 design *des;
-lfit *lf;
 double *coef;
 { double s1, dc[MXDIM], wd, link[LLEN];
-  INT i, ii, j, m, p, d, *mi; 
-  mi = lf->mi;
-  if (mi[MTG]<=THAZ) return;
-  if (mi[MKER]==WPARM) return;
+  int i, ii, j, m, d, p;
+  if (fam(sp)<=THAZ) return;
+  if (ker(sp)==WPARM) return;
 
-  d = mi[MDIM];
+  d = lfd->d;
   p = des->p; m = des->n;
 
-  if (mi[MDEB]>1) printf("  Correcting derivatives\n");
-  fitfun(lf,des->xev,des->xev,des->f1,NULL,0);
+  if (lf_debug>1) printf("  Correcting derivatives\n");
+  fitfun(lfd, sp, des->xev,des->xev,des->f1,NULL);
   jacob_solve(&des->xtwx,des->f1);
   setzero(dc,d);
 
@@ -40,9 +40,10 @@ double *coef;
   for (i=0; i<m; i++)
   { s1 = innerprod(des->f1,&des->X[i*p],p);
     ii = des->ind[i];
-    stdlinks(link,lf,ii,des->th[i],robscale);
+    stdlinks(link,lfd,sp,ii,des->th[i],robscale);
     for (j=0; j<d; j++)
-    { wd = des->w[i]*weightd(datum(lf,j,ii)-des->xev[j],lf->sca[j],d,mi[MKER],mi[MKT],des->h,lf->sty[j],des->di[ii]);
+    { wd = des->w[i]*weightd(datum(lfd,j,ii)-des->xev[j],lfd->sca[j],
+        d,ker(sp),kt(sp),des->h,lfd->sty[j],des->di[ii]);
       dc[j] += s1*wd*link[ZDLL];
     }
 

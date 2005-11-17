@@ -25,24 +25,24 @@
 #include "local.h"
 
 static double ilim[2*MXDIM], *ff, tmax;
+static lfdata *haz_lfd;
+static smpar  *haz_sp;
 
 /*
  *  hrao returns 0 if integration region is empty.
  *               1 otherwise.
  */
-INT haz_sph_int(lf,dfx,cf,h,r1)
-lfit *lf;
+int haz_sph_int(dfx,cf,h,r1)
 double *dfx, *cf, h, *r1;
 { double s, t0, t1, wt, th;
-  INT dim, j, p, *mi;
-  mi = lf->mi;
-  s = 0; p = mi[MP];
-  dim = mi[MDIM];
-  for (j=1; j<dim; j++) s += SQR(dfx[j]/(h*lf->sca[j]));
+  int j, dim, p;
+  s = 0; p = npar(haz_sp);
+  dim = haz_lfd->d;
+  for (j=1; j<dim; j++) s += SQR(dfx[j]/(h*haz_lfd->sca[j]));
   if (s>1) return(0);
 
   setzero(r1,p*p);
-  t1 = sqrt(1-s)*h*lf->sca[0];
+  t1 = sqrt(1-s)*h*haz_lfd->sca[0];
   t0 = -t1;
   if (t0<ilim[0])   t0 = ilim[0];
   if (t1>ilim[dim]) t1 = ilim[dim];
@@ -51,63 +51,62 @@ double *dfx, *cf, h, *r1;
 
 /*  Numerical integration by Simpson's rule.
  */
-  for (j=0; j<=mi[MMINT]; j++)
-  { dfx[0] = t0+(t1-t0)*j/mi[MMINT];
-    wt = weight(lf,dfx,NULL,h,0,0.0);
-    fitfun(lf,dfx,NULL,ff,NULL,0);
+  for (j=0; j<=de_mint; j++)
+  { dfx[0] = t0+(t1-t0)*j/de_mint;
+    wt = weight(haz_lfd, haz_sp, dfx, NULL, h, 0, 0.0);
+    fitfun(haz_lfd, haz_sp, dfx,NULL,ff,NULL);
     th = innerprod(cf,ff,p);
-    if (mi[MLINK]==LLOG) th = exp(th);
-    wt *= 2+2*(j&1)-(j==0)-(j==mi[MMINT]);
+    if (link(haz_sp)==LLOG) th = exp(th);
+    wt *= 2+2*(j&1)-(j==0)-(j==de_mint);
     addouter(r1,ff,ff,p,wt*th);
   }
-  multmatscal(r1,(t1-t0)/(3*mi[MMINT]),p*p);
+  multmatscal(r1,(t1-t0)/(3*de_mint),p*p);
 
   return(1);
 }
 
-INT hazint_sph(t,resp,r1,lf,cf,h)
-lfit *lf;
+int hazint_sph(t,resp,r1,cf,h)
 double *t, *resp, *r1, *cf, h;
-{ INT i, j, p, st;
+{ int i, j, n, p, st;
   double dfx[MXDIM], eb, sb;
-  p = lf->mi[MP];
+  p = npar(haz_sp);
   setzero(resp,p*p);
   sb = 0.0;
 
-  for (i=0; i<=lf->mi[MN]; i++)
+  n = haz_lfd->n;
+  for (i=0; i<=n; i++)
   {
-    if (i==lf->mi[MN])
+    if (i==n)
     { dfx[0] = tmax-t[0];
-      for (j=1; j<lf->mi[MDIM]; j++) dfx[j] = 0.0;
-      eb = exp(sb/lf->mi[MN]);
+      for (j=1; j<haz_lfd->d; j++) dfx[j] = 0.0;
+      eb = exp(sb/n);
     }
     else
-    { eb = exp(base(lf,i)); sb += base(lf,i);
-      for (j=0; j<lf->mi[MDIM]; j++) dfx[j] = datum(lf,j,i)-t[j];
+    { eb = exp(base(haz_lfd,i)); sb += base(haz_lfd,i);
+      for (j=0; j<haz_lfd->d; j++) dfx[j] = datum(haz_lfd,j,i)-t[j];
     }
 
-    st = haz_sph_int(lf,dfx,cf,h,r1);
+    st = haz_sph_int(dfx,cf,h,r1);
     if (st)
       for (j=0; j<p*p; j++) resp[j] += eb*r1[j];
   }
   return(LF_OK);
 }
 
-INT hazint_prod(t,resp,x,lf,cf,h)
-lfit *lf;
+int hazint_prod(t,resp,x,cf,h)
 double *t, *resp, *x, *cf, h;
-{ INT d, p, deg, i, j, k, st;
+{ int d, p, i, j, k, st;
   double dfx[MXDIM], t_prev,
          hj, hs, ncf[MXDEG], ef, il1;
   double prod_wk[MXDIM][2*MXDEG+1], eb, sb;
 
-  p = lf->mi[MP]; d = lf->mi[MDIM];
-  deg = lf->mi[MDEG];
+  p = npar(haz_sp);
+  d = haz_lfd->d;
   setzero(resp,p*p);
-  hj = hs = h*lf->sca[0];
+  hj = hs = h*haz_lfd->sca[0];
 
   ncf[0] = cf[0];
-  for (i=1; i<=deg; i++)
+  for (i=1; i<=deg(haz_sp); i++)
   { ncf[i] = hj*cf[(i-1)*d+1]; hj *= hs;
   }
 
@@ -120,15 +119,15 @@ double *t, *resp, *x, *cf, h;
  *     with the right factorial denominators.
  */
   t_prev = ilim[0]; sb = 0.0;
-  for (i=0; i<=lf->mi[MN]; i++)
-  { if (i==lf->mi[MN])
+  for (i=0; i<=haz_lfd->n; i++)
+  { if (i==haz_lfd->n)
     { dfx[0] = tmax-t[0];
       for (j=1; j<d; j++) dfx[j] = 0.0;
-      eb = exp(sb/lf->mi[MN]);
+      eb = exp(sb/haz_lfd->n);
     }
     else
-    { eb = exp(base(lf,i)); sb += base(lf,i);
-      for (j=0; j<d; j++) dfx[j] = datum(lf,j,i)-t[j];
+    { eb = exp(base(haz_lfd,i)); sb += base(haz_lfd,i);
+      for (j=0; j<d; j++) dfx[j] = datum(haz_lfd,j,i)-t[j];
     }
 
     if (dfx[0]>ilim[0]) /* else it doesn't contribute */
@@ -136,10 +135,10 @@ double *t, *resp, *x, *cf, h;
 /* time integral */
       il1 = (dfx[0]>ilim[d]) ? ilim[d] : dfx[0];
       if (il1 != t_prev) /* don't repeat! */
-      { st = onedint(ncf,lf->mi,ilim[0]/hs,il1/hs,prod_wk[0]);
+      { st = onedint(haz_sp,ncf,ilim[0]/hs,il1/hs,prod_wk[0]);
         if (st>0) return(st);
         hj = eb;
-        for (j=0; j<=2*deg; j++)
+        for (j=0; j<=2*deg(haz_sp); j++)
         { hj *= hs;
           prod_wk[0][j] *= hj;
         }
@@ -150,15 +149,15 @@ double *t, *resp, *x, *cf, h;
       for (j=1; j<d; j++)
       {
         ef = 0.0;
-        for (k=deg; k>0; k--) ef = (ef+dfx[j])*cf[1+(k-1)*d+j];
+        for (k=deg(haz_sp); k>0; k--) ef = (ef+dfx[j])*cf[1+(k-1)*d+j];
         ef = exp(ef);
-        prod_wk[j][0] = ef * W(dfx[j]/(h*lf->sca[j]),lf->mi[MKER]);
-        for (k=1; k<=2*deg; k++)
+        prod_wk[j][0] = ef * W(dfx[j]/(h*haz_lfd->sca[j]),ker(haz_sp));
+        for (k=1; k<=2*deg(haz_sp); k++)
           prod_wk[j][k] = prod_wk[j][k-1] * dfx[j];
       }
 
 /*  add to the integration.  */
-      prodint_resp(resp,prod_wk,d,deg,p);
+      prodintresp(resp,prod_wk,d,deg(haz_sp),p);
     } /* if dfx0 > ilim0 */
   } /* n loop */
 
@@ -169,22 +168,26 @@ double *t, *resp, *x, *cf, h;
   return(LF_OK);
 }
 
-INT hazint(t,resp,resp1,lf,cf,h)
-lfit *lf;
+int hazint(t,resp,resp1,cf,h)
 double *t, *resp, *resp1, *cf, h;
-{ if (lf->mi[MDIM]==1) return(hazint_prod(t,resp,resp1,lf,cf,h));
-  if (lf->mi[MKT]==KPROD) return(hazint_prod(t,resp,resp1,lf,cf,h));
+{ if (haz_lfd->d==1) return(hazint_prod(t,resp,resp1,cf,h));
+  if (kt(haz_sp)==KPROD) return(hazint_prod(t,resp,resp1,cf,h));
 
-  return(hazint_sph(t,resp,resp1,lf,cf,h));
+  return(hazint_sph(t,resp,resp1,cf,h));
 }
 
-void haz_init(lf,des,il)
-lfit *lf;
+void haz_init(lfd,des,sp,il)
+lfdata *lfd;
 design *des;
+smpar *sp;
 double *il;
 { int i;
-  tmax = datum(lf,0,0);
-  for (i=1; i<lf->mi[MN]; i++) tmax = MAX(tmax,datum(lf,0,i));
+  
+  haz_lfd = lfd;
+  haz_sp  = sp;
+
+  tmax = datum(lfd,0,0);
+  for (i=1; i<lfd->n; i++) tmax = MAX(tmax,datum(lfd,0,i));
   ff = des->xtwx.wk;
-  for (i=0; i<2*lf->mi[MDIM]; i++) ilim[i] = il[i];
+  for (i=0; i<2*lfd->d; i++) ilim[i] = il[i];
 }

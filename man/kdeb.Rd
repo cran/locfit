@@ -4,7 +4,7 @@
 Bandwidth selectors for kernel density estimation.
 }
 \usage{
-kdeb(x, h0 = 0.01 * sd, h1 = sd, meth = c("AIC", "LCV", "LSCV", "BCV",
+kdeb(x, h0 = 0.01 * sd, h1 = sd, meth = c("AIC", "LCV", "LSCV", "BCV", 
   "SJPI", "GKK"), kern = "gauss", gf = 2.5)
 
 }
@@ -37,4 +37,4 @@ Vector of selected bandwidths.
 \references{
 Loader, C. (1999). Local Regression and Likelihood. Springer, New York.
 }
-\keyword{smooth}
+\keyword{htest}

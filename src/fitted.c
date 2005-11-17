@@ -7,24 +7,20 @@
   Functions for computing residuals and fitted values from
   the locfit object.
 
-  fitted(lf,des,fit,what,cv,ty) computes fitted values from the
+  fitted(lf,fit,what,cv,ty) computes fitted values from the
     fit structure in lf. 
   resid(y,c,w,th,mi,ty) converts fitted values to residuals
-  cfitted(v,ty) is CVERSION front end, interpreting command
-    line arguments and computing th.
-  vfitted(ty) for use by arithmetic interpreter.
 */
 
 #include "local.h"
 
-double resid(y,w,th,mi,ty,res)
-INT *mi, ty;
+double resid(y,w,th,fam,ty,res)
+int fam, ty;
 double y, w, th, *res;
 { double raw;
-  INT tg;
 
-  tg = mi[MTG] & 63;
-  if ((tg==TGAUS) | (tg==TROBT) | (tg==TCAUC))
+  fam = fam & 63;
+  if ((fam==TGAUS) | (fam==TROBT) | (fam==TCAUC))
     raw = y-res[ZMEAN];
   else
     raw = y-w*res[ZMEAN];
@@ -44,7 +40,7 @@ double y, w, th, *res;
     case RLDDT: return(res[ZDDLL]);
     case RFIT:  return(th);
     case RMEAN: return(res[ZMEAN]);
-    default: lfERROR(("resid: unknown residual type %d",ty));
+    default: ERROR(("resid: unknown residual type %d",ty));
   }
   return(0.0);
 }
@@ -71,82 +67,36 @@ int ty;
   }
 }
 
-void fitted(lf,des,fit,what,cv,st,ty)
+void fitted(lf,fit,what,cv,st,ty)
 lfit *lf;
-design *des;
 double *fit;
-INT what, cv, st, ty;
-{ INT i, j, d, n, ev;
+int what, cv, st, ty;
+{ int i, j, d, n, evo;
   double xx[MXDIM], th, inl, var, link[LLEN];
-  n = lf->mi[MN];
-  d = lf->mi[MDIM];
-  ev = lf->mi[MEV];
-  cv &= (ev!=ECROS);
-  if ((lf->mi[MEV]==EDATA)|(lf->mi[MEV]==ECROS)) ev = EFITP;
+  n = lf->lfd.n;
+  d = lf->lfd.d;
+  evo = ev(&lf->evs);
+  cv &= (evo!=ECROS);
+  if ((evo==EDATA)|(evo==ECROS)) evo = EFITP;
   for (i=0; i<n; i++)
-  { for (j=0; j<d; j++) xx[j] = datum(lf,j,i);
-    th = dointpoint(lf,des,xx,what,ev,i);
+  { for (j=0; j<d; j++) xx[j] = datum(&lf->lfd,j,i);
+    th = dointpoint(lf,xx,what,evo,i);
     if ((what==PT0)|(what==PVARI)) th = th*th;
     if (what==PCOEF)
-    { th += base(lf,i);
-      stdlinks(link,lf,i,th,lf->dp[DRSC]);
+    { th += base(&lf->lfd,i);
+      stdlinks(link,&lf->lfd,&lf->sp,i,th,rsc(&lf->fp));
       if ((cv)|(st))
-      { inl = dointpoint(lf,des,xx,PT0,ev,i);
+      { inl = dointpoint(lf,xx,PT0,evo,i);
         inl = inl*inl;
         if (cv)
         { th -= inl*link[ZDLL];
-          stdlinks(link,lf,i,th,lf->dp[DRSC]);
+          stdlinks(link,&lf->lfd,&lf->sp,i,th,rsc(&lf->fp));
         }
-        if (st) var = dointpoint(lf,des,xx,PNLX,ev,i);
+        if (st) var = dointpoint(lf,xx,PNLX,evo,i);
       }
-      fit[i] = resid(resp(lf,i),prwt(lf,i),th,lf->mi,ty,link);
+      fit[i] = resid(resp(&lf->lfd,i),prwt(&lf->lfd,i),th,fam(&lf->sp),ty,link);
       if (st) fit[i] = studentize(fit[i],inl,var,ty,link);
     } else fit[i] = th;
     if (lf_error) return;
   }
 }
-
-#ifdef CVERSION
-extern lfit lf;
-extern design des;
-
-vari *vfitted(type)
-INT type;
-{ vari *v;
-  INT n;
-  n = lf.mi[MN];
-  v = createvar("vfitted",STHIDDEN,n,VDOUBLE);
-  recondat(1,&n);
-  if (lf_error) return(NULL);
-
-  fitted(&lf,&des,vdptr(v),PCOEF,0,0,type);
-  return(v);
-}
-
-void cfitted(v,ty)
-vari *v;
-INT ty;
-{ double *f;
-  vari *vr;
-  INT i, n, cv, st, wh;
-
-  i = getarg(v,"type",1);
-  if (i>0) ty = restyp(argval(v,i));
-
-  i = getarg(v,"cv",1); cv = (i>0) ? getlogic(v,i) : 0;
-  i = getarg(v,"studentize",1); st = (i>0) ? getlogic(v,i) : 0;
-
-  wh = PCOEF;
-  i = getarg(v,"what",1);
-  if (i>0) wh = ppwhat(argval(v,i));
-
-  recondat(ty==5,&n);
-  if (lf_error) return;
-
-  vr = createvar("fitted",STHIDDEN,n,VDOUBLE);
-  f = vdptr(vr);
-  fitted(&lf,&des,f,wh,cv,st,ty);
-
-  saveresult(vr,argarg(v,0),STREGULAR);
-}
-#endif

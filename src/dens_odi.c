@@ -20,16 +20,16 @@
 
 static int debug;
 
-INT exbctay(b,c,n,z) /* n-term taylor series of e^(bx+cx^2) */
+int exbctay(b,c,n,z) /* n-term taylor series of e^(bx+cx^2) */
 double b, c, *z;
-INT n;
+int n;
 { double ec[20];
-  INT i, j;
+  int i, j;
   z[0] = 1;
   for (i=1; i<=n; i++) z[i] = z[i-1]*b/i;
   if (c==0.0) return(n);
   if (n>=40)
-  { lfWARN(("exbctay limit to n<40"));
+  { WARN(("exbctay limit to n<40"));
     n = 39;
   }
   ec[0] = 1;
@@ -43,10 +43,10 @@ INT n;
 double explinjtay(l0,l1,j,cf)
 /* int_l0^l1 x^j e^(a+bx+cx^2); exbctay aroud l1 */
 double l0, l1, *cf;
-INT j;
+int j;
 { double tc[40], f, s;
-  INT k, n;
-  if ((l0!=0.0) | (l1!=1.0)) lfWARN(("explinjtay: invalid l0, l1"));
+  int k, n;
+  if ((l0!=0.0) | (l1!=1.0)) WARN(("explinjtay: invalid l0, l1"));
   n = exbctay(cf[1]+2*cf[2]*l1,cf[2],20,tc);
   s = tc[0]/(j+1);
   f = 1/(j+1);
@@ -59,12 +59,12 @@ INT j;
 
 void explint1(l0,l1,cf,I,p) /* int x^j exp(a+bx); j=0..p-1 */
 double l0, l1, *cf, *I;
-INT p;
+int p;
 { double y0, y1, f;
-  INT j, k, k1;
+  int j, k, k1;
   y0 = lf_exp(cf[0]+l0*cf[1]);
   y1 = lf_exp(cf[0]+l1*cf[1]);
-  if (p<2*fabs(cf[1])) k = p; else k = (INT)fabs(cf[1]);
+  if (p<2*fabs(cf[1])) k = p; else k = (int)fabs(cf[1]);
 
   if (k>0)
   { I[0] = (y1-y0)/cf[1];
@@ -83,7 +83,7 @@ INT p;
     if (k>=p) f *= fabs(cf[1])/(k+1);
     k++;
   }
-  if (k==50) lfWARN(("explint1: want k>50"));
+  if (k==50) WARN(("explint1: want k>50"));
   I[k] = 0.0;
   for (j=k-1; j>=k1; j--) /* now do back step recursion */
     I[j] = (I[j]-cf[1]*I[j+1])/(j+1);
@@ -91,8 +91,8 @@ INT p;
 
 void explintyl(l0,l1,cf,I,p) /* small c, use taylor series and explint1 */
 double l0, l1, *cf, *I;
-INT p;
-{ INT i;
+int p;
+{ int i;
   double c;
   explint1(l0,l1,cf,I,p+8);
   c = cf[2];
@@ -102,8 +102,8 @@ INT p;
 
 void solvetrid(X,y,m)
 double *X, *y;
-INT m;
-{ INT i;
+int m;
+{ int i;
   double s;
   for (i=1; i<m; i++)
   { s = X[3*i]/X[3*i-2];
@@ -127,11 +127,11 @@ double *I, *cf, y0, y1, l0, l1;
   { bi = lf_exp(cf[0]+cf[1]*d+cf[2]*d*d)/c;
     if (a0>0)
     { if (a0>6) I[0] = (y0*ptail(-a0)-y1*ptail(-a1))/c;
-      else I[0] = S2PI*(pnorm(-a0,0.0,1.0)-pnorm(-a1,0.0,1.0))*bi;
+      else I[0] = S2PI*(mut_pnorm(-a0,0.0,1.0)-mut_pnorm(-a1,0.0,1.0))*bi;
     }
     else
     { if (a1< -6) I[0] = (y1*ptail(a1)-y0*ptail(a0))/c;
-      else I[0] = S2PI*(pnorm(a1,0.0,1.0)-pnorm(a0,0.0,1.0))*bi;
+      else I[0] = S2PI*(mut_pnorm(a1,0.0,1.0)-mut_pnorm(a0,0.0,1.0))*bi;
     }
   }
   else
@@ -141,13 +141,13 @@ double *I, *cf, y0, y1, l0, l1;
 
 void explinsid(l0,l1,cf,I,p) /* large b; don't use fwd recursion */
 double l0, l1, *cf, *I;
-INT p;
-{ INT k, k0, k1, k2;
+int p;
+{ int k, k0, k1, k2;
   double y0, y1, Z[150];
 if (debug) printf("side: %8.5f %8.5f %8.5f    limt %8.5f %8.5f  p %2d\n",cf[0],cf[1],cf[2],l0,l1,p);
  
   k0 = 2;
-  k1 = (INT)(fabs(cf[1])+fabs(2*cf[2]));
+  k1 = (int)(fabs(cf[1])+fabs(2*cf[2]));
   if (k1<2) k1 = 2;
   if (k1>p+20) k1 = p+20;
   k2 = p+20;
@@ -191,8 +191,8 @@ if (debug)
 
 void explinbkr(l0,l1,cf,I,p) /* small b,c; use back recursion */
 double l0, l1, *cf, *I;
-INT p;
-{ INT k, km;
+int p;
+{ int k, km;
   double y0, y1;
   y0 = lf_exp(cf[0]+l0*(cf[1]+cf[2]*l0));
   y1 = lf_exp(cf[0]+l1*(cf[1]+cf[2]*l1));
@@ -208,16 +208,16 @@ INT p;
 
 void explinfbk0(l0,l1,cf,I,p) /* fwd and bac recur; b=0; c<0 */
 double l0, l1, *cf, *I;
-INT p;
+int p;
 { double y0, y1, f1, f2, f, ml2;
-  INT k, ks;
+  int k, ks;
 
   y0 = lf_exp(cf[0]+l0*l0*cf[2]);
   y1 = lf_exp(cf[0]+l1*l1*cf[2]);
   initi0i1(I,cf,y0,y1,l0,l1);
 
   ml2 = MAX(l0*l0,l1*l1);
-  ks = 1+(INT)(2*fabs(cf[2])*ml2);
+  ks = 1+(int)(2*fabs(cf[2])*ml2);
   if (ks<2) ks = 2;
   if (ks>p-3) ks = p;
 
@@ -259,15 +259,15 @@ INT p;
 
 void explinfbk(l0,l1,cf,I,p) /* fwd and bac recur; b not too large */
 double l0, l1, *cf, *I;
-INT p;
+int p;
 { double y0, y1;
-  INT k, ks, km;
+  int k, ks, km;
 
   y0 = lf_exp(cf[0]+l0*(cf[1]+l0*cf[2]));
   y1 = lf_exp(cf[0]+l1*(cf[1]+l1*cf[2]));
   initi0i1(I,cf,y0,y1,l0,l1);
 
-  ks = (INT)(3*fabs(cf[2]));
+  ks = (int)(3*fabs(cf[2]));
   if (ks<3) ks = 3;
   if (ks>0.75*p) ks = p; /* stretch the forward recurs as far as poss. */
   /* forward recursion for k < ks */
@@ -290,8 +290,8 @@ INT p;
 
 void recent(I,resp,wt,p,s,x)
 double *I, *resp, *wt, x;
-INT p, s;
-{ INT i, j;
+int p, s;
+{ int i, j;
 
   /* first, use W taylor series I -> resp */
   for (i=0; i<=p; i++)
@@ -306,8 +306,8 @@ INT p, s;
 
 void recurint(l0,l2,cf,resp,p,ker)
 double l0, l2, *cf, *resp;
-INT p, ker;
-{ INT i, s;
+int p, ker;
+{ int i, s;
   double l1, d0, d1, d2, dl, z0, z1, z2, wt[20], ncf[3], I[50], r1[5], r2[5];
 if (debug) printf("\nrecurint: %8.5f %8.5f %8.5f   %8.5f %8.5f\n",cf[0],cf[1],cf[2],l0,l2);
 
@@ -415,16 +415,16 @@ if (debug) printf("case 8\n");
   return;
 }
 
-INT onedexpl(cf,mi,resp)
+int onedexpl(cf,deg,resp)
 double *cf, *resp;
-INT *mi;
-{ INT i;
+int deg;
+{ int i;
   double f0, fr, fl;
-  if (mi[MDEG]>=2) lfERROR(("onedexpl only valid for deg=0,1"));
+  if (deg>=2) ERROR(("onedexpl only valid for deg=0,1"));
   if (fabs(cf[1])>=EFACT) return(LF_BADP);
 
   f0 = exp(cf[0]); fl = fr = 1.0;
-  for (i=0; i<=2*mi[MDEG]; i++)
+  for (i=0; i<=2*deg; i++)
   { f0 *= i+1;
     fl /=-(EFACT+cf[1]);
     fr /=  EFACT-cf[1];
@@ -433,13 +433,13 @@ INT *mi;
   return(LF_OK);
 }
 
-INT onedgaus(cf,mi,resp)
+int onedgaus(cf,deg,resp)
 double *cf, *resp;
-INT *mi;
-{ INT i;
+int deg;
+{ int i;
   double f0, mu, s2;
-  if (mi[MDEG]>=3)
-  { lfERROR(("onedgaus only valid for deg=0,1,2"));
+  if (deg==3)
+  { ERROR(("onedgaus only valid for deg=0,1,2"));
     return(LF_ERR);
   }
   if (2*cf[2]>=GFACT*GFACT) return(LF_BADP);
@@ -447,68 +447,66 @@ INT *mi;
   s2 = 1/(GFACT*GFACT-2*cf[2]);
   mu = cf[1]*s2;
   resp[0] = 1.0;
-  if (mi[MDEG]>=1)
+  if (deg>=1)
   { resp[1] = mu;
     resp[2] = s2+mu*mu;
-    if (mi[MDEG]==2)
+    if (deg==2)
     { resp[3] = mu*(3*s2+mu*mu);
       resp[4] = 3*s2*s2 + mu*mu*(6*s2+mu*mu);
     }
   }
   f0 = S2PI * exp(cf[0]+mu*mu/(2*s2))*sqrt(s2);
-  for (i=0; i<=2*mi[MDEG]; i++) resp[i] *= f0;
+  for (i=0; i<=2*deg; i++) resp[i] *= f0;
   return(LF_OK);
 }
 
-INT onedint(cf,mi,l0,l1,resp) /* int W(u)u^j exp(..), j=0..2*deg */
+int onedint(sp,cf,l0,l1,resp) /* int W(u)u^j exp(..), j=0..2*deg */
+smpar *sp;
 double *cf, l0, l1, *resp;
-INT *mi;
 { double u, uj, y, ncf[4], rr[5];
-  INT deg, i, j;
+  int i, j;
 if (debug) printf("onedint: %f %f %f   %f %f\n",cf[0],cf[1],cf[2],l0,l1);
-  deg = mi[MDEG];
 
-  if (deg<=2)
-  { for (i=0; i<3; i++) ncf[i] = (i>deg) ? 0.0 : cf[i];
+  if (deg(sp)<=2)
+  { for (i=0; i<3; i++) ncf[i] = (i>deg(sp)) ? 0.0 : cf[i];
     ncf[2] /= 2;
 
-    if (mi[MKER]==WEXPL) return(onedexpl(ncf,mi,resp));
-    if (mi[MKER]==WGAUS) return(onedgaus(ncf,mi,resp));
+    if (ker(sp)==WEXPL) return(onedexpl(ncf,deg(sp),resp));
+    if (ker(sp)==WGAUS) return(onedgaus(ncf,deg(sp),resp));
 
     if (l1>0)
-      recurint(MAX(l0,0.0),l1,ncf,resp,2*deg,mi[MKER]);
-    else for (i=0; i<=2*deg; i++) resp[i] = 0;
+      recurint(MAX(l0,0.0),l1,ncf,resp,2*deg(sp),ker(sp));
+    else for (i=0; i<=2*deg(sp); i++) resp[i] = 0;
 
     if (l0<0)
     { ncf[1] = -ncf[1];
       l0 = -l0; l1 = -l1;
-      recurint(MAX(l1,0.0),l0,ncf,rr,2*deg,mi[MKER]);
+      recurint(MAX(l1,0.0),l0,ncf,rr,2*deg(sp),ker(sp));
     }
-    else for (i=0; i<=2*deg; i++) rr[i] = 0.0;
+    else for (i=0; i<=2*deg(sp); i++) rr[i] = 0.0;
 
-    for (i=0; i<=2*deg; i++)
+    for (i=0; i<=2*deg(sp); i++)
       resp[i] += (i%2==0) ? rr[i] : -rr[i];
 
     return(LF_OK);
   }
 
   /* For degree >= 3, we use Simpson's rule. */
-  for (j=0; j<=2*deg; j++) resp[j] = 0.0;
-  for (i=0; i<=mi[MMINT]; i++)
-  { u = l0+(l1-l0)*i/mi[MMINT];
+  for (j=0; j<=2*deg(sp); j++) resp[j] = 0.0;
+  for (i=0; i<=de_mint; i++)
+  { u = l0+(l1-l0)*i/de_mint;
     y = cf[0]; uj = 1;
-    for (j=1; j<=deg; j++)
+    for (j=1; j<=deg(sp); j++)
     { uj *= u;
       y += cf[j]*uj/fact[j];
     }
-    y = (4-2*(i%2==0)-(i==0)-(i==mi[MMINT])) *
-          W(fabs(u),mi[MKER])*exp(MIN(y,300.0));
-    for (j=0; j<=2*deg; j++)
+    y = (4-2*(i%2==0)-(i==0)-(i==de_mint)) *
+          W(fabs(u),ker(sp))*exp(MIN(y,300.0));
+    for (j=0; j<=2*deg(sp); j++)
     { resp[j] += y;
       y *= u;
     }
   }
-  for (j=0; j<=2*deg; j++) resp[j] = resp[j]*(l1-l0)/(3*mi[MMINT]);
+  for (j=0; j<=2*deg(sp); j++) resp[j] = resp[j]*(l1-l0)/(3*de_mint);
   return(LF_OK);
 }
-

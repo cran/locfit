@@ -3,26 +3,13 @@
  *   See README file for details.
  */
 
-#include "local.h"
+#include "mutil.h"
 
 #define LOG_2           0.6931471805599453094172321214581765680755
 #define IBETA_LARGE     1.0e30
 #define IBETA_SMALL     1.0e-30
 #define IGAMMA_LARGE    1.0e30
 #define DOUBLE_EP     2.2204460492503131E-16
-
-double dchisq(x, df)
-double x, df;
-{ return(exp(log(x/2)*(df/2-1) - x/2 - LGAMMA(df/2) - LOG_2));
-}
-
-double df(x, df1, df2)
-double x, df1, df2;
-{ double p;
-  p = exp(LGAMMA((df1+df2)/2) + df1/2*log(df1/df2) + (df1/2-1)*log(x)
-               - LGAMMA(df1/2) - LGAMMA(df2/2) - (df1+df2)/2*log(1+x*df1/df2));
-  return(p);
-}
 
 double ibeta(x, a, b)
 double x, a, b;
@@ -64,8 +51,9 @@ double x, a, b;
       for (i=0; i<=3; i++)
         pn[i] /= IBETA_SMALL;
   } while (fabs(next-prev) > DOUBLE_EP*prev);
-  factor = a*log(x) + (b-1)*log(1-x);
-  factor -= LGAMMA(a+1) + LGAMMA(b) - LGAMMA(a+b);
+  /* factor = a*log(x) + (b-1)*log(1-x);
+  factor -= LGAMMA(a+1) + LGAMMA(b) - LGAMMA(a+b); */
+  factor = dbeta(x,a,b,1) + log(x/a);
   I = exp(factor) * next;
   return(flipped ? 1-I : I);
 }
@@ -81,12 +69,10 @@ double x, df;
   if (x <= 0.0) return(0.0);
 
   if (df < 1.0)
-    return( exp(df*log(x)-x-LGAMMA(df+1.0)) + igamma(x,df+1.0) );
+    return( dgamma(x,df+1.0,1.0,0) + igamma(x,df+1.0) );
 
-/* 
- * this is unstable for large df
- */
-  factor = exp(df*log(x) - x - LGAMMA(df));
+  factor = x * dgamma(x,df,1.0,0);
+  /* factor = exp(df*log(x) - x - lgamma(df)); */
 
   if (x > 1.0 && x >= df)
   {
@@ -139,19 +125,14 @@ double q, df1, df2;
 { return(ibeta(q*df1/(df2+q*df1), df1/2, df2/2));
 }
 
-double pchisq(q, df)
-double q, df;
-{ return(igamma(q/2, df/2));
-}
-
 #ifdef RVERSION
 extern double Rf_pnorm5();
-double pnorm(x,mu,s)
+double mut_pnorm(x,mu,s)
 double x, mu, s;
 { return(Rf_pnorm5(x, mu, s, 1L, 0L));
 }
 #else
-double pnorm(x,mu,s)
+double mut_pnorm(x,mu,s)
 double x, mu, s;
 { if(x == mu)
     return(0.5);

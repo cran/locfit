@@ -11,8 +11,9 @@ print.scb(x, ...)
   \code{\link{scb}} function.
 }
 \arguments{
-\item{x}{ \code{"scb"} object created by \code{\link{scb}()}.}
-\item{...}{unused.}
+  \item{x}{ \code{"scb"} object created by \code{\link{scb}}.}
+  \item{...}{Arguments passed to and from other methods.}
+  
 }
 \seealso{
 \code{\link{scb}}

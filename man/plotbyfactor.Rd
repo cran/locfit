@@ -4,9 +4,9 @@
 x-y scatterplot, colored by levels of a factor.
 }
 \usage{
-plotbyfactor(x, y, f, data, col, pch, add, lg,
-             xlab = deparse(substitute(x)),
-             ylab = deparse(substitute(y)), log = "", ...)
+plotbyfactor(x, y, f, data, col = 1:10, pch = "O", add = FALSE, lg,
+    xlab = deparse(substitute(x)), ylab = deparse(substitute(y)),
+    log = "", ...)
 }
 \description{
   Produces a scatter plot of x-y data, with different classes given
@@ -24,32 +24,31 @@ Variable for y axis.
 Factor (or variable for which as.factor() works).
 }
 \item{data}{
-data frame for variables x, y, f. Default: \code{sys.parent()}.
+data frame for variables x, y, f. Default: sys.parent().
 }
 \item{col}{
 Color numbers to use in plot. Will be replicated if shorter than the
-number of levels of the factor f. Default: \code{1:10}.
+number of levels of the factor f. Default: 1:10.
 }
 \item{pch}{
-Vector of plot characters. Replicated if necessary. Default: O.
+Vector of plot characters. Replicated if necessary.
+Default: "O".
 }
 \item{add}{
-If TRUE, add to existing plot. Otherwise, create new plot.
-Default: \code{FALSE}.
+If \code{TRUE}, add to existing plot. Otherwise, create new plot.
 }
 \item{lg}{
 Coordinates to place a legend. Default: Missing (no legend).
 }
-\item{xlab}{label for x-axis.}
-\item{ylab}{label for y-axis.}
-\item{log}{which axis should be plotted in log scale (\code{"x"},
-           \code{"y"}, or \code{"xy"}.)}
+\item{xlab, ylab}{Axes labels.}
+\item{log}{Should the axes be in log scale? Use \code{"x"}, \code{"y"},
+  or \code{"xy"} to specify which axis to be in log scale.}
 \item{...}{
-Other graphical parameters, labels, titles e.t.c.}
-}
+Other graphical parameters, labels, titles e.t.c.
+}}
 \examples{
 data(iris)
-plotbyfactor(petal.wid,petal.len,species,data=iris)
+plotbyfactor(petal.wid, petal.len, species, data=iris)
 }
 \keyword{smooth}
 % Converted by Sd2Rd version 0.2-a3.

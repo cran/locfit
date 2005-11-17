@@ -4,9 +4,7 @@
 Local Quasi-Likelihood with global reweighting.
 }
 \usage{
-locfit.quasi(x, y, weights, ..., iter=3, var=function(mean)abs(mean))
-%locfit(y~x, lfproc=locfit.quasi)
-%locfit.quasi(y~x)
+locfit.quasi(x, y, weights, ..., iter=3, var=abs)
 }
 \description{
   \code{locfit.quasi} assumes a specified mean-variance relation,
@@ -28,8 +26,7 @@ locfit.quasi(x, y, weights, ..., iter=3, var=function(mean)abs(mean))
 \item{y}{
   If \code{x} is numeric, \code{y} gives the response variable.
 }
-\item{weights}{Prior weights (or sample sizes) for individual observations. This is
-typically used where observations have unequal variance.}
+\item{weights}{Case weights to use in the fitting.}
 \item{...}{
   Other arguments to \code{\link{locfit.raw}}
 }

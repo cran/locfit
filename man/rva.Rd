@@ -1,7 +1,7 @@
 \name{rva}
 \alias{rv<-}
 \title{
-Substitute variance estimate on a "locfit" object.
+Substitute variance estimate on a locfit object.
 }
 \description{
 By default, Locfit uses the normalized residual sum of squares as the

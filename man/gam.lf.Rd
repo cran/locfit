@@ -26,5 +26,4 @@ gam.lf(x, y, w, xeval, ...)
   \code{gam}
 }
 
-\keyword{smooth}
-% Converted by Sd2Rd version 0.2-a5.
+\keyword{models}

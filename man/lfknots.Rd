@@ -1,10 +1,10 @@
-\name{knots}
-\alias{knots}
+\name{lfknots}
+\alias{lfknots}
 \title{
 Extraction of fit-point information from a Locfit object.
 }
 \usage{
-knots(x, tr, what, delete.pv, ...)
+lfknots(x, tr, what = c("x", "coef", "h", "nlx"), delete.pv = TRUE)
 }
 \description{
   Extracts information, such as fitted values, influence functions
@@ -28,7 +28,6 @@ Allowed fields are \code{x} (fit points); \code{coef} (fitted values);
 \code{h} (bandwidth) and \code{deg} (degree of fit).
 }
 \item{delete.pv}{If \code{T}, pseudo-vertices are deleted.}
-\item{...}{not used.}
 }
 \value{
 A matrix with one row for each fit point. Columns correspond to

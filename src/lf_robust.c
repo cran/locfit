@@ -5,7 +5,7 @@
  *
  *   This file includes functions to solve for the scale estimate in
  *   local robust regression and likelihood. The main entry point is
- *   lf_robust(lf,des,noit),
+ *   lf_robust(lfd,sp,des,mxit),
  *   called from the locfit() function.
  *
  *   The update_rs(x) accepts a residual scale x as the argument (actually,
@@ -28,13 +28,15 @@
 extern int lf_status;
 double robscale;
 
-static lfit *rob_lf;
+static lfdata *rob_lfd;
+static smpar *rob_sp;
 static design *rob_des;
+static int rob_mxit;
 
 double median(x,n)
 double *x;
-INT n;
-{ INT i, j, lt, eq, gt;
+int n;
+{ int i, j, lt, eq, gt;
   double lo, hi, s;
   lo = hi = x[0];
   for (i=0; i<n; i++)
@@ -60,8 +62,9 @@ INT n;
   return((hi+lo)/2);
 }
 
-double nrobustscale(lf,des,rs)
-lfit *lf;
+double nrobustscale(lfd,sp,des,rs)
+lfdata *lfd;
+smpar *sp;
 design *des;
 double rs;
 { int i, ii, p;
@@ -69,9 +72,9 @@ double rs;
   p = des->p; sc = sd = sw = 0.0;
   for (i=0; i<des->n; i++)
   { ii = des->ind[i];
-    des->th[i] = base(lf,ii)+innerprod(des->cf,d_xi(des,i),p);
-    e = resp(lf,ii)-des->th[i];
-    stdlinks(link,lf,ii,des->th[i],rs);
+    des->th[i] = base(lfd,ii)+innerprod(des->cf,d_xi(des,i),p);
+    e = resp(lfd,ii)-des->th[i];
+    stdlinks(link,lfd,sp,ii,des->th[i],rs);
     sc += des->w[i]*e*link[ZDLL];
     sd += des->w[i]*e*e*link[ZDDLL];
     sw += des->w[i];
@@ -84,16 +87,19 @@ double rs;
   return(rs);
 }
 
-double robustscale(lf,des)
-lfit *lf;
+double robustscale(lfd,sp,des)
+lfdata *lfd;
+smpar *sp;
 design *des;
-{ INT i, ii, p;
+{ int i, ii, p, fam, lin;
   double rs, link[LLEN];
   p = des->p;
+  fam = fam(sp);
+  lin = link(sp);
   for (i=0; i<des->n; i++)
   { ii = des->ind[i];
-    des->th[i] = base(lf,ii) + innerprod(des->cf,d_xi(des,i),p);
-    links(des->th[i],resp(lf,ii),lf->mi[MTG]&127,lf->mi[MLINK],link,cens(lf,ii),prwt(lf,ii),1.0);
+    des->th[i] = base(lfd,ii) + innerprod(des->cf,d_xi(des,i),p);
+    links(des->th[i],resp(lfd,ii),fam&127,lin,link,cens(lfd,ii),prwt(lfd,ii),1.0);
     des->res[i] = -2*link[ZLIK];
   }
   rs = sqrt(median(des->res,des->n));
@@ -103,23 +109,29 @@ design *des;
 
 double update_rs(x)
 double x;
-{
+{ double nx;
   if (lf_status != LF_OK) return(x);
   robscale = exp(x);
-  lfiter(rob_lf,rob_des);
+  lfiter(rob_des,rob_mxit);
   if (lf_status != LF_OK) return(x);
 
-  return(log(robustscale(rob_lf,rob_des)));
+  nx = log(robustscale(rob_lfd,rob_sp,rob_des));
+  if (nx<x-0.2) nx = x-0.2;
+  return(nx);
 }
 
-void lf_robust(lf,des)
-lfit *lf;
+void lf_robust(lfd,sp,des,mxit)
+lfdata *lfd;
 design *des;
+smpar *sp;
+int mxit;
 { double x;
-  rob_lf = lf;
+  rob_lfd = lfd;
   rob_des = des;
+  rob_sp = sp;
+  rob_mxit = mxit;
   lf_status = LF_OK;
 
-  x = log(robustscale(lf,des));
-  solve_fp(update_rs, x, 1.0e-6, (int)lf->mi[MMXIT]);
+  x = log(robustscale(lfd,sp,des));
+  solve_fp(update_rs, x, 1.0e-6, mxit);
 }

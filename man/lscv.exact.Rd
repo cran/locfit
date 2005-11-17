@@ -4,7 +4,7 @@
 Exact LSCV Calculation
 }
 \usage{
-lscv.exact(x, alpha, ...)
+lscv.exact(x, h=0)
 }
 \description{
   This function performs the exact computation of the least squares
@@ -15,27 +15,23 @@ lscv.exact(x, alpha, ...)
   kernel (with the standard deviation of 0.4; Locfit's standard).
 }
 \arguments{
-  \item{x}{Numeric data vector}
-  \item{alpha}{The bandwidth. Note that this function only works with
-    a constant bandwidth, and in accordance with Locfit's standard, this
-    can be specified as \code{alpha=c(0,h)}. It can also be given as
-    a single number, which will be interpreted as a constant
-    (not NN) bandwidth. }
-  \item{...}{not used.}
+  \item{x}{Numeric data vector.}
+  \item{h}{The bandwidth. If \code{x} is constructed with
+    \code{\link{lp}()}, the bandwidth should be given there instead.}
 }
 \value{
   A vector of the LSCV statistic and the fitted degrees of freedom.
 }
 \examples{
 data(geyser, package="locfit")
-lscv.exact(geyser,alpha=0.25)
+lscv.exact(lp(geyser,h=0.25))
 # equivalent form using lscv
-lscv(geyser,alpha=0.25,exact=TRUE)
+lscv(lp(geyser, h=0.25), exact=TRUE)
 }
 \seealso{
   \code{\link{lscv}},
   \code{\link{lscvplot}}
 }
 
-\keyword{smooth}
+\keyword{htest}
 % Converted by Sd2Rd version 0.2-a5.

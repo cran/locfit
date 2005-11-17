@@ -22,10 +22,10 @@ spence.15(y)
   the graduated (smoothed) values.
 }
 \examples{
-  data(spencer)
-  yy <- spence.15(spencer$mortality)
-  plot(spencer$age, spencer$mortality)
-  lines(spencer$age, yy)
+data(spencer)
+yy <- spence.15(spencer$mortality)
+plot(spencer$age, spencer$mortality)
+lines(spencer$age, yy)
 }
 
 \seealso{

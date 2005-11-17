@@ -4,15 +4,12 @@
 Weight diagrams and the hat matrix for a local regression model.
 }
 \usage{
-hatmatrix(formula, dc, ...)
+hatmatrix(formula, dc=TRUE, \dots)
 }
 \arguments{
-\item{formula}{
-model formula.
-}
-\item{dc}{ Derivative adjustment (to be passed to \code{\link{locfit.raw}}.}
-\item{...}{
-Other arguments to \code{\link{locfit}} and
+  \item{formula}{model formula.}
+  \item{dc}{derivative adjustment (see \code{\link{locfit.raw}})}
+  \item{...}{Other arguments to \code{\link{locfit}} and
 \code{\link{locfit.raw}}.
 }}
 \description{

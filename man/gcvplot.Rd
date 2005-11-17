@@ -22,7 +22,7 @@ be used to produce an GCV plot.
      is provided as a vector, it will be converted to a one-column
      matrix, thus interpreting each component as a nearest neighbor
     smoothing parameter.}
-  \item{df}{ Degrees of freedom to use as the x-axis. 2=trace(L),
+  \item{df}{ Degrees of freedom to use as the x-axis. 2=trace(L), 
     3=trace(L'L).}
 }
 
@@ -33,8 +33,8 @@ be used to produce an GCV plot.
 }
 
 \examples{
-data(ethanol, package="locfit")
-plot(gcvplot(NOx~E, data=ethanol, alpha=seq(0.2, 1.0, by=0.05)))
+data(ethanol)
+plot(gcvplot(NOx~E,data=ethanol,alpha=seq(0.2,1.0,by=0.05)))
 }
 
 \seealso{
@@ -45,5 +45,5 @@ plot(gcvplot(NOx~E, data=ethanol, alpha=seq(0.2, 1.0, by=0.05)))
   \code{\link{summary.gcvplot}}
 }
 
-\keyword{smooth}
+\keyword{htest}
 % Converted by Sd2Rd version 0.2-a5.

@@ -35,5 +35,5 @@ cp(x, \dots, sig2=1)
   \code{\link{cpplot}}
 }
 
-\keyword{smooth}
+\keyword{htest}
 % Converted by Sd2Rd version 0.2-a5.

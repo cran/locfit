@@ -7,12 +7,12 @@ Print the Locfit Evaluation Points.
 print.lfeval(x, ...)
 }
 \description{
-  Prints a matrix of the evaluation points from a \code{"locfit"}
-  or \code{"lfeval"} structure.
+  Prints a matrix of the evaluation points from a \code{locfit}
+  or \code{lfeval} structure.
 }
 \arguments{
-  \item{x}{A \code{"lfeval"} or \code{"locfit"} object}
-  \item{...}{not used.}
+  \item{x}{A \code{lfeval} or \code{locfit} object}
+  \item{...}{Arguments passed to and from other methods.}
 }
 
 \value{

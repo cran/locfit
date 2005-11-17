@@ -1,11 +1,12 @@
 \name{lfbas}
 \alias{lfbas}
-\title{
-User-specified basis functions for Locfit.
+\title{User-specified basis functions for Locfit.}
+\synopsis{
+lfbas(dim, indices, tt, ...)
 }
-%\usage{
-%locfit(...,basis)
-%}
+\usage{
+locfit(..., basis)
+}
 \description{
   By default, Locfit uses a polynomial basis as the fitting functions.
   An alternative set of basis functions can be specified through
@@ -42,47 +43,48 @@ User-specified basis functions for Locfit.
   the basis.
 }
 \examples{
-# Specify a bivariate linear with interaction basis.
-data(ethanol)
-my.basis <- function(x,t)
-{
-  u1 <- x[, 1] - t[1]
-  u2 <- x[, 2] - t[2]
-  cbind(1, u1, u2, u1 * u2)
+## Specify a bivariate linear with interaction basis.
+data(ethanol, package="locfit")
+my.basis <- function(x, t) {
+    u1 <- x[, 1] - t[1]
+    u2 <- x[, 2] - t[2]
+    cbind(1, u1, u2, u1 * u2)
 }
-fit <- locfit(NOx~E+C, data=ethanol, scale=0, basis=my.basis)
-# With this basis, Locfit's standard interpolation and plot methods
-# should be reasonable.
-plot(fit,get.data=TRUE)
+fit <- locfit(NOx ~ E + C, data=ethanol, scale=0, basis=my.basis)
+## With this basis, Locfit's standard interpolation and plot methods
+## should be reasonable.
+plot(fit, get.data=TRUE)
 
-# Estimation of change points. This provides an alternative to using
-# left() and right(), and can easily be modified to detecting
-# a change in slopes or other parameters. Note that the first
-# component is the indicator of x>t, so the coefficient estimates
-# the size of the change, assuming the change occurs at t.
-data(penny)
-my.basis <- function(x,t) cbind(x>t,1,x-t)
+## Estimation of change points. This provides an alternative to using
+## left() and right(), and can easily be modified to detecting
+## a change in slopes or other parameters. Note that the first
+## component is the indicator of x>t, so the coefficient estimates
+## the size of the change, assuming the change occurs at t.
+data(penny, package="locfit")
+my.basis <- function(x, t) cbind(x > t, 1, x - t)
 xev <- (1945:1988) + 0.5
-fit <- locfit(thickness~year, data=penny, alpha=c(0,10), ev=xev, basis=my.basis)
-# The plot will show peaks where change points are most likely.
-# in S4, S-Plus 5 etc,
-# plot(preplot(fit,where="fitp")^2, type="b") is an alternative.
-plot(xev, predict(fit,where="fitp")^2, type="b")
+fit <- locfit(thickness ~ year, data=penny, alpha=c(0, 10), ev=xev,
+              basis=my.basis)
+## The plot will show peaks where change points are most likely.
+## in S4, S-Plus 5 etc,
+## plot(preplot(fit,where="fitp")^2, type="b") is an alternative.
+plot(xev, predict(fit, where="fitp")^2, type="b")
 
-# Estimate the mean function using local linear regression, with
-# discontinuities at 1958.5 and 1974.5.
-# The basis functions must consist of the constant 1, the linear term
-# x-t, and indicator functions for two of the three sections.
-# Note the care taken to ensure my.basis(t,t) = c(1,0,0,0) for all t.
-my.basis <- function(x,t)
-{ ret <- NULL
-  if (t<1958.5) ret <- cbind(1, x>=1958.5, x>1974.5, x-t)
-  if (t>1974.5) ret <- cbind(1, x<=1974.5, x<1958.5, x-t)
-  if (is.null(ret))
-    ret <- cbind(1, x<1958.5, x>1974.5, x-t)
-  ret
+## Estimate the mean function using local linear regression, with
+## discontinuities at 1958.5 and 1974.5.
+## The basis functions must consist of the constant 1, the linear term
+## x-t, and indicator functions for two of the three sections.
+## Note the care taken to ensure my.basis(t,t) = c(1,0,0,0) for all t.
+my.basis <- function(x, t) {
+    ret <- NULL
+    if (t<1958.5) ret <- cbind(1, x >= 1958.5, x > 1974.5, x - t)
+    if (t>1974.5) ret <- cbind(1, x <= 1974.5, x < 1958.5, x - t)
+    if (is.null(ret))
+    ret <- cbind(1, x < 1958.5, x > 1974.5, x - t)
+    ret
 }
-fit <- locfit(thickness~year, data=penny, alpha=c(0,10), ev=xev, basis=my.basis)
+fit <- locfit(thickness ~ year, data=penny, alpha=c(0,10), ev=xev,
+              basis=my.basis)
 plot(preplot(fit,where="fitp", get.data=TRUE))
 }
 \seealso{
@@ -90,4 +92,4 @@ plot(preplot(fit,where="fitp", get.data=TRUE))
   \code{\link{locfit.raw}}
 }
 
-\keyword{smooth}
+\keyword{internal}

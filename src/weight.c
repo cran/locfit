@@ -13,7 +13,7 @@
 /* The weight functions themselves.  Used everywhere. */
 double W(u,ker)
 double u;
-INT ker;
+int ker;
 { u = fabs(u);
   switch(ker)
   { case WRECT: return((u>1) ? 0.0 : 1.0);
@@ -33,29 +33,30 @@ INT ker;
     case WGAUS: return(exp(-SQR(GFACT*u)/2.0));
     case WEXPL: return(exp(-EFACT*u));
     case WMACL: return(1/((u+1.0e-100)*(u+1.0e-100)));
-    case WMINM: lfERROR(("WMINM in W"));
+    case WMINM: ERROR(("WMINM in W"));
                 return(0.0);
     case WPARM: return(1.0);
   }
-  return(0.0);
+  ERROR(("W(): Unknown kernel %d\n",ker));
+  return(1.0);
 }
 
-INT iscompact(ker)
-INT ker;
+int iscompact(ker)
+int ker;
 { if ((ker==WEXPL) | (ker==WGAUS) | (ker==WMACL) | (ker==WPARM)) return(0);
   return(1);
 }
 
-double weightprod(lf,u,h)
-lfit *lf;
+double weightprod(lfd,u,h,ker)
+lfdata *lfd;
 double *u, h;
-{ INT i, ker;
+int ker;
+{ int i;
   double sc, w;
   w = 1.0;
-  ker = lf->mi[MKER];
-  for (i=0; i<lf->mi[MDIM]; i++)
-  { sc = lf->sca[i];
-    switch(lf->sty[i])
+  for (i=0; i<lfd->d; i++)
+  { sc = lfd->sca[i];
+    switch(lfd->sty[i])
     { case STLEFT:
         if (u[i]>0) return(0.0);
         w *= W(-u[i]/(h*sc),ker);
@@ -77,35 +78,36 @@ double *u, h;
   return(w);
 }
 
-double weightsph(lf,u,h,hasdi,di)
-lfit *lf;
+double weightsph(lfd,u,h,ker, hasdi,di)
+lfdata *lfd;
 double *u, h, di;
-INT hasdi;
-{ INT i;
+int ker, hasdi;
+{ int i;
 
-  if (!hasdi) di = rho(u,lf->sca,lf->mi[MDIM],lf->mi[MKT],lf->sty);
+  if (!hasdi) di = rho(u,lfd->sca,lfd->d,KSPH,lfd->sty);
 
-  for (i=0; i<lf->mi[MDIM]; i++)
-  { if ((lf->sty[i]==STLEFT) && (u[i]>0.0)) return(0.0);
-    if ((lf->sty[i]==STRIGH) && (u[i]<0.0)) return(0.0);
+  for (i=0; i<lfd->d; i++)
+  { if ((lfd->sty[i]==STLEFT) && (u[i]>0.0)) return(0.0);
+    if ((lfd->sty[i]==STRIGH) && (u[i]<0.0)) return(0.0);
   }
   if (h==0) return((di==0.0) ? 1.0 : 0.0);
 
-  return(W(di/h,lf->mi[MKER]));
+  return(W(di/h,ker));
 }
 
-double weight(lf,x,t,h,hasdi,di)
-lfit *lf;
+double weight(lfd,sp,x,t,h, hasdi,di)
+lfdata *lfd;
+smpar *sp;
 double *x, *t, h, di;
-INT hasdi;
+int hasdi;
 { double u[MXDIM];
-  INT i;
-  for (i=0; i<lf->mi[MDIM]; i++) u[i] = (t==NULL) ? x[i] : x[i]-t[i];
-  switch(lf->mi[MKT])
-  { case KPROD: return(weightprod(lf,u,h));
-    case KSPH:  return(weightsph(lf,u,h,hasdi,di));
+  int i;
+  for (i=0; i<lfd->d; i++) u[i] = (t==NULL) ? x[i] : x[i]-t[i];
+  switch(kt(sp))
+  { case KPROD: return(weightprod(lfd,u,h,ker(sp)));
+    case KSPH:  return(weightsph(lfd,u,h,ker(sp), hasdi,di));
   }
-  lfERROR(("weight: unknown kernel type %d",lf->mi[MKT]));
+  ERROR(("weight: unknown kernel type %d",kt(sp)));
   return(1.0);
 }
 
@@ -118,7 +120,7 @@ double x;
 
 double WdW(u,ker) /* W'(u)/W(u) */
 double u;
-INT ker;
+int ker;
 { double eps=1.0e-10;
   if (ker==WGAUS) return(-GFACT*GFACT*u);
   if (ker==WPARM) return(0.0);
@@ -132,7 +134,7 @@ INT ker;
     case WTCUB: return(-9*sgn(u)*u*u/(1-u*u*fabs(u)+eps));
     case WEXPL: return((u>0) ? -EFACT : EFACT);
   }
-  lfERROR(("WdW: invalid kernel"));
+  ERROR(("WdW: invalid kernel"));
   return(0.0);
 }
 
@@ -142,7 +144,7 @@ INT ker;
 */
 double weightd(u,sc,d,ker,kt,h,sty,di)
 double u, sc, h, di;
-INT d, ker, kt, sty;
+int d, ker, kt, sty;
 { if (sty==STANGL)
   { if (kt==KPROD)
       return(-WdW(2*sin(u/(2*sc)),ker)*cos(u/(2*sc))/(h*sc));
@@ -158,7 +160,7 @@ INT d, ker, kt, sty;
 
 double weightdd(u,sc,d,ker,kt,h,sty,di,i0,i1)
 double *u, *sc, h, di;
-INT d, ker, kt, *sty, i0, i1;
+int d, ker, kt, i0, i1, *sty;
 { double w;
   w = 1;
   if (kt==KPROD)
@@ -173,7 +175,7 @@ INT d, ker, kt, *sty, i0, i1;
    and kernel density bandwidth selectors. */
 double Wd(u,ker)
 double u;
-INT ker;
+int ker;
 { double v;
   if (ker==WGAUS) return(-SQR(GFACT)*exp(-SQR(GFACT*u)/2));
   if (ker==WPARM) return(0.0);
@@ -185,7 +187,7 @@ INT ker;
                 return(-9*v*v*u);
     case WTRWT: v = 1-u*u;
                 return(-6*v*v);
-    default: lfERROR(("Invalid kernel %d in Wd",ker));
+    default: ERROR(("Invalid kernel %d in Wd",ker));
   }
   return(0.0);
 }
@@ -194,7 +196,7 @@ INT ker;
    used in simult. conf. band computations in >1 dimension. */
 double Wdd(u,ker)
 double u;
-INT ker;
+int ker;
 { double v;
   if (ker==WGAUS) return(SQR(u*GFACT*GFACT)*exp(-SQR(u*GFACT)/2));
   if (ker==WPARM) return(0.0);
@@ -204,7 +206,7 @@ INT ker;
     case WTCUB: v = 1-u*u*u;
                 return(-9*u*v*v+54*u*u*u*u*v);
     case WTRWT: return(24*u*u*(1-u*u));
-    default: lfERROR(("Invalid kernel %d in Wdd",ker));
+    default: ERROR(("Invalid kernel %d in Wdd",ker));
   }
   return(0.0);
 }
@@ -215,7 +217,7 @@ INT ker;
    Also in some bandwidth selection.
 */
 double wint(d,j,nj,ker)
-INT d, *j, nj, ker;
+int d, *j, nj, ker;
 { double I, z;
   int k, dj;
   dj = d;
@@ -241,7 +243,7 @@ INT d, *j, nj, ker;
                   }
                 return(I);
     case WEXPL: I = factorial(dj-1)/ipower(EFACT,dj); break;
-    default: lfERROR(("Unknown kernel %d in exacint",ker));
+    default: ERROR(("Unknown kernel %d in exacint",ker));
   }
   if ((d==1) && (nj==0)) return(2*I); /* common case quick */
   z = (d-nj)*LOGPI/2-LGAMMA(dj/2.0);
@@ -254,9 +256,9 @@ INT d, *j, nj, ker;
    as special cases.
    Used in density estimation.
 */
-INT wtaylor(f,x,ker)
+int wtaylor(f,x,ker)
 double *f, x;
-INT ker;
+int ker;
 { double v;
   switch(ker)
   { case WRECT:
@@ -320,7 +322,7 @@ INT ker;
       f[18]= 1;
       return(19);
   }
-  lfERROR(("Invalid kernel %d in wtaylor",ker));
+  ERROR(("Invalid kernel %d in wtaylor",ker));
   return(0);
 }
 
@@ -329,7 +331,7 @@ INT ker;
 */
 double Wconv(v,ker)
 double v;
-INT ker;
+int ker;
 { double v2;
   switch(ker)
   { case WGAUS: return(SQRPI/GFACT*exp(-SQR(GFACT*v)/4));
@@ -347,7 +349,7 @@ INT ker;
       v2 = 2-v;
       return(v2*v2*v2*v2*v2*(16+v*(40+v*(36+v*(10+v))))/630);
   }
-  lfERROR(("Wconv not implemented for kernel %d",ker));
+  ERROR(("Wconv not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -357,7 +359,7 @@ INT ker;
 */
 double Wconv1(v,ker)
 double v;
-INT ker;
+int ker;
 { double v2;
   v = fabs(v);
   switch(ker)
@@ -373,7 +375,7 @@ INT ker;
       v2 = 2-v;
       return(-v2*v2*v2*v2*(32+v*(64+v*(24+v*3)))/210);
   }
-  lfERROR(("Wconv1 not implemented for kernel %d",ker));
+  ERROR(("Wconv1 not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -382,14 +384,14 @@ INT ker;
 */
 double Wconv4(v,ker)
 double v;
-INT ker;
+int ker;
 { double gv;
   switch(ker)
   { case WGAUS:
       gv = GFACT*v;
       return(exp(-SQR(gv)/4)*GFACT*GFACT*GFACT*(12-gv*gv*(12-gv*gv))*SQRPI/16);
   }
-  lfERROR(("Wconv4 not implemented for kernel %d",ker));
+  ERROR(("Wconv4 not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -398,14 +400,14 @@ INT ker;
 */
 double Wconv5(v,ker) /* (d/dv)^5 int W(x)W(x+v)dx */
 double v;
-INT ker;
+int ker;
 { double gv;
   switch(ker)
   { case WGAUS:
       gv = GFACT*v;
       return(-exp(-SQR(gv)/4)*GFACT*GFACT*GFACT*GFACT*gv*(60-gv*gv*(20-gv*gv))*SQRPI/32);
   }
-  lfERROR(("Wconv5 not implemented for kernel %d",ker));
+  ERROR(("Wconv5 not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -414,7 +416,7 @@ INT ker;
 */
 double Wconv6(v,ker)
 double v;
-INT ker;
+int ker;
 { double gv, z;
   switch(ker)
   { case WGAUS:
@@ -424,7 +426,7 @@ INT ker;
       gv = GFACT*GFACT;
       return(z*gv*gv*GFACT);
   }
-  lfERROR(("Wconv6 not implemented for kernel %d",ker));
+  ERROR(("Wconv6 not implemented for kernel %d",ker));
   return(0.0);
 }
 
@@ -432,7 +434,7 @@ INT ker;
    used in some bandwidth selectors
 */
 double Wikk(ker,deg)
-INT ker, deg;
+int ker, deg;
 { switch(deg)
   { case 0:
     case 1: /* int W(v)^2 dv / (int v^2 W(v) dv)^2 */
@@ -456,6 +458,6 @@ INT ker, deg;
         case WTRWT: return(254371.7647);
       }
   }
-  lfERROR(("Wikk not implemented for kernel %d",ker));
+  ERROR(("Wikk not implemented for kernel %d",ker));
   return(0.0);
 }

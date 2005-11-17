@@ -11,6 +11,7 @@
 #include "local.h"
 
 extern double robscale;
+static double tr0, tr1, tr2;
 
 /*
   vmat() computes (after the local fit..) the matrix 
@@ -18,11 +19,12 @@ extern double robscale;
   M12 = (X^T W V X)^{-1} M2
   Also, for convenience, tr[0] = sum(wi) tr[1] = sum(wi^2).
 */
-void vmat(lf, des, M12, M2, tr)
-lfit *lf;
+void vmat(lfd, sp, des, M12, M2)
+lfdata *lfd;
+smpar *sp;
 design *des;
-double *M12, *M2, *tr;
-{ INT i, p, nk, ok;
+double *M12, *M2;
+{ int i, p, nk, ok;
   double link[LLEN], h, ww;
   p = des->p;
   setzero(M2,p*p);
@@ -32,8 +34,8 @@ double *M12, *M2, *tr;
   /* for density estimation, use integral rather than
      sum form, if W^2 is programmed...
   */
-  if ((lf->mi[MTG]<=THAZ) && (lf->mi[MLINK]==LLOG))
-  { switch(lf->mi[MKER])
+  if ((fam(sp)<=THAZ) && (link(sp)==LLOG))
+  { switch(ker(sp))
     { case WGAUS: nk = WGAUS; h = des->h/SQRT2; break;
       case WRECT: nk = WRECT; h = des->h; break;
       case WEPAN: nk = WBISQ; h = des->h; break;
@@ -43,22 +45,22 @@ double *M12, *M2, *tr;
     }
   }
 
-  tr[0] = tr[1] = 0.0;
+  tr0 = tr1 = 0.0;
   if (nk != -1)
-  { ok = lf->mi[MKER]; lf->mi[MKER] = nk;
+  { ok = ker(sp); ker(sp) = nk;
 /* compute M2 using integration. Use M12 as work matrix. */
-    (des->itype)(des->xev, M2, M12, lf, des->cf, h);
-    lf->mi[MKER] = ok;
-    if (lf->mi[MTG]==TDEN) multmatscal(M2,lf->dp[DSWT],p*p);
-    tr[0] = des->ss[0];
-    tr[1] = M2[0]; /* n int W e^<a,A> */
+    (des->itype)(des->xev, M2, M12, des->cf, h);
+    ker(sp) = ok;
+    if (fam(sp)==TDEN) multmatscal(M2,des->smwt,p*p);
+    tr0 = des->ss[0];
+    tr1 = M2[0]; /* n int W e^<a,A> */
   }
   else
   { for (i=0; i<des->n; i++)
-    { stdlinks(link,lf,des->ind[i],des->th[i],robscale);
+    { stdlinks(link,lfd,sp,(int)des->ind[i],des->th[i],robscale);
       ww = SQR(des->w[i])*link[ZDDLL];
-      tr[0] += des->w[i];
-      tr[1] += SQR(des->w[i]);
+      tr0 += des->w[i];
+      tr1 += SQR(des->w[i]);
       addouter(M2,d_xi(des,i),d_xi(des,i),p,ww);
     }
   }
@@ -68,30 +70,15 @@ double *M12, *M2, *tr;
     jacob_solve(&des->xtwx,&M12[i*p]);
 }
 
-/* Compute influence function and estimated derivatives.
- * Results stored in des->f1.
- * This assumes weight function is scaled so that W(0)=1.0.
- */
-double comp_infl(lf,des)
-lfit *lf;
+void lf_vcov(lfd,sp,des)
+lfdata *lfd;
+smpar *sp;
 design *des;
-{ unitvec(des->f1,0,des->p);
-  jacob_solve(&des->xtwx,des->f1);
-  return(des->f1[0]);
-}
-
-void comp_vari(lf,des,tr,t0)
-lfit *lf;
-design *des;
-double *tr, *t0;
 { int i, j, k, p;
   double *M12, *M2;
   M12 = des->V; M2 = des->P; p = des->p;
-  vmat(lf,des,M12,M2,tr); /* M2 = X^T W^2 V X  tr0=sum(W) tr1=sum(W*W) */
-  tr[2] = m_trace(M12,p);   /* tr (XTWVX)^{-1}(XTW^2VX) */
-
-  comp_infl(lf,des);
-  for (i=0; i<=lf->mi[MDIM]; i++) t0[i] = des->f1[i];
+  vmat(lfd,sp,des,M12,M2); /* M2 = X^T W^2 V X  tr0=sum(W) tr1=sum(W*W) */
+  tr2 = m_trace(M12,p);   /* tr (XTWVX)^{-1}(XTW^2VX) */
 
 /*
  * Covariance matrix is M1^{-1} * M2 * M1^{-1}
@@ -99,7 +86,12 @@ double *tr, *t0;
  * M2; premultiplying by M1^{-1} and squaring. This
  * is more stable than direct computation in near-singular cases.
  */
-  chol_dec(M2,p);
+  chol_dec(M2,p,p);
+  for (i=0; i<p; i++)
+    for (j=0; j<i; j++)
+    { M2[j*p+i] = M2[i*p+j];
+      M2[i*p+j] = 0.0;
+    }
   for (i=0; i<p; i++) jacob_solve(&des->xtwx,&M2[i*p]);
   for (i=0; i<p; i++)
   { for (j=0; j<p; j++)
@@ -108,8 +100,24 @@ double *tr, *t0;
         M12[i*p+j] += M2[k*p+i]*M2[k*p+j]; /* ith column of covariance */
     }
   }
-  if ((lf->mi[MTG]==TDEN) && (lf->mi[MLINK]==LIDENT))
-    multmatscal(M12,1/SQR(lf->dp[DSWT]),p*p);
+  if ((fam(sp)==TDEN) && (link(sp)==LIDENT))
+    multmatscal(M12,1/SQR(des->smwt),p*p);
+}
+
+void comp_vari(lfd,sp,des,tr,t0)
+lfdata *lfd;
+smpar *sp;
+design *des;
+double *tr, *t0;
+{ int i;
+  lf_vcov(lfd,sp,des);
+  tr[0] = tr0;
+  tr[1] = tr1;
+  tr[2] = tr2;
+  /* influence components */
+  unitvec(des->f1,0,des->p);
+  jacob_solve(&des->xtwx,des->f1);
+  for (i=0; i<=lfd->d; i++) t0[i] = des->f1[i];
 }
 
 /* local_df computes:
@@ -120,8 +128,9 @@ double *tr, *t0;
  *   tr[4] = trace( (M1^{-1} M2)^2 )
  *   tr[5] = var(theta-hat).
  */
-void local_df(lf,des,tr)
-lfit *lf;
+void local_df(lfd,sp,des,tr)
+lfdata *lfd;
+smpar *sp;
 design *des;
 double *tr;
 { int i, j, p;
@@ -130,7 +139,9 @@ double *tr;
   tr[0] = tr[1] = tr[2] = tr[3] = tr[4] = tr[5] = 0.0;
   m2 = des->V; V = des->P; p = des->p;
 
-  vmat(lf,des,m2,V,tr);  /* M = X^T W^2 V X  tr0=sum(W) tr1=sum(W*W) */
+  vmat(lfd,sp,des,m2,V);  /* M = X^T W^2 V X  tr0=sum(W) tr1=sum(W*W) */
+  tr[0] = tr1;
+  tr[1] = tr1;
   tr[2] = m_trace(m2,p);   /* tr (XTWVX)^{-1}(XTW^2VX) */
 
   unitvec(des->f1,0,p);
@@ -144,7 +155,7 @@ double *tr;
 
   setzero(m2,p*p);
   for (i=0; i<des->n; i++)
-  { stdlinks(link,lf,des->ind[i],des->th[i],robscale);
+  { stdlinks(link,lfd,sp,(int)des->ind[i],des->th[i],robscale);
     ww = SQR(des->w[i])*des->w[i]*link[ZDDLL];
     addouter(m2,d_xi(des,i),d_xi(des,i),p,ww);
   }

@@ -6,17 +6,21 @@
 #include "local.h"
 
 extern int lf_status;
-static double u[MXDIM], ilim[2*MXDIM], *ff;
-static lfit   *den_lf;
+static double u[MXDIM], ilim[2*MXDIM], *ff, hh, *cff;
+static lfdata *den_lfd;
 static design *den_des;
-INT fact[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800};
+static smpar *den_sp;
+int fact[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800};
+int de_mint  = 20;
+int de_itype = IDEFA;
+int de_renorm= 0;
 
-INT multint(), prodint(), gausint(), mlinint();
+int multint(), prodint(), gausint(), mlinint();
 
 void prresp(coef,resp,p)
 double *coef, *resp;
-INT p;
-{ INT i, j;
+int p;
+{ int i, j;
   printf("Coefficients:\n");
   for (i=0; i<p; i++) printf("%8.5f ",coef[i]);
   printf("\n");
@@ -27,74 +31,70 @@ INT p;
   }
 }
 
-INT multint(t,resp1,resp2,lf,cf,h)
-lfit *lf;
+int mif(u,d,resp,M)
+double *u, *resp, *M;
+int d;
+{ double wt;
+  int i, j, p;
+
+  p = den_des->p;
+  wt = weight(den_lfd, den_sp, u, NULL, hh, 0, 0.0);
+  if (wt==0)
+  { setzero(resp,p*p);
+    return(p*p);
+  }
+
+  fitfun(den_lfd, den_sp, u,NULL,ff,NULL);
+  if (link(den_sp)==LLOG)
+    wt *= lf_exp(innerprod(ff,cff,p));
+  for (i=0; i<p; i++)
+    for (j=0; j<p; j++)
+      resp[i*p+j] = wt*ff[i]*ff[j];
+  return(p*p);
+}
+
+int multint(t,resp1,resp2,cf,h)
 double *t, *resp1, *resp2, *cf, h;
-{ INT d, p, i, j, k, m, m1, w, z, z1;
-  double th, wt, dj[MXDIM];
-  d = lf->mi[MDIM]; p = lf->mi[MP];
-  setzero(resp1,p*p);
-  m = 1; m1 = lf->mi[MMINT]+1;
-  for (i=0; i<d; i++)
-  { m *= m1;
-    dj[i] = (ilim[i+d]-ilim[i])/lf->mi[MMINT];
-  }
-  for (i=0; i<m; i++)
-  { z = i; w = 1;
-    for (j=d-1; j>=0; j--)
-    { z1 = z%m1;
-      u[j] = t[j]+ilim[j]+dj[j]*z1;
-      w *= (4-2*(z1%2==0)-(z1==0)-(z1==lf->mi[MMINT]));
-      z /= m1;
-    }
-    wt = w*weight(lf,u,t,h,0,0.0);
-    if (wt>0)
-    { fitfun(lf,u,t,ff,NULL,0);
-      th = innerprod(ff,cf,p);
-      switch(lf->mi[MLINK])
-      { case LLOG:
-          addouter(resp1,ff,ff,p,wt*lf_exp(th));
-          break;
-        case LIDENT:
-          addouter(resp1,ff,ff,p,wt);
-          break;
-        default:
-          lfERROR(("multint: Invalid link"));
-          return(LF_LNK);
-      }
-    }
-  }
-  wt = 1;
-  for (j=0; j<d; j++) wt *= dj[j]/3;
-  for (j=0; j<p; j++)
-    for (k=j; k<p; k++)
-      resp1[p*k+j] = resp1[p*j+k] = resp1[p*j+k]*wt;
+{ int d, i, mg[MXDIM];
+
+  if (ker(den_sp)==WGAUS) return(gausint(t,resp1,resp2,cf,h,den_lfd->sca));
+
+  d = den_lfd->d;
+  for (i=0; i<d; i++) mg[i] = de_mint;
+
+  hh = h;
+  cff= cf;
+  simpsonm(mif,ilim,&ilim[d],d,resp1,mg,resp2);
   return(LF_OK);
 }
 
-INT mlinint(t,resp1,resp2,lf,cf,h)
-lfit *lf;
+int mlinint(t,resp1,resp2,cf,h)
 double *t, *resp1, *resp2, *cf, h;
 {
   double hd, nb, wt, wu, g[4], w0, w1, v, *sca;
-  INT d, p, i, j, jmax, k, l, z, jj[2];
-  d = lf->mi[MDIM]; p = lf->mi[MP]; sca = lf->sca;
+  int d, p, i, j, jmax, k, l, z, jj[2];
+
+  d = den_lfd->d; p = den_des->p; sca = den_lfd->sca;
   hd = 1;
   for (i=0; i<d; i++) hd *= h*sca[i];
 
-  if (lf->mi[MLINK]==LIDENT)
+  if (link(den_sp)==LIDENT)
   { setzero(resp1,p*p);
-    resp1[0] = wint(d,NULL,0,lf->mi[MKER])*hd;
-    if (lf->mi[MDEG]==0) return(LF_OK);
-    jj[0] = 2; w0 = wint(d,jj,1,lf->mi[MKER])*hd*h*h;
+    resp1[0] = wint(d,NULL,0,ker(den_sp))*hd;
+    if (deg(den_sp)==0) return(LF_OK);
+    jj[0] = 2; w0 = wint(d,jj,1,ker(den_sp))*hd*h*h;
     for (i=0; i<d; i++) resp1[(i+1)*p+i+1] = w0*sca[i]*sca[i];
-    if (lf->mi[MDEG]==1) return(LF_OK);
+    if (deg(den_sp)==1) return(LF_OK);
     for (i=0; i<d; i++)
     { j = p-(d-i)*(d-i+1)/2;
       resp1[j] = resp1[p*j] = w0*sca[i]*sca[i]/2;
     }
-    if (d>1) { jj[1] = 2; w0 = wint(d,jj,2,lf->mi[MKER])*hd*h*h*h*h; }
-    jj[0] = 4; w1 = wint(d,jj,1,lf->mi[MKER])*hd*h*h*h*h/4;
+    if (d>1)
+    { jj[1] = 2;
+      w0 = wint(d,jj,2,ker(den_sp)) * hd*h*h*h*h;
+    }
+    jj[0] = 4;
+    w1 = wint(d,jj,1,ker(den_sp)) * hd*h*h*h*h/4;
     z = d+1;
     for (i=0; i<d; i++)
     { k = p-(d-i)*(d-i+1)/2;
@@ -109,9 +109,9 @@ double *t, *resp1, *resp2, *cf, h;
     } }
     return(LF_OK);
   }
-  switch(lf->mi[MDEG])
+  switch(deg(den_sp))
   { case 0:
-      resp1[0] = lf_exp(cf[0])*wint(d,NULL,0,lf->mi[MKER])*hd;
+      resp1[0] = lf_exp(cf[0])*wint(d,NULL,0,ker(den_sp))*hd;
       return(LF_OK);
     case 1:
       nb = 0.0;
@@ -119,7 +119,7 @@ double *t, *resp1, *resp2, *cf, h;
       { v = h*cf[i]*sca[i-1];
         nb += v*v;
       }
-      if (lf->mi[MKER]==WGAUS)
+      if (ker(den_sp)==WGAUS)
       { w0 = 1/(GFACT*GFACT);
         g[0] = lf_exp(cf[0]+w0*nb/2+d*log(S2PI/2.5));
         g[1] = g[3] = g[0]*w0;
@@ -127,15 +127,15 @@ double *t, *resp1, *resp2, *cf, h;
       }
       else
       { wt = wu = lf_exp(cf[0]);
-        w0 = wint(d,NULL,0,lf->mi[MKER]); g[0] = wt*w0;
+        w0 = wint(d,NULL,0,ker(den_sp)); g[0] = wt*w0;
         g[1] = g[2] = g[3] = 0.0;
-        j = 0; jmax = (d+2)*lf->mi[MMINT];
+        j = 0; jmax = (d+2)*de_mint;
         while ((j<jmax) && (wt*w0/g[0]>1.0e-8))
         { j++;
-          jj[0] = 2*j; w0 = wint(d,jj,1,lf->mi[MKER]);
+          jj[0] = 2*j; w0 = wint(d,jj,1,ker(den_sp));
           if (d==1) g[3] += wt * w0;
           else
-          { jj[0] = 2; jj[1] = 2*j-2; w1 = wint(d,jj,2,lf->mi[MKER]);
+          { jj[0] = 2; jj[1] = 2*j-2; w1 = wint(d,jj,2,ker(den_sp));
             g[3] += wt*w1;
             g[2] += wu*(w0-w1);
           }
@@ -144,7 +144,7 @@ double *t, *resp1, *resp2, *cf, h;
           wu /= (2*j-1.0)*(2*j);
           if (j>1) wu *= nb;
         }
-        if (j==jmax) lfWARN(("mlinint: series not converged"));
+        if (j==jmax) WARN(("mlinint: series not converged"));
       }
       g[0] *= hd; g[1] *= hd;
       g[2] *= hd; g[3] *= hd;
@@ -158,11 +158,11 @@ double *t, *resp1, *resp2, *cf, h;
       }
       return(LF_OK);
   }
-  lfERROR(("mlinint: deg=0,1 only"));
+  ERROR(("mlinint: deg=0,1 only"));
   return(LF_ERR);
 }
 
-void prodint_resp(resp,prod_wk,dim,deg,p)
+void prodintresp(resp,prod_wk,dim,deg,p)
 double *resp, prod_wk[MXDIM][2*MXDEG+1];
 int dim, deg, p;
 { double prod;
@@ -194,30 +194,28 @@ int dim, deg, p;
     }
 }
 
-INT prodint(t,resp,resp2,lf,coef,h)
-lfit *lf;
+int prodint(t,resp,resp2,coef,h)
 double *t, *resp, *resp2, *coef, h;
-{ INT dim, deg, p, i, j, k, st;
+{ int dim, p, i, j, k, st;
   double cf[MXDEG+1], hj, hs, prod_wk[MXDIM][2*MXDEG+1];
 
-  dim = lf->mi[MDIM];
-  deg = lf->mi[MDEG];
-  p = lf->mi[MP];
+  dim = den_lfd->d;
+  p = den_des->p;
   for (i=0; i<p*p; i++) resp[i] = 0.0;
   cf[0] = coef[0];
 
 /*  compute the one dimensional terms
  */
   for (i=0; i<dim; i++)
-  { hj = 1; hs = h*lf->sca[i];
-    for (j=0; j<deg; j++)
+  { hj = 1; hs = h*den_lfd->sca[i];
+    for (j=0; j<deg(den_sp); j++)
     { hj *= hs;
       cf[j+1] = hj*coef[ j*dim+i+1 ];
     }
-    st = onedint(cf,lf->mi,ilim[i]/hs,ilim[i+dim]/hs,prod_wk[i]);
+    st = onedint(den_sp,cf,ilim[i]/hs,ilim[i+dim]/hs,prod_wk[i]);
     if (st==LF_BADP) return(st);
     hj = 1;
-    for (j=0; j<=2*deg; j++)
+    for (j=0; j<=2*deg(den_sp); j++)
     { hj *= hs;
       prod_wk[i][j] *= hj;
     }
@@ -226,7 +224,7 @@ double *t, *resp, *resp2, *coef, h;
 
 /*  transfer to the resp array
  */
-  prodint_resp(resp,prod_wk,dim,deg,p);
+  prodintresp(resp,prod_wk,dim,deg(den_sp),p);
 
 /* Symmetrize.
 */
@@ -237,12 +235,11 @@ double *t, *resp, *resp2, *coef, h;
   return(st);
 }
 
-INT gausint(t,resp,C,cf,h,mi,sca)
+int gausint(t,resp,C,cf,h,sca)
 double *t, *resp, *C, *cf, h, *sca;
-INT *mi;
 { double nb, det, z, *P;
-  INT d, p, i, j, k, l, m1, m2, f;
-  d = mi[MDIM]; p = mi[MP];
+  int d, p, i, j, k, l, m1, m2, f;
+  d = den_lfd->d; p = den_des->p;
   m1 = d+1; nb = 0;
   P = &C[d*d];
   resp[0] = 1;
@@ -296,23 +293,23 @@ double *coef, *lk0, *f1, *A;
 
   lf_status = LF_OK;
   p = den_des->p;
-  if ((den_lf->mi[MLINK]==LIDENT) && (coef[0] != 0.0)) return(NR_BREAK);
-  lf_status = (den_des->itype)(den_des->xev,A,den_des->xtwx.Q,den_lf,coef,den_des->h);
+  if ((link(den_sp)==LIDENT) && (coef[0] != 0.0)) return(NR_BREAK);
+  lf_status = (den_des->itype)(den_des->xev,A,den_des->xtwx.Q,coef,den_des->h);
   if (lf_error) lf_status = LF_ERR;
   if (lf_status==LF_BADP)
   { *lk0 = -1.0e300;
     return(NR_REDUCE);
   }
   if (lf_status!=LF_OK) return(NR_BREAK);
-  if (den_lf->mi[MDEB]>2) prresp(coef,A,(INT)p);
+  if (lf_debug>2) prresp(coef,A,p);
 
   den_des->xtwx.p = p;
   rstat = NR_OK;
-  switch(den_lf->mi[MLINK])
+  switch(link(den_sp))
   { case LLOG:
       r = den_des->ss[0]/A[0];
       coef[0] += log(r);
-      multmatscal(A,r,(INT)p*p);
+      multmatscal(A,r,p*p);
       A[0] = den_des->ss[0];
       lk = -A[0];
       if (fabs(coef[0]) > 700)
@@ -338,10 +335,10 @@ double *coef, *lk0, *f1, *A;
   return(rstat);
 }
 
-INT inre(x,bound,d)
+int inre(x,bound,d)
 double *x, *bound;
-INT d;
-{ INT i, z;
+int d;
+{ int i, z;
   z = 1;
   for (i=0; i<d; i++)
     if (bound[i]<bound[i+d])
@@ -349,31 +346,31 @@ INT d;
   return(z);
 }
 
-INT setintlimits(lf, x, h, ang, lset)
-lfit *lf;
-INT *ang, *lset;
+int setintlimits(lfd, x, h, ang, lset)
+lfdata *lfd;
+int *ang, *lset;
 double *x, h;
-{ INT d, i;
-  d = lf->mi[MDIM];
+{ int d, i;
+  d = lfd->d;
   *ang = *lset = 0;
   for (i=0; i<d; i++)
-  { if (lf->sty[i]==STANGL)
-    { ilim[i+d] = ((h<2) ? 2*asin(h/2) : PI)*lf->sca[i];
+  { if (lfd->sty[i]==STANGL)
+    { ilim[i+d] = ((h<2) ? 2*asin(h/2) : PI)*lfd->sca[i];
       ilim[i] = -ilim[i+d];
       *ang = 1;
     }
     else
-    { ilim[i+d] = h*lf->sca[i];
+    { ilim[i+d] = h*lfd->sca[i];
       ilim[i] = -ilim[i+d];
 
-      if (lf->sty[i]==STLEFT) { ilim[i+d] = 0; *lset = 1; }
-      if (lf->sty[i]==STRIGH) { ilim[i] = 0;   *lset = 1; }
+      if (lfd->sty[i]==STLEFT) { ilim[i+d] = 0; *lset = 1; }
+      if (lfd->sty[i]==STRIGH) { ilim[i] = 0;   *lset = 1; }
 
-      if (lf->xl[i]<lf->xl[i+d]) /* user limits for this variable */
-      { if (lf->xl[i]-x[i]> ilim[i])
-        { ilim[i] = lf->xl[i]-x[i]; *lset=1; }
-        if (lf->xl[i+d]-x[i]< ilim[i+d])
-        { ilim[i+d] = lf->xl[i+d]-x[i]; *lset=1; }
+      if (lfd->xl[i]<lfd->xl[i+d]) /* user limits for this variable */
+      { if (lfd->xl[i]-x[i]> ilim[i])
+        { ilim[i] = lfd->xl[i]-x[i]; *lset=1; }
+        if (lfd->xl[i+d]-x[i]< ilim[i+d])
+        { ilim[i+d] = lfd->xl[i+d]-x[i]; *lset=1; }
       }
     }
     if (ilim[i]==ilim[i+d]) return(LF_DEMP); /* empty integration */
@@ -381,32 +378,33 @@ double *x, h;
   return(LF_OK);
 }
 
-INT selectintmeth(mi,lset,ang)
-INT *mi, lset, ang;
+int selectintmeth(itype,lset,ang)
+int itype, lset, ang;
 {
-  if (mi[MIT]==IDEFA) /* select the default method */
-  { if (mi[MTG]==THAZ)
+  if (itype==IDEFA) /* select the default method */
+  { if (fam(den_sp)==THAZ)
     { if (ang) return(IDEFA);
       return( IHAZD );
     }
 
-    if (mi[MUBAS]) return(IMULT);
+    if (ubas(den_sp)) return(IMULT);
 
     if (ang) return(IMULT);
 
-    if (iscompact(mi[MKER]))
-    { if (mi[MKT]==KPROD) return(IPROD);
+    if (iscompact(ker(den_sp)))
+    { if (kt(den_sp)==KPROD) return(IPROD);
       if (lset)
-        return( (mi[MDIM]==1) ? IPROD : IMULT );
-      if (mi[MDEG]<=1) return(IMLIN);
-      if (mi[MDIM]==1) return(IPROD);
+        return( (den_lfd->d==1) ? IPROD : IMULT );
+      if (deg(den_sp)<=1) return(IMLIN);
+      if (den_lfd->d==1) return(IPROD);
       return(IMULT);
     }
 
-    if (mi[MKER]==WGAUS)
-    { if (lset) lfWARN(("Integration for Gaussian weights ignores limits"));
-      if ((mi[MDIM]==1)|(mi[MKT]==KPROD)) return(IPROD);
-      return(IMLIN);
+    if (ker(den_sp)==WGAUS)
+    { if (lset) WARN(("Integration for Gaussian weights ignores limits"));
+      if ((den_lfd->d==1)|(kt(den_sp)==KPROD)) return(IPROD);
+      if (deg(den_sp)<=1) return(IMLIN);
+      if (deg(den_sp)==2) return(IMULT);
     }
 
     return(IDEFA);
@@ -414,85 +412,88 @@ INT *mi, lset, ang;
 
   /* user provided an integration method, check it is valid */
 
-  if (mi[MTG]==THAZ)
+  if (fam(den_sp)==THAZ)
   { if (ang) return(INVLD);
-    if (!iscompact(mi[MKER])) return(INVLD);
-    return( ((mi[MKT]==KPROD) | (mi[MKT]==KSPH)) ? IHAZD : INVLD );
+    if (!iscompact(ker(den_sp))) return(INVLD);
+    return( ((kt(den_sp)==KPROD) | (kt(den_sp)==KSPH)) ? IHAZD : INVLD );
   }
 
-  if ((ang) && (mi[MIT] != IMULT)) return(INVLD);
+  if ((ang) && (itype != IMULT)) return(INVLD);
 
-  switch(mi[MIT])
-  { case IMULT: return( iscompact(mi[MKER]) ? IMULT : INVLD );
-    case IPROD: return( ((mi[MDIM]==1) | (mi[MKT]==KPROD)) ? IPROD : INVLD );
-    case IMLIN: return( ((mi[MKT]==KSPH) && (!lset) &&
-      (mi[MDEG]<=1)) ? IMLIN : INVLD );
+  switch(itype)
+  { case IMULT:
+      if (ker(den_sp)==WGAUS) return(deg(den_sp)==2);
+      return( iscompact(ker(den_sp)) ? IMULT : INVLD );
+    case IPROD: return( ((den_lfd->d==1) | (kt(den_sp)==KPROD)) ? IPROD : INVLD );
+    case IMLIN: return( ((kt(den_sp)==KSPH) && (!lset) &&
+      (deg(den_sp)<=1)) ? IMLIN : INVLD );
   }
 
   return(INVLD);
 }
 
-INT densinit(lf,des,h,cf,m)
-lfit *lf;
+int densinit(lfd,des,sp,cf)
+lfdata *lfd;
 design *des;
-double h, *cf;
-INT m;
-{ INT deg, p, i, ii, j, nnz, rnz, lset, ang, status;
+smpar *sp;
+double *cf;
+{ int p, i, ii, j, nnz, rnz, ang, lset, status;
   double w;
 
-  den_lf  = lf;
+  den_lfd = lfd;
   den_des = des;
+  den_sp  = sp;
 
-  p = des->p; deg = lf->mi[MDEG];
+  p = des->p;
   ff = des->xtwx.wk;
   cf[0] = NOSLN;
   for (i=1; i<p; i++) cf[i] = 0.0;
 
-  if (!inre(des->xev,lf->xl,lf->mi[MDIM])) return(LF_XOOR);
+  if (!inre(des->xev,lfd->xl,lfd->d)) return(LF_XOOR);
 
-  status = setintlimits(lf,des->xev,h,&ang,&lset);
+  status = setintlimits(lfd,des->xev,des->h,&ang,&lset);
   if (status != LF_OK) return(status);
 
-  switch(selectintmeth(lf->mi,lset,ang))
+  switch(selectintmeth(de_itype,lset,ang))
   { case IMULT: des->itype = multint; break;
     case IPROD: des->itype = prodint; break;
     case IMLIN: des->itype = mlinint; break;
     case IHAZD: des->itype = hazint; break;
-    case INVLD: lfERROR(("Invalid integration method %d",lf->mi[MIT]));
+    case INVLD: ERROR(("Invalid integration method %d",de_itype));
                 break;
-    case IDEFA: lfERROR(("No integration type available for this model"));
+    case IDEFA: ERROR(("No integration type available for this model"));
                 break;
-    default: lfERROR(("densinit: unknown integral type"));
+    default: ERROR(("densinit: unknown integral type"));
   }
 
-  switch(deg)
+  switch(deg(den_sp))
   { case 0: rnz = 1; break;
     case 1: rnz = 1; break;
-    case 2: rnz = lf->mi[MDIM]+1; break;
-    case 3: rnz = lf->mi[MDIM]+2; break;
-    default: lfERROR(("densinit: invalid degree %d",deg));
+    case 2: rnz = lfd->d+1; break;
+    case 3: rnz = lfd->d+2; break;
+    default: ERROR(("densinit: invalid degree %d",deg(den_sp)));
   }
   if (lf_error) return(LF_ERR);
 
   setzero(des->ss,p);
   nnz = 0;
-  for (i=0; i<m; i++)
+  for (i=0; i<des->n; i++)
   { ii = des->ind[i];
-    if (!cens(lf,ii))
-    { w = des->w[i]*prwt(lf,ii);
+    if (!cens(lfd,ii))
+    { w = des->w[i]*prwt(lfd,ii);
       for (j=0; j<p; j++) des->ss[j] += d_xij(des,i,j)*w;
       if (des->w[i]>0.00001) nnz++;
   } }
 
-  if (lf->mi[MTG]==THAZ) haz_init(lf,des,ilim);
+  if (fam(den_sp)==THAZ) haz_init(lfd,des,sp,ilim);
 
-  if (lf->mi[MDEB]>2)
+  if (lf_debug>2)
   { printf("    LHS: ");
     for (i=0; i<p; i++) printf(" %8.5f",des->ss[i]);
     printf("\n");
   }
 
-  switch(lf->mi[MLINK])
+  switch(link(den_sp))
   { case LIDENT:
       cf[0] = 0.0;
       return(LF_OK);
@@ -501,7 +502,7 @@ INT m;
       cf[0] = 0.0;
       return(LF_OK);
     default:
-      lfERROR(("unknown link in densinit"));
+      ERROR(("unknown link in densinit"));
       return(LF_ERR);
   }
 }

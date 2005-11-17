@@ -4,8 +4,8 @@
 Plot an object of class locfit.
 }
 \usage{
-\method{plot}{locfit}(x, xlim, pv, tv, m, mtv, band, tr,
-        what, get.data, f3d, ...)
+\method{plot}{locfit}(x, xlim, pv, tv, m, mtv=6, band="none", tr=NULL,
+  what = "coef", get.data=FALSE, f3d=(d == 2) && (length(tv) > 0), ...)
 }
 \arguments{
 \item{x}{
@@ -40,15 +40,12 @@ Number of points for trellis variables; default 6.
   for prediction bands (at present, using a global variance estimate).
   To obtain the global variance estimate for a fit, use \code{\link{rv}}.
   This can be changed with \code{\link{rv<-}}. Confidence bands, by default,
-  are 95%, based on normal approximations and neglecting bias.
+  are 95\%, based on normal approximations and neglecting bias.
   To change the critical value or confidence level, or to obtain
   simultaneous instead of pointwise confidence,
   the critical value stored on the fit must be changed. See the
   \code{\link{kappa0}} and \code{\link{crit}} functions.
 }
-%\item{deriv}{derivative estimation (see \code{\link{locfit.raw}}). }
-%\item{se.fit}{If \code{TRUE}, standard errors are plotted along with the
-%              fitted values.}
 \item{tr}{
 Transformation function to use for plotting. Default is the inverse
 link function, or the identity function if derivatives are requested.
@@ -70,13 +67,14 @@ Other arguments to \code{plot.locfit.1d}, \code{plot.locfit.2d} or
 }}
 \description{
 The \code{plot.locfit} function generates grids of ploting points, followed
-by a call to \code{preplot.locfit}. The returned object is then passed to
-\code{plot.locfit.1d}, \code{plot.locfit.2d} or \code{plot.locfit.3d} as appropriate.
+by a call to \code{\link{preplot.locfit}}. The returned object is then
+passed to \code{\link{plot.locfit.1d}}, \code{\link{plot.locfit.2d}} or
+\code{\link{plot.locfit.3d}} as appropriate.
 }
 \examples{
 x <- rnorm(100)
-y <- dnorm(x)+rnorm(100)/5
-plot(locfit(y ~ x), vband=TRUE)
+y <- dnorm(x) + rnorm(100) / 5
+plot(locfit(y~x), band="global")
 x <- cbind(rnorm(100), rnorm(100))
 plot(locfit(~x), type="persp")
 }
@@ -86,4 +84,4 @@ plot(locfit(~x), type="persp")
 \code{\link{lines.locfit}}, \code{\link{predict.locfit}},
 \code{\link{preplot.locfit}}
 }
-\keyword{smooth}
+\keyword{methods}

@@ -5,7 +5,7 @@ Compute an AIC plot.
 }
 \description{
   The \code{aicplot} function loops through calls to the \code{\link{aic}}
-function (and hence to \code{link{locfit}}), using a different
+function (and hence to \code{\link{locfit}}), using a different
 smoothing parameter for each call.
 The returned structure contains the AIC statistic for each fit, and can
 be used to produce an AIC plot.
@@ -32,7 +32,8 @@ aicplot(..., alpha)
 
 \examples{
 data(morths)
-plot(aicplot(deaths~age,weights=n,data=morths,family="binomial",alpha=seq(0.2,1.0,by=0.05)))
+plot(aicplot(deaths~age,weights=n,data=morths,family="binomial",
+  alpha=seq(0.2,1.0,by=0.05)))
 }
 
 \seealso{
@@ -43,6 +44,4 @@ plot(aicplot(deaths~age,weights=n,data=morths,family="binomial",alpha=seq(0.2,1.
   \code{\link{plot.gcvplot}}
 }
 
-\keyword{smooth}
-\keyword{hplot}
-% Converted by Sd2Rd version 0.2-a5.
+\keyword{htest}

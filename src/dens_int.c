@@ -27,10 +27,11 @@
  * At output, x[ind[0]] <= x[ind[1]] <= ...
  */
 void lforder(ind,x,l,r)
-INT *ind, l, r;
+Sint *ind;
+int l, r;
 double *x;
 { double piv;
-  INT i, i0, i1;
+  int i, i0, i1;
   piv = (x[ind[l]]+x[ind[r]])/2;
   i0 = l; i1 = r;
   while (i0<=i1)
@@ -58,14 +59,14 @@ double *x;
  *  estdiv integrates the density between fit points x0 and x1.
  *  f0, f1 are function values, d0, d1 are derivatives.
  */
-double estdiv(x0,x1,f0,f1,d0,d1,link)
+double estdiv(x0,x1,f0,f1,d0,d1,lin)
 double x0, x1, f0, f1, d0, d1;
-INT link;
+int lin;
 { double cf[4], I[2], dlt, e0, e1;
 
   if (x0==x1) return(0.0);
 
-  if (link==LIDENT)
+  if (lin==LIDENT)
   {
 /* cf are integrals of hermite polynomials.
  * Then adjust for x1-x0.
@@ -104,28 +105,31 @@ INT link;
 double dens_integrate(lf,des,z)
 lfit *lf;
 design *des;
-INT z;
-{ INT has_deriv, i, i0, i1, link, nv, *ind;
+int z;
+{ int has_deriv, i, i0, i1, nv;
+  Sint *ind;
   double *xev, *fit, *deriv, sum, term;
   double d0, d1, f0, f1;
+  fitpt *fp;
 
-  if (lf->mi[MDIM]>=2)
-  { lfWARN(("dens_integrate requires d=1"));
+  fp = &lf->fp;
+
+  if (fp->d >= 2)
+  { WARN(("dens_integrate requires d=1"));
     return(0.0);
   }
 
-  link = lf->mi[MLINK];
-  has_deriv = (lf->mi[MDEG] > 0); /* not right? */
-  fit = lf->coef;
+  has_deriv = (deg(&lf->sp) > 0); /* not right? */
+  fit = fp->coef;
   if (has_deriv)
-    deriv = &lf->coef[lf->nvm];
-  xev = vdptr(lf->xxev);
+    deriv = &fit[fp->nvm];
+  xev = evp(fp);
 
   /*
    * order the vertices
    */
-  nv = lf->nv;
-  if (lf->mi[MN]<nv) return(0.0);
+  nv = fp->nv;
+  if (lf->lfd.n<nv) return(0.0);
   ind = des->ind;
   for (i=0; i<nv; i++) ind[i] = i;
   lforder(ind,xev,0,nv-1);
@@ -139,28 +143,28 @@ INT z;
   f1 = fit[i0];
   d1 = (has_deriv) ? deriv[i0] :
          (fit[i1]-fit[i0])/(xev[i1]-xev[i0]);
-  if (d1 <= 0) lfWARN(("dens_integrate - ouch!"));
+  if (d1 <= 0) WARN(("dens_integrate - ouch!"));
   if (z==2)
-  { if (link==LLOG)
+  { if (link(&lf->sp)==LLOG)
     { f1 *= 2; d1 *= 2; }
     else
     { d1 = 2*d1*f1; f1 = f1*f1; }
   }
-  term = (link==LIDENT) ? f1*f1/(2*d1) : exp(f1)/d1;
+  term = (link(&lf->sp)==LIDENT) ? f1*f1/(2*d1) : exp(f1)/d1;
   sum += term;
 
   i0 = ind[nv-2]; i1 = ind[nv-1];
   f0 = fit[i1];
   d0 = (has_deriv) ? deriv[i1] :
          (fit[i1]-fit[i0])/(xev[i1]-xev[i0]);
-  if (d0 >= 0) lfWARN(("dens_integrate - ouch!"));
+  if (d0 >= 0) WARN(("dens_integrate - ouch!"));
   if (z==2)
-  { if (link==LLOG)
+  { if (link(&lf->sp)==LLOG)
     { f0 *= 2; d0 *= 2; }
     else
     { d0 = 2*d0*f0; f0 = f0*f0; }
   }
-  term = (link==LIDENT) ? -f0*f0/(2*d0) : exp(f0)/d0;
+  term = (link(&lf->sp)==LIDENT) ? -f0*f0/(2*d0) : exp(f0)/d0;
   sum += term;
   
   for (i=1; i<nv; i++)
@@ -170,12 +174,12 @@ INT z;
               (f1-f0)/(xev[i1]-xev[i0]);
     d1 = (has_deriv) ? deriv[i1] : d0;
     if (z==2)
-    { if (link==LLOG)
+    { if (link(&lf->sp)==LLOG)
       { f0 *= 2; f1 *= 2; d0 *= 2; d1 *= 2; }
       else
       { d0 *= 2*f0; d1 *= 2*f1; f0 = f0*f0; f1 = f1*f1; }
     }
-    term = estdiv(xev[i0],xev[i1],f0,f1,d0,d1,link);
+    term = estdiv(xev[i0],xev[i1],f0,f1,d0,d1,link(&lf->sp));
     sum += term;
   }
 
@@ -185,39 +189,39 @@ INT z;
 void dens_renorm(lf,des)
 lfit *lf;
 design *des;
-{ INT i;
+{ int i;
   double sum;
   sum = dens_integrate(lf,des,1);
   if (sum==0.0) return;
   sum = log(sum);
-  for (i=0; i<lf->nv; i++) lf->coef[i] -= sum;
+  for (i=0; i<lf->fp.nv; i++) lf->fp.coef[i] -= sum;
 }
 
 void dens_lscv(des,lf)
 lfit *lf;
 design *des;
 { double df, fh, fh_cv, infl, z0, z1, x[MXDIM];
-  int i, n, j, ev;
+  int i, n, j, evo;
   z1 = df = 0.0;
-  ev = lf->mi[MEV];
-  n = lf->mi[MN];
-  if ((ev==EDATA) | (ev==ECROS)) ev = EFITP;
+  evo = ev(&lf->evs);
+  n = lf->lfd.n;
+  if ((evo==EDATA) | (evo==ECROS)) evo = EFITP;
 
   z0 = dens_integrate(lf,des,2);
 
   for (i=0; i<n; i++)
-  { for (j=0; j<lf->mi[MDIM]; j++) x[j] = datum(lf,j,i);
-    fh = base(lf,i)+dointpoint(lf,des,x,PCOEF,ev,i);
-    if (lf->mi[MLINK]==LLOG) fh = exp(fh);
-    infl = dointpoint(lf,des,x,PT0,ev,i);
+  { for (j=0; j<lf->lfd.d; j++) x[j] = datum(&lf->lfd,j,i);
+    fh = base(&lf->lfd,i)+dointpoint(lf,x,PCOEF,evo,i);
+    if (link(&lf->sp)==LLOG) fh = exp(fh);
+    infl = dointpoint(lf,x,PT0,evo,i);
     infl = infl * infl;
     if (infl>1) infl = 1;
-    fh_cv = (lf->mi[MLINK] == LIDENT) ?
+    fh_cv = (link(&lf->sp) == LIDENT) ?
        (n*fh - infl) / (n-1.0) : fh*(1-infl)*n/(n-1.0);
     z1 += fh_cv;
     df += infl;
   }
 
-  vdptr(lf->L)[0] = z0-2*z1/n;
-  vdptr(lf->L)[1] = df;
+  lf->fp.L[0] = z0-2*z1/n;
+  lf->fp.L[1] = df;
 }

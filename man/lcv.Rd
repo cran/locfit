@@ -1,10 +1,8 @@
 \name{lcv}
 \alias{lcv}
-\title{
-Compute Likelihood Cross Validation Statistic.
-}
+\title{Compute Likelihood Cross Validation Statistic.}
 \usage{
-lcv(x, ...)
+lcv(x, \dots)
 }
 \description{
   The calling sequence for \code{lcv} matches those for the
@@ -29,5 +27,5 @@ lcv(x, ...)
   \code{\link{lcvplot}}
 }
 
-\keyword{smooth}
+\keyword{htest}
 % Converted by Sd2Rd version 0.2-a5.

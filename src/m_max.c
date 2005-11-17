@@ -33,12 +33,10 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include "mutil.h"
-extern double innerprod();
 
 #define gold_rat 0.6180339887498948482045870
-#define max_val(x,y) ((flag=='x') ? x : y)
+#define max_val(a,b) ((flag=='x') ? a : b)
 
 double max_grid(f,xlo,xhi,n,flag)
 double (*f)(), xlo, xhi;
@@ -64,13 +62,14 @@ double max_golden(f,xlo,xhi,n,tol,err,flag)
 double (*f)(), xhi, xlo, tol;
 int n, *err;
 char flag;
-{ double x0, x1, x2, x3, y0, y1, y2, y3;
+{ double dlt, x0, x1, x2, x3, y0, y1, y2, y3;
   *err = 0;
 
   if (n>2)
-  { x0 = max_grid(f,xlo,xhi,n,'x');
-    if (xlo<x0) xlo = x0-1.0/n;
-    if (xhi>x0) xhi = x0+1.0/n;
+  { dlt = (xhi-xlo)/n;
+    x0 = max_grid(f,xlo,xhi,n,'x');
+    if (xlo<x0) xlo = x0-dlt;
+    if (xhi>x0) xhi = x0+dlt;
   }
 
   x0 = xlo; y0 = f(xlo);
@@ -198,8 +197,9 @@ jacobian *J;
     cut *= 0.0001;
     do
     { for (j=0; j<p; j++) coef[j] = old_coef[j] + lambda*delta[j];
+      f = old_f - 1.0;
       fr = F(coef, &f, f1, J->Z); J->st = JAC_RAW;
-      if (fr==NR_BREAK) return(f);
+      if (fr==NR_BREAK) return(old_f);
 
       lambda = (fr==NR_REDUCE) ? lambda/2 : lambda/10.0;
     } while ((lambda>cut) & (f <= old_f - 1.0e-3));

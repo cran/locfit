@@ -46,5 +46,5 @@ plot(cpplot(NOx~E,data=ethanol,alpha=seq(0.2,1.0,by=0.05)))
   \code{\link{plot.gcvplot}}
 }
 
-\keyword{smooth}
+\keyword{htest}
 % Converted by Sd2Rd version 0.2-a5.

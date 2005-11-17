@@ -1,12 +1,11 @@
 \name{locfit.censor}
 \alias{locfit.censor}
+
 \title{
 Censored Local Regression
 }
 \usage{
 locfit.censor(x, y, cens, ..., iter=3, km=FALSE)
-%locfit(y~x, cens=cens, lfproc=locfit.censor)
-%locfit.censor(y~x, cens, ..., iter=3, km=F)
 }
 \description{
   \code{locfit.censor} produces local regression estimates for censored
@@ -46,7 +45,7 @@ locfit.censor(x, y, cens, ..., iter=3, km=FALSE)
 }
 }
 \value{
-\code{"locfit"} object.
+\code{locfit} object.
 }
 \seealso{
 \code{\link{km.mrl}},
@@ -54,10 +53,12 @@ locfit.censor(x, y, cens, ..., iter=3, km=FALSE)
 \code{\link{locfit.raw}}
 }
 \examples{
-data(heart)
-fit <- locfit.censor(log10(surv+0.5)~age, cens=cens, data=heart)
-plotbyfactor(heart$age, 0.5+heart$surv, heart$cens, ylim=c(0.5,16000), log="y")
-lines(fit, tr=function(x)10^x)
+data(heart, package="locfit")
+fit <- locfit.censor(log10(surv+0.5) ~ age, cens=cens, data=heart)
+## Can also be written as:
+\dontrun{fit <- locfit(log10(surv + 0.5) ~ age, cens=cens, data=heart, lfproc=locfit.censor)}
+with(heart, plotbyfactor(age, 0.5 + surv, cens, ylim=c(0.5, 16000), log="y"))
+lines(fit, tr=function(x) 10^x)
 }
 \references{
 Buckley, J. and James, I. (1979). Linear Regression with censored data.

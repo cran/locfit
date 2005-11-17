@@ -9,8 +9,8 @@
 
 extern double rs, log();
 
-INT defaultlink(link,family)
-INT link, family;
+int defaultlink(link,family)
+int link, family;
 { if (link==LDEFAU)
     switch(family&63)
     { case TDEN:
@@ -35,7 +35,7 @@ INT link, family;
       case TPROB:
       case TPOIS: return(LLOG);
       case TGEOM:
-        lfWARN(("Canonical link unavaialable for geometric family; using inverse"));
+        WARN(("Canonical link unavaialable for geometric family; using inverse"));
       case TGAMM: return(LINVER);
       case TCIRC:
       case TGAUS:
@@ -47,8 +47,8 @@ INT link, family;
   return(link);
 }
 
-INT validlinks(link,family)
-INT link, family;
+int validlinks(link,family)
+int link, family;
 { switch(family&63)
   { case TDEN:
     case TRAT:
@@ -72,13 +72,13 @@ INT link, family;
     case TPROB:
       return((link==LLOG) | (link==LSQRT) | (link==LIDENT));
   }
-  lfERROR(("Unknown family %d in validlinks",family));
+  ERROR(("Unknown family %d in validlinks",family));
   return(0);
 }
 
-INT famdens(mean,th,link,res,cens,w)
+int famdens(mean,th,link,res,cens,w)
 double mean, th, *res, w;
-INT link, cens;
+int link, cens;
 { if (cens)
     res[ZLIK] = res[ZDLL] = res[ZDDLL] = 0.0;
   else
@@ -88,9 +88,9 @@ INT link, cens;
   return(LF_OK);
 }
 
-INT famgaus(y,mean,th,link,res,cens,w)
+int famgaus(y,mean,th,link,res,cens,w)
 double y, mean, th, *res, w;
-INT link, cens;
+int link, cens;
 { double z, pz, dp;
   if (link==LINIT)
   { res[ZDLL] = w*y;
@@ -99,10 +99,10 @@ INT link, cens;
   z = y-mean;
   if (cens)
   { if (link!=LIDENT)
-    { lfERROR(("Link invalid for censored Gaussian family"));
+    { ERROR(("Link invalid for censored Gaussian family"));
       return(LF_LNK);
     }
-    pz = pnorm(-z,0.0,1.0);
+    pz = mut_pnorm(-z,0.0,1.0);
     dp = ((z>6) ? ptail(-z) : exp(-z*z/2)/pz)/2.5066283;
     res[ZLIK] = w*log(pz);
     res[ZDLL] = w*dp;
@@ -124,15 +124,15 @@ INT link, cens;
       res[ZDDLL]= w*mean*mean*(1-mean)*(1-mean);
       break;
     default:
-      lfERROR(("Invalid link for Gaussian family"));
+      ERROR(("Invalid link for Gaussian family"));
       return(LF_LNK);
   }
   return(LF_OK);
 }
 
-INT famrobu(y,mean,th,link,res,cens,w,rs)
+int famrobu(y,mean,th,link,res,cens,w,rs)
 double y, mean, th, *res, w, rs;
-INT link, cens;
+int link, cens;
 { double z, sw;
   if (link==LINIT)
   { res[ZDLL] = w*y;
@@ -156,12 +156,12 @@ INT link, cens;
   return(LF_OK);
 }
 
-INT famcauc(y,p,th,link,res,cens,w,rs)
+int famcauc(y,p,th,link,res,cens,w,rs)
 double y, p, th, *res, w, rs;
-INT link, cens;
+int link, cens;
 { double z;
   if (link!=LIDENT)
-  { lfERROR(("Invalid link in famcauc"));
+  { ERROR(("Invalid link in famcauc"));
     return(LF_LNK);
   }
   z = w*(y-th)/rs;
@@ -171,9 +171,9 @@ INT link, cens;
   return(LF_OK);
 }
 
-INT famrbin(y,p,th,link,res,cens,w)
+int famrbin(y,p,th,link,res,cens,w)
 double y, p, th, *res, w;
-INT link, cens;
+int link, cens;
 { double s2y;
   if (link==LINIT)
   { res[ZDLL] = y;
@@ -197,9 +197,9 @@ INT link, cens;
   return(LF_OK);
 }
 
-INT fambino(y,p,th,link,res,cens,w)
+int fambino(y,p,th,link,res,cens,w)
 double y, p, th, *res, w;
-INT link, cens;
+int link, cens;
 { double wp;
   if (link==LINIT)
   { if (y<0) y = 0;
@@ -252,13 +252,13 @@ INT link, cens;
     res[ZDDLL] = 4*w;
     return(LF_OK);
   }
-  lfERROR(("link %d invalid for binomial family",link));
+  ERROR(("link %d invalid for binomial family",link));
   return(LF_LNK);
 }
 
-INT fampois(y,mean,th,link,res,cens,w)
+int fampois(y,mean,th,link,res,cens,w)
 double y, mean, th, *res, w;
-INT link, cens;
+int link, cens;
 { double wmu, pt, dp, dq;
   if (link==LINIT)
   { res[ZDLL] = MAX(y,0.0);
@@ -323,13 +323,13 @@ INT link, cens;
     }
     return(LF_OK);
   }
-  lfERROR(("link %d invalid for Poisson family",link));
+  ERROR(("link %d invalid for Poisson family",link));
   return(LF_LNK);
 }
 
-INT famgamm(y,mean,th,link,res,cens,w)
+int famgamm(y,mean,th,link,res,cens,w)
 double y, mean, th, *res, w;
-INT link, cens;
+int link, cens;
 { double pt, dg;
   if (link==LINIT)
   { res[ZDLL] = MAX(y,0.0);
@@ -359,7 +359,7 @@ INT link, cens;
     }
   }
   else
-  { if (y<0) lfWARN(("Negative Gamma observation"));
+  { if (y<0) WARN(("Negative Gamma observation"));
     if (link==LLOG)
     { res[ZLIK] = -y/mean+w*(1-th);
       if (y>0) res[ZLIK] += w*log(y/w);
@@ -382,13 +382,13 @@ INT link, cens;
       return(LF_OK);
     }
   }
-  lfERROR(("link %d invalid for Gamma family",link));
+  ERROR(("link %d invalid for Gamma family",link));
   return(LF_LNK);
 }
 
-INT famgeom(y,mean,th,link,res,cens,w)
+int famgeom(y,mean,th,link,res,cens,w)
 double y, mean, th, *res, w;
-INT link, cens;
+int link, cens;
 { double p, pt, dp, dq;
   if (link==LINIT)
   { res[ZDLL] = MAX(y,0.0);
@@ -423,13 +423,13 @@ INT link, cens;
       return(LF_OK);
     }
   }
-  lfERROR(("link %d invalid for geometric family",link));
+  ERROR(("link %d invalid for geometric family",link));
   return(LF_LNK);
 }
 
-INT famweib(y,mean,th,link,res,cens,w)
+int famweib(y,mean,th,link,res,cens,w)
 double y, mean, th, *res, w;
-INT link, cens;
+int link, cens;
 { double yy;
   yy = pow(y,w);
   if (link==LINIT)
@@ -448,9 +448,9 @@ INT link, cens;
   return(LF_OK);
 }
 
-INT famcirc(y,mean,th,link,res,cens,w)
+int famcirc(y,mean,th,link,res,cens,w)
 double y, mean, th, *res, w;
-INT link, cens;
+int link, cens;
 { if (link==LINIT)
   { res[ZDLL] = w*sin(y);
     res[ZLIK] = w*cos(y);
@@ -462,6 +462,7 @@ INT link, cens;
   return(LF_OK);
 }
 
+/*
 void robustify(res,rs)
 double *res, rs;
 { double sc, z;
@@ -472,10 +473,26 @@ double *res, rs;
   res[ZDLL]*= sc/z;
   res[ZLIK] = sc*sc/2-sc*z;
 }
+*/
+void robustify(res,rs)
+double *res, rs;
+{ double sc, z;
+  sc = rs*HUBERC;
+  if (res[ZLIK] > -sc*sc/2)
+  { res[ZLIK] /= sc*sc;
+    res[ZDLL] /= sc*sc;
+    res[ZDDLL] /= sc*sc;
+    return;
+  }
+  z = sqrt(-2*res[ZLIK]);
+  res[ZDDLL]= (-sc*res[ZDLL]*res[ZDLL]/(z*z*z)+sc*res[ZDDLL]/z)/(sc*sc);
+  res[ZDLL]*= 1.0/(z*sc);
+  res[ZLIK] = 0.5-z/sc;
+}
 
 double lf_link(y,lin)
 double y;
-INT lin;
+int lin;
 { switch(lin)
   { case LIDENT: return(y);
     case LLOG:   return(log(y));
@@ -484,13 +501,13 @@ INT lin;
     case LSQRT:  return(sqrt(fabs(y)));
     case LASIN:  return(asin(sqrt(y)));
   }
-  lfERROR(("link: unknown link %d",lin));
+  ERROR(("link: unknown link %d",lin));
   return(0.0);
 }
 
 double invlink(th,lin)
 double th;
-INT lin;
+int lin;
 { switch(lin)
   { case LIDENT: return(th);
     case LLOG:   return(lf_exp(th));
@@ -500,18 +517,18 @@ INT lin;
     case LASIN:  return(sin(th)*sin(th));
     case LINIT:  return(0.0);
   }
-  lfERROR(("invlink: unknown link %d",lin));
+  ERROR(("invlink: unknown link %d",lin));
   return(0.0);
 }
 
-INT links(th,y,fam,lin,res,cd,w,rs) /* the link and various related functions */
-double th, y, *res, w, cd, rs;
-INT fam, lin;
+/* the link and various related functions */
+int links(th,y,fam,link,res,c,w,rs)
+double th, y, *res, w, rs;
+int fam, link, c;
 { double mean;
-  INT c, link, st;
-  c = (INT)cd; link = (INT)lin;
+  int st;
 
-  mean = res[ZMEAN] = invlink(th,lin);
+  mean = res[ZMEAN] = invlink(th,link);
   if (lf_error) return(LF_LNK);
 
   switch(fam&63)
@@ -536,7 +553,7 @@ INT fam, lin;
     case TROBT: return(famrobu(y,mean,th,link,res,c,w,rs));
     case TCAUC: return(famcauc(y,mean,th,link,res,c,w,rs));
     default:
-      lfERROR(("links: invalid family %d",fam));
+      ERROR(("links: invalid family %d",fam));
       return(LF_FAM);
   }
   if (st!=LF_OK) return(st);
@@ -549,11 +566,12 @@ INT fam, lin;
   stdlinks is a version of links when family, link, response e.t.c
   all come from the standard places.
 */
-INT stdlinks(res,lf,i,th,rs)
-lfit *lf;
+int stdlinks(res,lfd,sp,i,th,rs)
+lfdata *lfd;
+smpar *sp;
 double th, rs, *res;
-INT i;
-{ return(links(th,resp(lf,i),lf->mi[MTG],lf->mi[MLINK],res,cens(lf,i),prwt(lf,i),rs));
+int i;
+{ return(links(th,resp(lfd,i),fam(sp),link(sp),res,cens(lfd,i),prwt(lfd,i),rs));
 }
 
 /*
@@ -563,7 +581,7 @@ INT i;
 
 double b2(th,tg,w)
 double th, w;
-INT tg;
+int tg;
 { double y;
   switch(tg&63)
   { case TGAUS: return(w);
@@ -572,13 +590,13 @@ INT tg;
       y = expit(th);
       return(w*y*(1-y));
   }
-  lfERROR(("b2: invalid family %d",tg));
+  ERROR(("b2: invalid family %d",tg));
   return(0.0);
 }
 
 double b3(th,tg,w)
 double th, w;
-INT tg;
+int tg;
 { double y;
   switch(tg&63)
   { case TGAUS: return(0.0);
@@ -587,13 +605,13 @@ INT tg;
       y = expit(th);
       return(w*y*(1-y)*(1-2*y));
   }
-  lfERROR(("b3: invalid family %d",tg));
+  ERROR(("b3: invalid family %d",tg));
   return(0.0);
 }
 
 double b4(th,tg,w)
 double th, w;
-INT tg;
+int tg;
 { double y;
   switch(tg&63)
   { case TGAUS: return(0.0);
@@ -602,6 +620,6 @@ INT tg;
       y = expit(th); y = y*(1-y);
       return(w*y*(1-6*y));
   }
-  lfERROR(("b4: invalid family %d",tg));
+  ERROR(("b4: invalid family %d",tg));
   return(0.0);
 }

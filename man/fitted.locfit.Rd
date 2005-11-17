@@ -4,8 +4,8 @@
 Fitted values for a `"locfit"' object.
 }
 \usage{
-\method{fitted}{locfit}(object, data, what="coef", cv=FALSE, studentize=FALSE,
-    type="fit", tr, ...)
+\method{fitted}{locfit}(object, data=NULL, what="coef", cv=FALSE,
+studentize=FALSE, type="fit", tr, ...)
 }
 \description{Evaluates the fitted values (i.e. evaluates the surface
   at the original data points) for a Locfit object. This function works
@@ -51,7 +51,7 @@ If \code{TRUE}, residuals are studentized.
 \item{tr}{
 Back transformation for likelihood models.
 }
-\item{...}{currently not used.}
+\item{...}{arguments passed to and from methods.}
 }
 \value{
 A numeric vector of the fitted values.

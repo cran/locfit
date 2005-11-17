@@ -4,8 +4,7 @@
 One-sided left smooth for a Locfit model.
 }
 \usage{
-left(x)
-%locfit(y~left(x), ev="data", deg=1)
+left(x,...)
 }
 \description{
   The \code{left()} function is used in a locfit model formula
@@ -13,6 +12,7 @@ left(x)
   only data points with \eqn{x_i \le x} should be used.
   This can be useful in estimating points of discontinuity,
   and in cross-validation for forecasting a time series.
+  \code{left(x)} is equivalent to \code{lp(x,style="left")}.
 
   When using this function, it will usually be necessary to specify an
   evaluation structure, since the fit is not smooth and locfit's
@@ -25,21 +25,22 @@ left(x)
 
 \arguments{
   \item{x}{numeric variable.}
+  \item{...}{Other arguments to \code{\link{lp}()}.}
 }
 
 \examples{
 # compute left and right smooths
 data(penny)
 xev <- (1945:1988)+0.5
-fitl <- locfit(thickness~left(year), alpha=c(0,10), deg=1, ev=xev, data=penny)
-fitr <- locfit(thickness~right(year),alpha=c(0,10), deg=1, ev=xev, data=penny)
+fitl <- locfit(thickness~left(year,h=10,deg=1), ev=xev, data=penny)
+fitr <- locfit(thickness~right(year,h=10,deg=1),ev=xev, data=penny)
 # plot the squared difference, to show the change points.
 plot( xev, (predict(fitr,where="ev") - predict(fitl,where="ev"))^2 )
 }
 
 \seealso{
-  \code{\link{lfbas}},
   \code{\link{locfit}},
+  \code{\link{lp}},
   \code{\link{right}}
 }
 
