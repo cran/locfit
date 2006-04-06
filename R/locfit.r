@@ -94,7 +94,7 @@ function(x, y, weights = 1, cens = 0, base = 0, scale = FALSE, alpha = 0.7, deg 
     xl <- lflim(xlim, vnames, xl)
     lset <- 1
   }
-  fl <- c(ev$ll[1:d], ev$ur[1:d])
+  fl <- c(rep(ev$ll,length.out=d), rep(ev$ur,length.out=d))
   if(is.character(ev)) {
     stop("Character ev argument no longer used.")
   }
