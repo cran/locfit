@@ -33,6 +33,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "mutil.h"
 
 #define gold_rat 0.6180339887498948482045870
@@ -42,8 +43,8 @@ double max_grid(f,xlo,xhi,n,flag)
 double (*f)(), xlo, xhi;
 int n;
 char flag;
-{ int i, mi;
-  double x, y, mx, my;
+{ int i, mi=0;
+  double x, y, mx=0.0, my=0.0;
   for (i=0; i<=n; i++)
   { x = xlo + (xhi-xlo)*i/n;
     y = f(x);

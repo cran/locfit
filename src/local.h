@@ -9,6 +9,7 @@
 
 #ifndef I_LF_H
 #define I_LF_H
+#include <R.h>
 
 /*
  *   DIRSEP: '/' for unix; '\\' for DOS
@@ -121,8 +122,10 @@ extern int printe(const char *format, ...);
 #undef WARN
 #endif
 
-#define ERROR(args) {printe("Error: "); printe args; printe("\n"); lf_error=1;}
-#define WARN(args)  {printe("Warning: "); printe args; printe("\n"); }
+/* #define ERROR(args) {printe("Error: "); printe args; printe("\n"); lf_error=1;} */
+#define ERROR(args) {error args; lf_error=1;}
+/* #define WARN(args)  {printe("Warning: "); printe args; printe("\n"); } */
+#define WARN(args)  warning args;
 
 #define MAX(a,b) (((a)>(b)) ? (a) : (b))
 #define MIN(a,b) (((a)<(b)) ? (a) : (b))

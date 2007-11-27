@@ -8,6 +8,8 @@
 #undef ERROR
 
 #include "local.h"
+int deitype(char *);  /* in lfstr.c */
+
 
 design des;
 lfit lf;
@@ -187,7 +189,7 @@ double *x, *y, *c, *w, *b, *lim, *dp, *sca, *xev, *L, *kap, *wdes, *wtre, *wpc;
 Sint *mi, *nvc, *iwk1, *iwk2, *lw, *mg, *dv, *nd, *sty;
 char **str;
 CALL_S_FUNC *bs;
-{ Sint n, d, i, kk;
+{ Sint n, d, i;
 
   mi[MKER] = lfkernel(str[0]);
   mi[MTG]  = lffamily(str[1]);
@@ -289,7 +291,7 @@ CALL_S_FUNC *bs;
 void recoef(xev,coef,cell,nvc,mi,dp)
 double *xev, *coef, *dp;
 Sint *cell, *nvc, *mi;
-{ int d, vc;
+{ int d, vc=0;
 
   d = mi[MDIM];
   lf.fp.nv = lf.fp.nvm = nvc[3];

@@ -218,7 +218,7 @@ int ker;
 */
 double wint(d,j,nj,ker)
 int d, *j, nj, ker;
-{ double I, z;
+{ double I=0.0, z;
   int k, dj;
   dj = d;
   for (k=0; k<nj; k++) dj += j[k];

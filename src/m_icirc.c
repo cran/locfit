@@ -23,7 +23,7 @@ void integ_circ(f,r,orig,res,mint,b)
 int (*f)(), mint, b;
 double r, *orig, *res;
 { double y, x[2], theta, tres[MXRESULT], M[12], c, s;
-  int i, j, nr;
+  int i, j, nr=0;
   
   y = 0;
   for (i=0; i<mint; i++)
@@ -53,7 +53,7 @@ void integ_disc(f,fb,fl,res,resb,mg)
 int (*f)(), (*fb)(), *mg;
 double *fl, *res, *resb;
 { double x[2], y, r, tres[MXRESULT], *orig, rmin, rmax, theta, c, s, M[12];
-  int ct, ctb, i, j, k, nr, nrb, w;
+  int ct, ctb, i, j, k, nr=0, nrb=0, w;
 
   orig = &fl[2];
   rmax = fl[1];

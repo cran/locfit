@@ -290,6 +290,12 @@ double *x, h0, h1, c;
 int j, k, ker, n;
 { double h[7], d[7], r[7], res[4], min, minh, fact;
   int i, nc;
+  for ( i = 0; i < 7; ++i) {
+      h[i] = 0.0;
+      d[i] = 0.0;
+      r[i] = 0.0;
+  }
+  for ( i = 0; i < 4; ++i) res[i] = 0.0;
   min = 1.0e30; minh = 0.0;
   fact = 1.00001;
   h[6] = h0; kdecri(x,h[6],res,c,j,ker,n);

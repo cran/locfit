@@ -98,7 +98,7 @@ double **x, *f, *se;
 Sint *mg;
 int where, what;
 char band;
-{ int d, i, n;
+{ int d, i, n=0;
   double *xx[MXDIM];
   d = lf->fp.d;
   fit = f;

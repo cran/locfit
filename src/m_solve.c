@@ -110,7 +110,7 @@ int *err;
 double solve_fp(f,x0,tol,maxit)
 double (*f)(), x0, tol;
 int maxit;
-{ double x1;
+{ double x1=0.0;
   int i;
   for (i=0; i<maxit; i++)
   { x1 = f(x0);

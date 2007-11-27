@@ -108,7 +108,7 @@ design *des;
 int z;
 { int has_deriv, i, i0, i1, nv;
   Sint *ind;
-  double *xev, *fit, *deriv, sum, term;
+  double *xev, *fit, *deriv=NULL, sum, term;
   double d0, d1, f0, f1;
   fitpt *fp;
 

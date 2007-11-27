@@ -172,7 +172,7 @@ lfit *lf;
 double *x;
 int what;
 { double vv[64][64], *ll, *ur, h, xx[MXDIM];
-  int lo, tk, ns, nv, nc, d, i, vc;
+  int lo, tk, ns, nv, nc=0, d, i, vc;
   Sint ce[64];
 
 fitpt *fp;

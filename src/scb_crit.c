@@ -6,12 +6,13 @@
  */
 
 #include <math.h>
+#include "local.h"
 #include "tube.h"
 
 /*
  * some old math libraries choke on lgamma()...
  */
-#define LGAMMA(arg) lgamma(arg)
+/* #define LGAMMA(arg) lgamma(arg) */
 #define LOGPI 1.144729885849400174143427
 
 /* area(d) = 2 pi^(d/2) / Gamma(d/2)

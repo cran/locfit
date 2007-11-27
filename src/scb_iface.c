@@ -45,7 +45,7 @@ int constants(des,lf)
 design *des;
 lfit *lf;
 {
-  int d, i, m, nt, rw;
+  int d, m, nt, rw;
   evstruc *evs;
 
   lf_scb = lf;

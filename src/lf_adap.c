@@ -59,7 +59,7 @@ lfdata *lfd;
 smpar *sp;
 deriv *dv;
 design *des;
-{ int lf_status, p, z, cri, noit, redo;
+{ int lf_status=0, p, z, cri, noit, redo;
   double ho, t[6];
 
   if (lf_debug >= 2) printf("ainitband:\n");

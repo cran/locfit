@@ -82,7 +82,7 @@ design *des;
 lfit *lf;
 Sint *ce, *ct, *term;
 { double le[(1+MXDIM)*(1+MXDIM)], ml;
-  int d, i, j, im, jm, vc, pv[(1+MXDIM)*(1+MXDIM)], dig[6];
+  int d, i, j, im=0, jm=0, vc, pv[(1+MXDIM)*(1+MXDIM)], dig[6];
   Sint nce[1+MXDIM];
   if (lf_error) return;
   d = lf->fp.d; vc = d+1;
@@ -133,7 +133,7 @@ lfit *tr;
 double *xa;
 Sint *ce;
 { double le[(1+MXDIM)*(1+MXDIM)], ml;
-  int d, vc, i, j, im, jm, pv[(1+MXDIM)*(1+MXDIM)];
+  int d, vc, i, j, im=0, jm=0, pv[(1+MXDIM)*(1+MXDIM)];
   design *des;
   des = NULL;
   if (!triang_split(tr,ce,le)) return;
@@ -306,7 +306,7 @@ double triang_cubicint(v,vv,w,d,nc,xxa)
 double *v, *vv, *xxa;
 int d, nc;
 Sint *w;
-{ double sa, lb, *vert0, *vert1, *vals0, *vals1, deriv0, deriv1;
+{ double sa, lb, *vert0, *vert1, *vals0=NULL, *vals1, deriv0, deriv1;
   int i, j, k;
   if (nc==1) /* linear interpolate */
   { sa = 0;

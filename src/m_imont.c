@@ -14,13 +14,13 @@
 #include "mutil.h"
 extern void setzero();
 
-static int lfindex[MXIDIM];
-static double M[(1+MXIDIM)*MXIDIM*MXIDIM];
+/* static int lfindex[MXIDIM];
+   static double M[(1+MXIDIM)*MXIDIM*MXIDIM]; */
 
 void monte(f,ll,ur,d,res,n)
 int (*f)(), d, n;
 double *ll, *ur, *res;
-{ int i, j, nr;
+{ int i, j, nr=0;
   double z, x[MXIDIM], tres[MXRESULT];
 
 /* srand48(234L); */

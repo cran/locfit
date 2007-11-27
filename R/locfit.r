@@ -1,6 +1,7 @@
-"locfit"<- 
-function(formula, data = sys.frame(sys.parent()), weights = 1, cens = 0, base = 0, subset, 
-  geth = FALSE, ..., lfproc = locfit.raw)
+"locfit" <-
+    function(formula, data = sys.frame(sys.parent()), weights = 1,
+             cens = 0, base = 0, subset, geth = FALSE, ...,
+             lfproc = locfit.raw)
 {
   Terms <- terms(formula, data = data)
   attr(Terms, "intercept") <- 0
@@ -94,7 +95,6 @@ function(x, y, weights = 1, cens = 0, base = 0, scale = FALSE, alpha = 0.7, deg 
     xl <- lflim(xlim, vnames, xl)
     lset <- 1
   }
-  fl <- c(rep(ev$ll,length.out=d), rep(ev$ur,length.out=d))
   if(is.character(ev)) {
     stop("Character ev argument no longer used.")
   }
@@ -105,6 +105,7 @@ function(x, y, weights = 1, cens = 0, base = 0, scale = FALSE, alpha = 0.7, deg 
     if(mg == 0)
       stop("Invalid ev argument")
   }
+  fl <- c(rep(ev$ll,length.out=d), rep(ev$ur,length.out=d))
   mi <- c(n, 0, deg, d, 0, 0, 0, 0, mint, maxit, renorm, 0, 0, 0, dc, maxk, 
     debug, geth, 0, !missing(basis))
   if(any(is.na(mi)))

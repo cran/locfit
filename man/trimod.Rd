@@ -1,7 +1,6 @@
 \name{trimod}
 \alias{trimod}
 \title{Generated sample from a bivariate trimodal normal mixture}
-\usage{data(trimod)}
 \format{
   Data frame with 225 observations and variables x0, x1.
 }

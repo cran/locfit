@@ -10,7 +10,7 @@
 
 #define DEF_METH JAC_EIGD
 
-int jac_reqd(p) { return(2*p*(p+1)); }
+int jac_reqd(int p) { return(2*p*(p+1)); }
 
 double *jac_alloc(J,p,wk)
 jacobian *J;

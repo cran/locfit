@@ -1,6 +1,7 @@
 #include "local.h"
 static double scb_crit, *x, c[10], kap[5], kaq[5], max_p2;
-static int side, type;
+/* static int side, type; */
+static int type;
 design *scb_des;
 
 double covar_par(lf,des,x1,x2)
@@ -227,7 +228,8 @@ int v;
 void scb(des,lf)
 design *des;
 lfit *lf;
-{ double k1, k2, kap[10], *lo, *hi, sig, thhat, nlx;
+{ double k1, k2; /* kap[10], */
+  double *lo, *hi, sig, thhat, nlx;
   int i, nterms;
 
   scb_des= des;

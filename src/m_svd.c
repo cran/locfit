@@ -3,6 +3,8 @@
  *   See README file for details.
  */
 
+#include <stdlib.h>
+#include "local.h"
 #include "mutil.h"
 
 void svd(x,p,q,d,mxit)  /* svd of square matrix */
@@ -74,7 +76,7 @@ int d, mxit;
       }
     if (ms==0) iter=mxit+10;
   }
-  if (iter==mxit) printf("Warning: svd not converged.\n");
+  if (iter==mxit) WARN(("Warning: svd not converged.\n"));
   for (i=0; i<d; i++)
     if (x[i*d+i]<0)
     { x[i*d+i] = -x[i*d+i];

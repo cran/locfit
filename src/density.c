@@ -196,7 +196,7 @@ int dim, deg, p;
 
 int prodint(t,resp,resp2,coef,h)
 double *t, *resp, *resp2, *coef, h;
-{ int dim, p, i, j, k, st;
+{ int dim, p, i, j, k, st=0;
   double cf[MXDEG+1], hj, hs, prod_wk[MXDIM][2*MXDEG+1];
 
   dim = den_lfd->d;
@@ -288,7 +288,7 @@ double *t, *resp, *C, *cf, h, *sca;
 
 int likeden(coef, lk0, f1, A)
 double *coef, *lk0, *f1, *A;
-{ double lk, r;
+{ double lk=0.0, r;
   int i, j, p, rstat;
 
   lf_status = LF_OK;

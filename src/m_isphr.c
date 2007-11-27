@@ -98,7 +98,7 @@ double *a, *b, *c;
 void li(x,f,fb,mint,ar)
 double *x, ar;
 int (*f)(), (*fb)(), mint;
-{ int i, j, nr, nrb, ct1, w;
+{ int i, j, nr=0, nrb, ct1, w;
   double u[3], r, M[36];
   double sres[MXRESULT], tres[MXRESULT];
 

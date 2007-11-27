@@ -13,7 +13,7 @@ int meth;
 design *des;
 lfit *tr;
 { double x[4], y[4], xx[11], yy[11];
-  int i, im;
+  int i, im=0;
   xx[0] = tr->sp.fixh;
   if (xx[0]<=0)
   { ERROR(("regband: initialize h>0"));
@@ -83,6 +83,7 @@ double loccp(h,des,lf,m) /* m=1: cp    m=2: gcv */
 double h;
 design *des;
 lfit *lf;
+int m;
 { double cp;
   int dg, n;
 

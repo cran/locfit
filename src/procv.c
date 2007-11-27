@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 1996-2001 Lucent Technologies.
+ *   copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 
@@ -158,8 +158,8 @@ int procvvord(des,lf,v)
 design *des;
 lfit *lf;
 int v;
-{ double tr[6], gcv, g0, ap, coef[4][10], t2[4], th, md;
-  int i, j, k, d1, i0, p1, ip;
+{ double tr[6], gcv, g0, ap, coef[4][10], t2[4], th, md=0.0;
+  int i, j, k=0, d1, i0, p1, ip;
   des->xev = evpt(&lf->fp,v);
 
   ap = pen(&lf->sp);
@@ -214,7 +214,7 @@ int procvhatm(des,lf,v)
 design *des;
 lfit *lf;
 int v;
-{ int k;
+{ int k=0;
   double *l;
   l = &lf->fp.L[v*lf->lfd.n];
   if ((ker(&lf->sp)!=WPARM) | (!haspc(&lf->pc)))

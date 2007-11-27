@@ -113,7 +113,7 @@ int deg, ty, exp;
    ty = 1: e1 (X^T WVX)^{-1} X^T W        -- hat matrix
    ty = 2: e1 (X^T WVX)^{-1} X^T WV^{1/2} -- scb's
 */
-{ double w, *X, *lxd, *lxdd, wdd, wdw, *ulx, link[LLEN], h;
+{ double w, *X, *lxd=NULL, *lxdd=NULL, wdd, wdw, *ulx, link[LLEN], h;
   double dfx[MXDIM], hs[MXDIM];
   int i, ii, j, k, l, m, d, p, nd;
 

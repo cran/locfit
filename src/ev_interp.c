@@ -183,7 +183,7 @@ fitpt *fp;
 evstruc *evs;
 double *x;
 int what;
-{ int d, i, j, jj, nc, sk, v[MXDIM], vc, z0, nce[1<<MXDIM], *mg;
+{ int d, i, j, jj, nc=0, sk, v[MXDIM], vc, z0, nce[1<<MXDIM], *mg;
   double *ll, *ur, vv[64][64], z;
 
   d = fp->d;
@@ -239,7 +239,7 @@ double dointpoint(lf,x,what,ev,j)
 lfit *lf;
 double *x;
 int what, ev, j;
-{ double xf, f;
+{ double xf, f=0.0;
   int i;
   fitpt *fp;
   evstruc *evs;

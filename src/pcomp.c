@@ -54,6 +54,7 @@ design *des;
 lfdata *lfd;
 smpar *sp;
 paramcomp *pc;
+int geth;
 int nopc;
 { int i, j, k, p;
   double wt, sw;

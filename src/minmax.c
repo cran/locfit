@@ -84,7 +84,7 @@ design *des;
 int p;
 double *z, *a, *a0, sw0, gam;
 { double f, sw, c0, c1, tmp[10];
-  int i, j, sd;
+  int i, j, sd=0;
 
 if (debug) printf("updatesd\n");
   for (i=0; i<p; i++) if (des->xtwx.Z[i*p+i]<SINGTOL) sd = i;
@@ -157,7 +157,7 @@ double *coef, *old_coef, *f1, *delta, tol;
 int p, maxit, *err;
 jacobian *J;
 { double f, old_f, lambda;
-  int i, j, fr, sing;
+  int i, j, fr, sing=0;
 
   *err = NR_OK;
   J->p = p;
