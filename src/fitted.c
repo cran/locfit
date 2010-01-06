@@ -72,7 +72,7 @@ lfit *lf;
 double *fit;
 int what, cv, st, ty;
 { int i, j, d, n, evo;
-  double xx[MXDIM], th, inl=0.0, var=0.0, link[LLEN];
+  double xx[MXDIM], th, inl=0.0, var, link[LLEN];
   n = lf->lfd.n;
   d = lf->lfd.d;
   evo = ev(&lf->evs);

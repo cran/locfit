@@ -4,7 +4,7 @@
 Print method for preplot.locfit objects.
 }
 \usage{
-print.preplot.locfit(x, ...)
+\method{print}{preplot.locfit}(x, ...)
 }
 \description{
   Print method for objects created by the

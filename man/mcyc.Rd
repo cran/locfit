@@ -10,10 +10,10 @@
   Actually, rumored to be a concatenation of several such datasets.
 }
 \source{
-  H\"{a}rdle (1990).
+  H\"ardle (1990).
 }
 \references{
-  H\"{a}rdle, W. (1990). Applied Nonparametric Regression.
+  H\"ardle, W. (1990). Applied Nonparametric Regression.
   Cambridge University Press.
 }
 \keyword{datasets}

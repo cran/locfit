@@ -4,7 +4,7 @@
 Print method for gcvplot objects
 }
 \usage{
-print.gcvplot(x, ...)
+\method{print}{gcvplot}(x, ...)
 }
 \description{
   Print method for \code{"gcvplot"} objects. Actually, equivalent to

@@ -4,14 +4,14 @@
 Prediction from a Locfit object.
 }
 \usage{
-\method{preplot}{locfit}(object, newdata=NULL, where, tr=NULL, what="coef", 
+\method{preplot}{locfit}(object, newdata=NULL, where, tr=NULL, what="coef",
   band="none", get.data=FALSE, f3d=FALSE, \dots)
 }
 \arguments{
   \item{object}{Fitted object from \code{\link{locfit}()}.}
   \item{newdata}{Points to predict at. Can be given in several forms:
     vector/matrix; list, data frame.}
-  \item{where}{An alternative to \texttt{newdata}. Choices include
+  \item{where}{An alternative to \code{newdata}. Choices include
     \code{"grid"} for the grid \code{\link{lfmarg}(object)};
     \code{"data"} for the original data points and \code{"fitp"} for the
     direct fitting points (ie. no interpolation).}

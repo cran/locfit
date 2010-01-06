@@ -4,7 +4,7 @@
 Print the Locfit Evaluation Points.
 }
 \usage{
-print.lfeval(x, ...)
+\method{print}{lfeval}(x, ...)
 }
 \description{
   Prints a matrix of the evaluation points from a \code{locfit}

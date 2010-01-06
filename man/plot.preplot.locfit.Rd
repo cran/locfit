@@ -4,13 +4,13 @@
 Plot a "preplot.locfit" object.
 }
 \usage{
-\method{plot}{preplot.locfit}(x, ...)
+\method{plot}{preplot.locfit}(x, pv, tv, ...)
 }
 \arguments{
 \item{x}{A \code{preplot.locfit} object, produced by
 \code{\link{preplot.locfit}()}.
 }
-\item{...}{
+\item{pv, tv, ...}{
 Other arguments to \code{plot.locfit.1d}, \code{plot.locfit.2d} or
 \code{plot.locfit.3d} as appropriate.
 }}

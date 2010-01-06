@@ -53,7 +53,7 @@ void integ_disc(f,fb,fl,res,resb,mg)
 int (*f)(), (*fb)(), *mg;
 double *fl, *res, *resb;
 { double x[2], y, r, tres[MXRESULT], *orig, rmin, rmax, theta, c, s, M[12];
-  int ct, ctb, i, j, k, nr=0, nrb=0, w;
+  int ct, ctb, i, j, k, nr, nrb=0, w;
 
   orig = &fl[2];
   rmax = fl[1];

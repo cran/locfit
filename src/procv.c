@@ -1,5 +1,5 @@
 /*
- *   copyright (c) 1996-2001 Lucent Technologies.
+ *   Copyright (c) 1996-2001 Lucent Technologies.
  *   See README file for details.
  */
 

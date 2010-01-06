@@ -4,7 +4,7 @@
 Print method for simultaneous confidence bands
 }
 \usage{
-print.scb(x, ...)
+\method{print}{scb}(x, ...)
 }
 \description{
   Print method for simultaneous confidence bands created by the
@@ -13,7 +13,7 @@ print.scb(x, ...)
 \arguments{
   \item{x}{ \code{"scb"} object created by \code{\link{scb}}.}
   \item{...}{Arguments passed to and from other methods.}
-  
+
 }
 \seealso{
 \code{\link{scb}}

@@ -10,7 +10,7 @@ store(data=FALSE, grand=FALSE)
   I've gotta keep track of this mess somehow!
 }
 \arguments{
-  \item{data}{whether datasets are to be dumped.}
-  \item{grand}{whether \code{grand} is to be dumped.}
+  \item{data}{whether data objects are to be saved.}
+  \item{grand}{whether everything is to be saved.}
 }
 \keyword{smooth}

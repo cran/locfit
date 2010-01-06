@@ -122,7 +122,8 @@ extern int printe(const char *format, ...);
 #undef WARN
 #endif
 
-/* #define ERROR(args) {printe("Error: "); printe args; printe("\n"); lf_error=1;} */
+/* #define ERROR(args) {printe("Error: "); printe args; printe("\n"); lf_error=
+1;} */
 #define ERROR(args) {error args; lf_error=1;}
 /* #define WARN(args)  {printe("Warning: "); printe args; printe("\n"); } */
 #define WARN(args)  warning args;

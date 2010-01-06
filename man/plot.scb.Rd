@@ -6,7 +6,7 @@
 Plot method for simultaneous confidence bands
 }
 \usage{
-plot.scb(x, add=FALSE, ...)
+\method{plot}{scb}(x, add=FALSE, ...)
 }
 \description{
   Plot method for simultaneous confidence bands created by the
