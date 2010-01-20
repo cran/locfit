@@ -11,6 +11,7 @@ function(formula, data = sys.frame(sys.parent()), weights = 1, cens = 0, base = 
   for(i in length(z):2)
     if(is.na(z[i])) m[[i]] <- NULL
   frm <- eval(m, sys.frame(sys.parent()))
+  if (nrow(frm) < 1) stop("fewer than one row in the data")
   vnames <- as.character(attributes(Terms)$variables)[-1]
   if(attr(Terms, "response")) {
     y <- model.extract(frm, response)

@@ -1,0 +1,9 @@
+1.5-6:
+
+o Added check for 0-row data so locfit() won't segfault.
+
+
+1.5-5:
+
+o Patches provided by Brian Ripley to clean up some function arguments and
+  documentations.
