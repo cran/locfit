@@ -10,12 +10,12 @@ In some cases, the user may like to use alternative variance
 estimates; this function allows the default value to be changed.
 }
 \usage{
-rv(fit) <- 1.2345
+rv(fit) <- value
 }
 \arguments{
-\item{fit}{
-\code{"locfit"} object.
-}}
+  \item{fit}{\code{"locfit"} object.}
+  \item{value}{numeric replacement value.}
+}
 \seealso{
 \link{locfit}(), \link{rv}(), \link{plot.locfit}()
 }

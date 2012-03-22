@@ -39,6 +39,7 @@
  *  TODO: additional error checking, non-convergence stop.
  */
 
+#include <R.h>
 #include <math.h>
 #include <stdio.h>
 #include "mutil.h"
@@ -88,7 +89,7 @@ int bd_flag, *err;
     if (y*ylo>0) { xlo = x; ylo = y; }
             else { xhi = x; yhi = y; }
 if (y2==y)
-{ printf("secant: y2 %12.9f\n",y2);
+{ Rprintf("secant: y2 %12.9f\n",y2);
   return(x);
 }
     x1 = x2; y1 = y2;

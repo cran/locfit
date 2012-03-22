@@ -4,6 +4,8 @@
  *   appearing in the tube formula.
  */
 
+#include <R.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -471,7 +473,7 @@ int tube_constants(int (*f)(), int d, int m, int ev, int *mg, double *fl,
   use_covar = uc;
   kap_terms = terms;
   if ((kap_terms <=0) | (kap_terms >= 5))
-    printf("Warning: terms = %2d\n",kap_terms);
+    warning("terms = %2d\n", kap_terms);
 
   switch(ev)
   {
@@ -490,17 +492,17 @@ int tube_constants(int (*f)(), int d, int m, int ev, int *mg, double *fl,
       kodf(fl,&fl[d],mg,k0,l0);
       break;
     default:
-      printf("Unknown integration type in tube_constants().\n");
+      Rprintf("Unknown integration type in tube_constants().\n");
   }
 
-  if (deb>0)
-  { printf("constants:\n");
-    printf("  k0: %8.5f %8.5f %8.5f %8.5f\n",k0[0],k0[1],k0[2],k0[3]);
-    printf("  l0: %8.5f %8.5f %8.5f\n",l0[0],l0[1],l0[2]);
-    printf("  m0: %8.5f %8.5f\n",m0[0],m0[1]);
-    printf("  n0: %8.5f\n",n0[0]);
-    if (d==2) printf("  check: %8.5f\n",(k0[0]+k0[2]+l0[1]+m0[0])/(2*PI));
-    if (d==3) printf("  check: %8.5f\n",(l0[0]+l0[2]+m0[1]+n0[0])/(4*PI));
+  if (deb>0) {
+    Rprintf("constants:\n");
+    Rprintf("  k0: %8.5f %8.5f %8.5f %8.5f\n",k0[0],k0[1],k0[2],k0[3]);
+    Rprintf("  l0: %8.5f %8.5f %8.5f\n",l0[0],l0[1],l0[2]);
+    Rprintf("  m0: %8.5f %8.5f\n",m0[0],m0[1]);
+    Rprintf("  n0: %8.5f\n",n0[0]);
+    if (d==2) Rprintf("  check: %8.5f\n",(k0[0]+k0[2]+l0[1]+m0[0])/(2*PI));
+    if (d==3) Rprintf("  check: %8.5f\n",(l0[0]+l0[2]+m0[1]+n0[0])/(4*PI));
   }
 
   if (aw) free(wk);

@@ -4,7 +4,7 @@
 Plot a high-dimensional "preplot.locfit" object using trellis displays.
 }
 \usage{
-plot.locfit.3d(x, main="", pv, tv, type = "level", pred.lab = x$vnames,
+\method{plot}{locfit.3d}(x, main="", pv, tv, type = "level", pred.lab = x$vnames,
                resp.lab=x$yname, crit = 1.96, ...)
 }
 \description{

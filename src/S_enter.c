@@ -7,12 +7,14 @@
 #undef WARN
 #undef ERROR
 
+#include <Rinternals.h>
+
 #include "local.h"
-int deitype(char *);  /* in lfstr.c */
+extern int deitype(char *);  /* in lfstr.c */
 
 
-design des;
-lfit lf;
+static design des;
+static lfit lf;
 
 int lf_error;
 
@@ -31,6 +33,7 @@ typedef char * CALL_S_VALS;
 
 static CALL_S_FUNC bsfunc, bsf2;
 
+#ifdef OLD
 void basis(x,t,f,dim,p)
 double *x, *t, *f;
 Sint dim, p;
@@ -100,8 +103,57 @@ int n, d, m, p, *ind;
   vptr = (double *)values[0];
   for (i=0; i<m*p; i++) X[i] = vptr[i];
 }
+#else
+#ifdef UNUSED
+static void basis(double *x, double *t, double *f, int dim, int p)
+{
+    SEXP call, pcall, s;
 
-void setevs(evs,mi,cut,mg,flim)
+    PROTECT(pcall = call = allocList(3));
+    SET_TYPEOF(call, LANGSXP);
+    SETCAR(pcall, (SEXP) bsfunc);
+    pcall = CDR(pcall);
+    SETCAR(pcall, allocVector(REALSXP, dim));
+    memcpy(REAL(CAR(pcall)), x, dim * sizeof(double));
+    pcall = CDR(pcall);
+    SETCAR(pcall, allocVector(REALSXP, dim));
+    memcpy(REAL(CAR(pcall)), t, dim * sizeof(double));
+
+    PROTECT(s = eval(call, R_GlobalEnv));
+    memcpy(f, REAL(s), p * sizeof(double));
+    UNPROTECT(2);
+}
+#endif
+
+static void 
+vbasis(double **x, double *t, int n, int d, int *ind, int m, int p, double *X)
+{
+    SEXP call, pcall, s;
+
+    /* two integer args, then 1+d double args */
+    PROTECT(pcall = call = allocList(d + 5));
+    SET_TYPEOF(call, LANGSXP);
+    SETCAR(pcall, (SEXP) bsf2);
+    pcall = CDR(pcall);
+    SETCAR(pcall, ScalarInteger(d));
+    pcall = CDR(pcall);
+    SETCAR(pcall, allocVector(INTSXP, m));
+    memcpy(INTEGER(CAR(pcall)), ind, m * sizeof(int));
+    pcall = CDR(pcall);
+    SETCAR(pcall, allocVector(REALSXP, d));
+    memcpy(REAL(CAR(pcall)), t, d * sizeof(double));
+    for (int i = 0 ; i < d ; i++) {
+	pcall = CDR(pcall);
+	SETCAR(pcall, allocVector(REALSXP, n));
+	memcpy(REAL(CAR(pcall)), x[i], n * sizeof(double));
+    }
+    PROTECT(s = eval(call, R_GlobalEnv));
+    memcpy(X, REAL(s), m * p * sizeof(double));
+    UNPROTECT(2);
+}
+#endif
+
+static void setevs(evs,mi,cut,mg,flim)
 evstruc *evs;
 int *mg;
 Sint *mi;
@@ -145,7 +197,7 @@ double cut, *flim;
   }
 }
 
-void setdata(lfd,x,y,c,w,b,n,d,sca,sty)
+static void setdata(lfd,x,y,c,w,b,n,d,sca,sty)
 lfdata *lfd;
 double *x, *y, *c, *w, *b, *sca;
 Sint n, d, *sty;
@@ -164,7 +216,7 @@ Sint n, d, *sty;
   lfd->ord = 0;
 }
 
-void setsmpar(sp,dp,mi)
+static void setsmpar(sp,dp,mi)
 smpar *sp;
 double *dp;
 Sint *mi;
@@ -183,7 +235,7 @@ Sint *mi;
   lf.sp.vbasis = vbasis;
 }
 
-void slocfit(x,y,c,w,b,lim,mi,dp,str,sca,xev,wdes,wtre,wpc,nvc,
+static void slocfit(x,y,c,w,b,lim,mi,dp,str,sca,xev,wdes,wtre,wpc,nvc,
   iwk1, iwk2,lw,mg,L,kap,dv,nd,sty,bs)
 double *x, *y, *c, *w, *b, *lim, *dp, *sca, *xev, *L, *kap, *wdes, *wtre, *wpc;
 Sint *mi, *nvc, *iwk1, *iwk2, *lw, *mg, *dv, *nd, *sty;
@@ -288,7 +340,7 @@ CALL_S_FUNC *bs;
   for(i=0; i<lw[5]; i++) kap[i] = lf.fp.kap[i];
 }
 
-void recoef(xev,coef,cell,nvc,mi,dp)
+static void recoef(xev,coef,cell,nvc,mi,dp)
 double *xev, *coef, *dp;
 Sint *cell, *nvc, *mi;
 { int d, vc=0;
@@ -328,7 +380,7 @@ Sint *cell, *nvc, *mi;
   lf.evs.hi = cell; cell += MAX(nvc[3],nvc[4]);
 }
 
-void spreplot(xev,coef,sv,cell,x,res,se,wpc,sca,m,nvc,mi,dp,
+static void spreplot(xev,coef,sv,cell,x,res,se,wpc,sca,m,nvc,mi,dp,
   mg,dv,nd,sty,where,what,bs)
 double *xev, *coef, *sv, *x, *res, *se, *wpc, *sca, *dp;
 Sint *cell, *m, *nvc, *mi, *mg, *dv, *nd, *sty, *where;
@@ -385,7 +437,7 @@ void **bs;
   preplot(&lf,xx,res,se,what[1][0],m,*where,ppwhat(what[0]));
 }
 
-void sfitted(x,y,w,c,ba,fit,cv,st,xev,coef,sv,cell,wpc,sca,nvc,mi,dp,mg,dv,nd,sty,what,bs)
+static void sfitted(x,y,w,c,ba,fit,cv,st,xev,coef,sv,cell,wpc,sca,nvc,mi,dp,mg,dv,nd,sty,what,bs)
 double *x, *y, *w, *c, *ba, *fit, *xev, *coef, *sv, *wpc, *sca, *dp;
 Sint *cv, *st, *cell, *nvc, *mi, *mg, *dv, *nd, *sty;
 char **what;
@@ -417,7 +469,7 @@ void **bs;
   fitted(&lf,fit,ppwhat(what[0]),*cv,*st,restyp(what[1]));
 }
 
-void triterm(xev,h,ce,lo,hi,sca,nvc,mi,dp,nt,term,box)
+static void triterm(xev,h,ce,lo,hi,sca,nvc,mi,dp,nt,term,box)
 double *xev, *h, *sca, *dp, *box;
 Sint *ce, *lo, *hi, *nvc, *mi, *nt, *term;
 { int i, d, vc;
@@ -538,4 +590,32 @@ int *lw, *mi, *nvc, *mg;
   nvc[2] = vc;
   nvc[3] = nvc[4] = 0;
 
+}
+
+/* Registration added Mar 2012 */
+#include <R_ext/Rdynload.h>
+
+/* From smisc.c */
+void kdeb(double *x, int *mi, double*band, int *ind, double *h0, double *h1,
+	  int *meth, int *nmeth, int *ker);
+void scritval(double *k0, int *d, double *cov, int *m, double *rdf, 
+	      double *z, int *k);
+void slscv(double *x, int *n, double *h, double *z);
+
+static const R_CMethodDef CEntries[]  = {
+    {"guessnv", (DL_FUNC) &guessnv, 6},
+    {"slocfit", (DL_FUNC) &slocfit, 25},
+    {"sfitted", (DL_FUNC) &sfitted, 23},
+    {"spreplot", (DL_FUNC) &spreplot, 20},
+    {"triterm", (DL_FUNC) &triterm, 12},
+    {"kdeb", (DL_FUNC) &kdeb, 9},
+    {"slscv", (DL_FUNC) &slscv, 4},
+    {"scritval", (DL_FUNC) &scritval, 7},
+    {NULL, NULL, 0}
+};
+
+void R_init_locfit(DllInfo *dll)
+{
+    R_registerRoutines(dll, CEntries, NULL, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

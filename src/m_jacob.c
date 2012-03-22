@@ -3,6 +3,7 @@
  *   See README file for details.
  */
 
+#include <R.h>
 #include "math.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -50,7 +51,7 @@ int meth;
     case JAC_CHOL:
       chol_dec(J->Z,J->p,J->p);
       return;
-    default: printf("jacob_dec: unknown method %d",meth);
+    default: Rprintf("jacob_dec: unknown method %d",meth);
   }
 }
 
@@ -72,7 +73,7 @@ double *v;
     case JAC_CHOL:
       return(chol_solve(J->Z,v,J->p,J->p));
   }
-  printf("jacob_solve: unknown method %d",J->st);
+  Rprintf("jacob_solve: unknown method %d",J->st);
   return(0);
 }
 
@@ -92,7 +93,7 @@ double *v;
     case JAC_CHOL:
       return(chol_hsolve(J->Z,v,J->p,J->p));
   }
-  printf("jacob_hsolve: unknown method %d",J->st);
+  Rprintf("jacob_hsolve: unknown method %d",J->st);
   return(0);
 }
 
@@ -112,7 +113,7 @@ double *v;
     case JAC_CHOL:
       return(chol_qf(J->Z,v,J->p,J->p));
     default:
-      printf("jacob_qf: invalid method\n");
+      Rprintf("jacob_qf: invalid method\n");
       return(0.0);
   }
 }

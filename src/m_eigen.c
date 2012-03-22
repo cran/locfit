@@ -3,6 +3,8 @@
  *   See README file for details.
  */
 
+#include <R.h>
+
 #include <stdio.h>
 #include <math.h>
 #include "mutil.h"
@@ -61,7 +63,7 @@ int d;
         }
     if (ms==0) return;
   }
-  printf("eig_dec not converged\n");
+  Rprintf("eig_dec not converged\n");
 }
 
 int eig_solve(J,x)

@@ -69,7 +69,7 @@ fit <- locfit(NOx~lp(E,C,nn=0.5,scale=0), data=ethanol)
 plot(fit)
 
 # density estimation
-data(geyser, data="locfit")
+data(geyser, package="locfit")
 fit <- locfit( ~ lp(geyser, nn=0.1, h=0.8))
 plot(fit,get.data=TRUE)
 }

@@ -29,7 +29,7 @@ sjpi(x, a)
 }
 \examples{
 # Fig 10.2 (S-J parts) from Loader (1999).
-data(geyser)
+data(geyser, package="locfit")
 gf <- 2.5
 a <- seq(0.05, 0.7, length=100)
 z <- sjpi(geyser, a)

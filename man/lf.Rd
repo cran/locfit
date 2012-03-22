@@ -30,6 +30,7 @@ lf(..., alpha=0.7, deg=2, scale=1, kern="tcub", ev=rbox(), maxk=100)
 stopifnot(require(gam))
 # The `gam' package must be attached _before_ `locfit', otherwise
 # the following will not work.
+data(ethanol, package = "lattice")
 fit <- gam(NOx ~ lf(E) + C, data=ethanol)
 op <- par(mfrow=c(2, 1))
 plot(fit)

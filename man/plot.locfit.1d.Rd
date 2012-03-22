@@ -4,7 +4,7 @@
 Plot a one dimensional preplot.locfit object.
 }
 \usage{
-plot.locfit.1d(x, add=FALSE, main="", xlab="default", ylab=x$yname,
+\method{plot}{locfit.1d}(x, add=FALSE, main="", xlab="default", ylab=x$yname,
   type="l", ylim, lty=1, col=1, \dots)
 }
 \arguments{

@@ -4,7 +4,7 @@
 Plot a two-dimensional "preplot.locfit" object.
 }
 \usage{
-plot.locfit.2d(x, type="contour", main, xlab, ylab, zlab=x$yname, ...)
+\method{plot}{locfit.2d}(x, type="contour", main, xlab, ylab, zlab=x$yname, ...)
 }
 \arguments{
   \item{x}{Two dimensional \code{preplot.locfit} object.}

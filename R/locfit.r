@@ -609,7 +609,7 @@ function(object, newdata = NULL, where, tr = NULL, what = "coef", band = "none",
     x <- object$eva$xev[2 * (1:nv) - 1]
     y <- object$eva$xev[2 * (1:nv)]
     z <- preplot.locfit.raw(object, 0, "fitp", what, band)$y
-    fhat <- interp(x, y, z, newdata[[1]], newdata[[2]], ncp = 2)$z
+    fhat <- akima::interp(x, y, z, newdata[[1]], newdata[[2]], ncp = 2)$z
   }
   else {
     z <- preplot.locfit.raw(object, newdata, where, what, band)
@@ -833,7 +833,7 @@ function(x, main = "", pv, tv, type = "level", pred.lab = x$vnames, resp.lab =
       y ~ pv1 | tv1 * tv2,
       y ~ pv1 | tv1 * tv2 * tv3)
     pl <- xyplot(formula, xlab = pred.lab[pv], ylab = resp.lab, main = main,
-      type = "l", clo = clo, cup = cup, wh = wh, panel = panel.xyplot.lf, data
+      type = "l", cllo, cup = cup, wh = wh, panel = panel.xyplot.lf, data
        = newdat, strip = loc.strip, ...)
   }
   if(length(pv) == 2) {
