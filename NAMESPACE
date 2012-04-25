@@ -45,4 +45,4 @@ S3method(residuals, locfit)
 S3method(summary, gcvplot)
 S3method(summary, locfit)
 S3method(summary, preplot.locfit)
-
+S3method("[", lp)

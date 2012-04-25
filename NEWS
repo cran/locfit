@@ -1,3 +1,8 @@
+1.5-8:
+
+o Added a subset method for the "lp" class to resolve the problem that in a locfit()
+  call, if "subset" is given then any optional argument to lp() are ignored.
+
 1.5-7:
 
 o Patches by Brian Ripley (added NAMESPACE, changed Call_S(), etc.)

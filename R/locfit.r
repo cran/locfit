@@ -22,7 +22,7 @@ function(formula, data = sys.frame(sys.parent()), weights = 1, cens = 0, base = 
     y <- yname <- NULL
   }
   x <- as.matrix(frm[, vnames])
-  if(class(x) != "lp") {
+  if(!inherits(x, "lp")) {
     if(length(vnames) == dim(x)[2]) {
       dimnames(x) <- list(NULL, vnames)
     }
@@ -53,7 +53,7 @@ function(x, y, weights = 1, cens = 0, base = 0, scale = FALSE, alpha = 0.7,
          maxk = 100, itype = "default", mint = 20, maxit = 20, debug = 0,
          geth = FALSE, sty = "none")
 {
-  if(class(x) == "lp") {
+  if(inherits(x, "lp")) {
     alpha <- attr(x, "alpha")
     deg <- attr(x, "deg")
     sty <- attr(x, "style")
@@ -326,8 +326,22 @@ function(..., nn = 0, h = 0, adpen = 0, deg = 2, acri = "none", scale = FALSE,
   attr(x, "acri") <- acri
   attr(x, "style") <- style
   attr(x, "scale") <- scale
-  class(x) <- "lp"
+  class(x) <- c("lp", class(x))
   x
+}
+
+
+"[.lp" <- function (x, ..., drop = FALSE) {
+    cl <- oldClass(x)
+    oldClass(x) <- NULL
+    ats <- attributes(x)
+    ats$dimnames <- NULL
+    ats$dim <- NULL
+    ats$names <- NULL
+    y <- x[..., drop = drop]
+    attributes(y) <- c(attributes(y), ats)
+    oldClass(y) <- cl
+    y
 }
 
 "fitted.locfit"<-
