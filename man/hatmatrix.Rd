@@ -1,15 +1,16 @@
 \name{hatmatrix}
-\alias{hatmatrix}
 \title{
 Weight diagrams and the hat matrix for a local regression model.
 }
 \usage{
-hatmatrix(formula, dc=TRUE, \dots)
+hatmatrix(formula, \dots)
 }
 \arguments{
-  \item{formula}{model formula.}
-  \item{dc}{derivative adjustment (see \code{\link{locfit.raw}})}
-  \item{...}{Other arguments to \code{\link{locfit}} and
+\item{formula}{
+model formula.
+}
+\item{...}{
+Other arguments to \code{\link{locfit}} and
 \code{\link{locfit.raw}}.
 }}
 \description{
@@ -28,4 +29,6 @@ If \code{ev="data"}, this is the transpose of the hat matrix.
 \code{\link{locfit}}, \code{\link{plot.locfit.1d}}, \code{\link{plot.locfit.2d}},
 \code{\link{plot.locfit.3d}}, \code{\link{lines.locfit}}, \code{\link{predict.locfit}}
 }
-\keyword{smooth}
+\keyword{locfit}
+
+

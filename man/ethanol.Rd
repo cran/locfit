@@ -1,7 +1,7 @@
 \name{ethanol}
-\alias{ethanol}
 \title{Exhaust emissions}
 \usage{data(ethanol)}
+\alias{ethanol}
 \format{
   Data frame with NOx, E and C variables.
 }

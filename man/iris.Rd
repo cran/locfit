@@ -1,7 +1,7 @@
 \name{iris}
-\alias{iris}
 \title{Fisher's Iris Data (subset)}
 \usage{data(iris)}
+\alias{iris}
 \format{
   Data frame with species, petal.wid, petal.len, sepal.wid, sepal.len.
 }

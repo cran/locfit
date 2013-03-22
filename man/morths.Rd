@@ -1,7 +1,7 @@
 \name{morths}
-\alias{morths}
 \title{Henderson and Sheppard Mortality Dataset}
 \usage{data(morths)}
+\alias{morths}
 \format{
   Data frame with age, n and number of deaths.
 }
@@ -13,6 +13,6 @@
 }
 \references{
   Henderson, R. and Sheppard, H. N. (1919). Graduation of mortality and
-  other tables. Actuarial Society of America, New York.
+  other tables. Acturial society of America, New York.
 }
 \keyword{datasets}

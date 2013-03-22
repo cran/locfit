@@ -1,29 +1,33 @@
 \name{residuals.locfit}
 \alias{residuals.locfit}
 \title{
-  Fitted values and residuals for a Locfit object.
+Residuals from a "locfit" object.
 }
 \usage{
-\method{residuals}{locfit}(object, data=NULL, type="deviance", ...)
+residuals(object, data, type, studentize)
 }
 \arguments{
-  \item{object}{\code{locfit} object.}
-  \item{data}{The data frame for the original fit. Usually, shouldn't be
-    needed.}
-  \item{type}{Type of fit or residuals to compute. The default is
-    \code{"fit"} for \code{fitted.locfit}, and \code{"dev"} for
-    \code{\link{residuals.locfit}}.  Other choices include \code{"pear"}
-    for Pearson residuals; \code{"raw"} for raw residuals, \code{"ldot"}
-    for likelihood derivative; \code{"d2"} for the deviance residual
-    squared; \code{lddot} for the likelihood second derivative.
-    Generally, \code{type} should only be used when \code{what="coef"}.}
-  \item{...}{arguments passed to and from other methods.}
+\item{object}{
+Fitted object from \code{\link{locfit}()}.
 }
-\description{\code{residuals.locfit} is implemented as a front-end to
-  \code{\link{fitted.locfit}}, with the \code{type} argument set.
+\item{data}{
+The data frame for the original data. Usually this isn't needed.
+}
+\item{type}{
+Type of residuals for local likelihood. Default \code{"deviance"}.
+Other choices include \code{"response"}; \code{"pearson"};
+\code{"ldot"} (likelihood derivative).
+}
+\item{studentize}{
+Studentize the residuals.
 }
 \value{
-A numeric vector of the residuals.
+A vector of residuals.
 }
-\keyword{smooth}
+\examples{
+data(ethanol)
+fit <- locfit(NOx~E,data=ethanol)
+residuals(fit)
+}
+\keyword{locfit}
 % Converted by Sd2Rd version 0.2-a5.
