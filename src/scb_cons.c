@@ -91,7 +91,7 @@ int m, d, dd;
     for (j=i; j<d; j++)
     { ll = &lij[(i*dd+j)*m];
       rproject(ll,A,fd,m,d+1);
-      if (i!=j) memcpy(&lij[(j*dd+i)*m],ll,m*sizeof(double));
+      if (i!=j) memmove(&lij[(j*dd+i)*m],ll,m*sizeof(double));
     }
 
 /* compute lij[j][i] = e_i^T (A^T A)^{-1} B_j^T */
@@ -192,7 +192,7 @@ int d;
   r = 1 + ((d>=2) & (kap_terms >= 3));
   m = globm = wdf(x,ft,r);
 
-  memcpy(fd,ft,m*(d+1)*sizeof(double));
+  memmove(fd,ft,m*(d+1)*sizeof(double));
   if (use_covar) chol_dec(fd,m,d+1);
             else qr(fd,m,d+1,NULL);
 
@@ -206,7 +206,7 @@ int d;
 
   lij = &ft[(d+1)*m];
   nij = &fd[(d+1)*m];
-  memcpy(nij,lij,m*d*d*sizeof(double));
+  memmove(nij,lij,m*d*d*sizeof(double));
   z = (use_covar) ?  k2c(nij,ft,m,d,d) : k2x(nij,ft,m,d,d);
   kap[2] = z*det;
   if ((kap_terms == 3) | (d==2)) return(3);
@@ -241,7 +241,7 @@ void d1x(li,ni,m,d,M)
 double *li, *ni, *M;
 int m, d;
 { int i, j, k;
-  memcpy(fd,ft,m*sizeof(double));
+  memmove(fd,ft,m*sizeof(double));
   setzero(ni,m*d);
   for (j=0; j<d; j++)
     for (k=0; k<d; k++)
@@ -269,9 +269,9 @@ int d;
   ll = &fd[d*d*m];
   u = &ll[d*m];
   if (use_covar)
-    memcpy(u,&ni[(d-1)*m],d*sizeof(double)); /* cov(ld, (l,l1,...ld-1)) */
+    memmove(u,&ni[(d-1)*m],d*sizeof(double)); /* cov(ld, (l,l1,...ld-1)) */
   else
-    memcpy(ll,fd,(d+1)*m*sizeof(double));
+    memmove(ll,fd,(d+1)*m*sizeof(double));
 
   if (use_covar) chol_dec(fd,m,d+1);
             else qr(fd,m,d+1,NULL);
@@ -335,11 +335,11 @@ int d;
   u1 = &ll[d*m];
   u2 = &ll[(d-1)*m];
   if (use_covar)
-  { memcpy(u1,&ni[(d-1)*m],d*sizeof(double));
-    memcpy(u2,&ni[(d-2)*m],d*sizeof(double));
+  { memmove(u1,&ni[(d-1)*m],d*sizeof(double));
+    memmove(u2,&ni[(d-2)*m],d*sizeof(double));
   }
   else
-    memcpy(ll,fd,(d+1)*m*sizeof(double));
+    memmove(ll,fd,(d+1)*m*sizeof(double));
 
   if (use_covar) chol_dec(fd,m,d+1);
             else qr(fd,m,d+1,NULL);

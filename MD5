@@ -1,4 +1,4 @@
-d70a193086e74d0fd3f1b71241c9a4a7 *DESCRIPTION
+069c74bb920c5b8852ffbab8298838df *DESCRIPTION
 145615a3c01c2f5e7c87c7e4affd4b90 *NAMESPACE
 cfb753adc26c57e1a349ba5a0ce83938 *NEWS
 c69fccb19975aaf5f91b8a35f5761819 *R/firstlib.r
@@ -134,7 +134,7 @@ a9a88509b23612f29caa34e886e4a150 *man/spence.21.Rd
 150eef77617e93a5ace416cf45e95c3b *man/summary.preplot.locfit.Rd
 ab11750329cf323f3959ab63d66dbce8 *man/trimod.Rd
 d25c8818c2acab0ef7881aa3f4ffefa2 *man/xbar.Rd
-780312d9e9e63ec78e8b5b0664949d1b *src/S_enter.c
+33bf71c7b8eff94ff08a43ccfde408ab *src/S_enter.c
 73f9e3dedc5868a3f900dfddd9073ed8 *src/band.c
 b778507185712ab4a3b04fb39a349b0f *src/cversion.h
 b3844fe5fba4aeba1797c514d140d24e *src/dbinom.c
@@ -158,7 +158,7 @@ af75dc440edd6a4f7479a4a62f642b45 *src/imatlb.h
 1ad3b2172b8727808b74a4fcd6986104 *src/lf_fitfun.c
 f71a319a64bb55e4a8c7d410b59b2dda *src/lf_nbhd.c
 aaa9900a031393f306de193bdebbb808 *src/lf_robust.c
-8f903be97a95ccad1a746597a2abd276 *src/lf_vari.c
+a5a176a66ab14efe34e6754d05bec8c1 *src/lf_vari.c
 e64b7546bb49ff263a535317a0b23177 *src/lf_wdiag.c
 fdf9f44ed36e6c1cd5f8993795182c87 *src/lfcons.h
 abe1a5d3bc096d237c4b26f9ab919322 *src/lffuns.h
@@ -174,20 +174,20 @@ fb224cc62f8e81140483c6a766485874 *src/m_imont.c
 992fab5af13b00d6fc4e9ae7c01874fb *src/m_isimp.c
 f4f6531382adcd1f84b790272a6d130d *src/m_isphr.c
 16126fac15165b4766a691f97ef14b19 *src/m_jacob.c
-1638581225e2f47e69d9c1fa516ce8db *src/m_max.c
+6cc7652b303cc32f0e892887c98d01c7 *src/m_max.c
 0284b151da66048e2b0181b9018c0446 *src/m_qr.c
 04a259905cc46b5a71133186099a60a7 *src/m_solve.c
 74c27b58eabe2ad302a3224a7996e52c *src/m_svd.c
 6d009b715fb0e669f93149a7a20bfb4e *src/m_vector.c
 c530dcb243b57b756cd18aadd69ea754 *src/math.c
-922fb86ac3bfe836d48f3974b6d10d83 *src/minmax.c
+2f9ff8bd302dd0f493273954529bc132 *src/minmax.c
 961fad8f1dfc4d8b122e7d31158ea828 *src/mutil.h
 163e8f5dfc6707f36a7845d7964e235d *src/pcomp.c
 383057377e058172640f14a7f7deb376 *src/preplot.c
 bc7c6a83e8486b45618f2ed5ff9a22eb *src/prob.c
 d92e11bdc1e3e9fa4b7bffaa14fab4a1 *src/procv.c
 1597b9eeb3d1479fcdf3388c5558f3a9 *src/scb.c
-af030be6583742afb12052b8d445d663 *src/scb_cons.c
+0275cae19b6eca069c2039382ae479d9 *src/scb_cons.c
 87a69e56337b2f44095b10bb1a8581d1 *src/scb_crit.c
 4b6faaf5efa9d5f0f50d10c441a5c4a8 *src/scb_iface.c
 c7aad1e9d87354097e6b7d54c744ad60 *src/simul.c

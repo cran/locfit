@@ -165,7 +165,7 @@ jacobian *J;
   fr = mmsums(coef,&f,f1,J);
 
   for (j=0; j<maxit; j++)
-  { memcpy(old_coef,coef,p*sizeof(double));
+  { memmove(old_coef,coef,p*sizeof(double));
     old_f = f;
 
     /* compute delta = Newton-Raphson increment */
@@ -182,7 +182,7 @@ if (j==0) printf("init singular\n");
     else
     { 
       jacob_solve(J,f1);
-      memcpy(delta,f1,p*sizeof(double));
+      memmove(delta,f1,p*sizeof(double));
 /* printf("delta %8.5f %8.5f\n",f1[0],f1[1]); */
       lambda = 1.0;
       do

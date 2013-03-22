@@ -65,7 +65,7 @@ double *M12, *M2;
     }
   }
 
-  memcpy(M12,M2,p*p*sizeof(double));
+  memmove(M12,M2,p*p*sizeof(double));
   for (i=0; i<p; i++)
     jacob_solve(&des->xtwx,&M12[i*p]);
 }

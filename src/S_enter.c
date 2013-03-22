@@ -114,13 +114,13 @@ static void basis(double *x, double *t, double *f, int dim, int p)
     SETCAR(pcall, (SEXP) bsfunc);
     pcall = CDR(pcall);
     SETCAR(pcall, allocVector(REALSXP, dim));
-    memcpy(REAL(CAR(pcall)), x, dim * sizeof(double));
+    memmove(REAL(CAR(pcall)), x, dim * sizeof(double));
     pcall = CDR(pcall);
     SETCAR(pcall, allocVector(REALSXP, dim));
-    memcpy(REAL(CAR(pcall)), t, dim * sizeof(double));
+    memmove(REAL(CAR(pcall)), t, dim * sizeof(double));
 
     PROTECT(s = eval(call, R_GlobalEnv));
-    memcpy(f, REAL(s), p * sizeof(double));
+    memmove(f, REAL(s), p * sizeof(double));
     UNPROTECT(2);
 }
 #endif
@@ -138,17 +138,17 @@ vbasis(double **x, double *t, int n, int d, int *ind, int m, int p, double *X)
     SETCAR(pcall, ScalarInteger(d));
     pcall = CDR(pcall);
     SETCAR(pcall, allocVector(INTSXP, m));
-    memcpy(INTEGER(CAR(pcall)), ind, m * sizeof(int));
+    memmove(INTEGER(CAR(pcall)), ind, m * sizeof(int));
     pcall = CDR(pcall);
     SETCAR(pcall, allocVector(REALSXP, d));
-    memcpy(REAL(CAR(pcall)), t, d * sizeof(double));
+    memmove(REAL(CAR(pcall)), t, d * sizeof(double));
     for (int i = 0 ; i < d ; i++) {
 	pcall = CDR(pcall);
 	SETCAR(pcall, allocVector(REALSXP, n));
-	memcpy(REAL(CAR(pcall)), x[i], n * sizeof(double));
+	memmove(REAL(CAR(pcall)), x[i], n * sizeof(double));
     }
     PROTECT(s = eval(call, R_GlobalEnv));
-    memcpy(X, REAL(s), m * p * sizeof(double));
+    memmove(X, REAL(s), m * p * sizeof(double));
     UNPROTECT(2);
 }
 #endif
@@ -168,8 +168,8 @@ double cut, *flim;
   if (flim != NULL)
   { ll = flim;
     ur = &flim[d];
-    memcpy(evs->fl,ll,d*sizeof(double));
-    memcpy(&evs->fl[d],ur,d*sizeof(double));
+    memmove(evs->fl,ll,d*sizeof(double));
+    memmove(&evs->fl[d],ur,d*sizeof(double));
   }
 
   switch(ev(evs))
@@ -289,7 +289,7 @@ CALL_S_FUNC *bs;
   for (i=0; i<lf.dv.nd; i++) lf.dv.deriv[i] = dv[i]-1;
   if (lf_error) return;
 
-  memcpy(lf.lfd.xl ,lim,2*d*sizeof(double));
+  memmove(lf.lfd.xl ,lim,2*d*sizeof(double));
 
  if (mi[MGETH] >= 70)
     scb(&des,&lf);
@@ -335,8 +335,8 @@ CALL_S_FUNC *bs;
   dp[DT1] = df1(&lf.fp);
   dp[DRV] = rv(&lf.fp);
   dp[DRSC]= rsc(&lf.fp);
-  memcpy(sca,lf.lfd.sca,d*sizeof(double));
-  memcpy(&lim[2*d],lf.evs.fl,2*d*sizeof(double));
+  memmove(sca,lf.lfd.sca,d*sizeof(double));
+  memmove(&lim[2*d],lf.evs.fl,2*d*sizeof(double));
   for(i=0; i<lw[5]; i++) kap[i] = lf.fp.kap[i];
 }
 
@@ -483,7 +483,7 @@ Sint *ce, *lo, *hi, *nvc, *mi, *nt, *term;
   lf.fp.d = d;
   lf.fp.nv = lf.fp.nvm = nvc[3];
 
-  memcpy(lf.lfd.sca,sca,d*sizeof(double));
+  memmove(lf.lfd.sca,sca,d*sizeof(double));
   setevs(&lf.evs,mi,dp[DCUT],&mg,NULL);
 
   lf.evs.ce = ce;

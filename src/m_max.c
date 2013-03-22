@@ -180,10 +180,10 @@ jacobian *J;
   fr = F(coef, &f, f1, J->Z); J->st = JAC_RAW;
 
   for (i=0; i<maxit; i++)
-  { memcpy(old_coef,coef,p*sizeof(double));
+  { memmove(old_coef,coef,p*sizeof(double));
     old_f = f;
     rank = jacob_solve(J,f1);
-    memcpy(delta,f1,p*sizeof(double));
+    memmove(delta,f1,p*sizeof(double));
 
 
     if (rank==0) /* NR won't move! */
