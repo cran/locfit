@@ -1,3 +1,12 @@
+1.5-9:
+
+o Support for user-supplied basis function has been withdrawn until further notice.
+
+o Changed akima from Import to Suggest.  The interp() function from akima is used 
+  conditionally in preplot.locfit().  Anyone who needs it will have to install
+  akima, whose license is more restrictive than locfit's.  If it's needed but 
+  not available, an error message is given with a note regarding the license.
+  
 1.5-8:
 
 o Added a subset method for the "lp" class to resolve the problem that in a locfit()

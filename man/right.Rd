@@ -33,13 +33,13 @@ right(x,...)
 data(penny)
 xev <- (1945:1988)+0.5
 fitl <- locfit(thickness~left(year,h=10,deg=1), ev=xev, data=penny)
-fitr <- locfit(thickness~right(year,h=10,deg=1),ev=xev, data=penny)
+fitr <- locfit(thickness~right(year, h=10, deg=1), ev=xev, data=penny)
 # plot the squared difference, to show the change points.
-plot( xev, (predict(fitr,where="ev") - predict(fitl,where="ev"))^2 )
+plot( xev, (predict(fitr, where="ev") - predict(fitl, where="ev"))^2 )
 }
 
 \seealso{
-  \code{\link{lfbas}},
+  %\code{\link{lfbas}},
   \code{\link{locfit}},
   \code{\link{left}}
 }

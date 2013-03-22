@@ -95,8 +95,8 @@ adaptive smoothing.
   simplified product model which speeds up computations.
 }
 \item{acri}{Deprecated - see \code{\link{lp}().}}
-\item{basis}{User-specified basis functions. See
-  \code{\link{lfbas}} for more details on this argument.}
+\item{basis}{User-specified basis functions.} 
+%See \code{\link{lfbas}} for more details on this argument.}
 
 \item{deriv}{
   Derivative estimation. If \code{deriv=1}, the returned fit will be

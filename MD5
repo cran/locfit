@@ -1,8 +1,8 @@
-9d13ea2f8a95db3e46b35ac87ef92ebe *DESCRIPTION
-0a4ac92c6931b3e1d2acfda2cac453fc *NAMESPACE
-bfcab61df2da7aa8074382531f48e2bb *NEWS
+d70a193086e74d0fd3f1b71241c9a4a7 *DESCRIPTION
+145615a3c01c2f5e7c87c7e4affd4b90 *NAMESPACE
+cfb753adc26c57e1a349ba5a0ce83938 *NEWS
 c69fccb19975aaf5f91b8a35f5761819 *R/firstlib.r
-f4f5991f41da751919bdd3a4a7e95d66 *R/locfit.r
+e93a46c91fb4df078d38d053b8c8a475 *R/locfit.r
 b401b88bd87bf18f03dd1bfe4cb0f544 *data/ais.rda
 0e01701b1a2baf4035fa5ee2a40a5115 *data/bad.rda
 4d5540425583246fcdb9c7713dc98147 *data/border.rda
@@ -70,7 +70,6 @@ e341e4ffc43f9d6986514df4358a20f4 *man/heart.Rd
 8e66b4d57784d66d0b293d2b7489bc59 *man/lcvplot.Rd
 1db2cefb09fc34162068501bb9d8d2e5 *man/left.Rd
 2b3c473671208ab27611f3b328bb57c4 *man/lf.Rd
-3710ec36f1129f6c2f3e250e377a6d64 *man/lfbas.Rd
 9aff1782414e5ea27e3c8699c67428a5 *man/lfeval.Rd
 b59099e635e0fc955669fb6cf9be0ea2 *man/lfgrid.Rd
 b78f066f54d8fc870e224d9a93744d24 *man/lfknots.Rd
@@ -82,7 +81,7 @@ b78f066f54d8fc870e224d9a93744d24 *man/lfknots.Rd
 cc8fbf6c052275d8b3604cc70c509f9e *man/locfit.censor.Rd
 0014077c83b12dead053f70cbf50767a *man/locfit.matrix.Rd
 527f5f81644050bc642ce11fb5a014fd *man/locfit.quasi.Rd
-380ae1a6b332dfa9873568611c96c46d *man/locfit.raw.Rd
+3e00ad1fcfc78158952f9d3aa6b400fe *man/locfit.raw.Rd
 73581436fec2d93a666c6c3b43be3b41 *man/locfit.robust.Rd
 3fd27a82384556dfec015f21f50d39b4 *man/lp.Rd
 9342bb1e57ee297e72f5934a090893aa *man/lscv.Rd
@@ -119,7 +118,7 @@ ff83c07fc2fad449383b36a2d018e80c *man/print.summary.locfit.Rd
 26ff201ba1102321ad24b910a03ae9e0 *man/rbox.Rd
 0f1bd575d1ead0dd28b709dc1c0ffb10 *man/regband.Rd
 d7ee4b04d7ae1359101c97b64b6f5f9e *man/residuals.locfit.Rd
-262b2243f0f8f7a796893ea0bf07df2c *man/right.Rd
+8515f17ca547b649044a4ef0db4689e0 *man/right.Rd
 6a37aa14781c85085a3e05177e5ab781 *man/rv.Rd
 cc087351c25a5208294428bf4cbab83a *man/rva.Rd
 e003b0d803716f5b3cbce55f283f22d8 *man/scb.Rd

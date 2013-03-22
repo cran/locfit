@@ -9,7 +9,7 @@ importFrom(lattice, contourplot, levelplot, llines, panel.xyplot,
 ## density.lf and plot.eval are not methods.
 export(aic, aicplot, ang, cp, cpar, cpplot, crit, "crit<-", dat,
        density.lf, expit, gam.lf, gam.slist, gcv, gcvplot, hatmatrix,
-       kappa0, kdeb, km.mrl, lcv, lcvplot, left, lf, lfbas, lfeval,
+       kappa0, kdeb, km.mrl, lcv, lcvplot, left, lf, lfeval,
        lfgrid, lfknots, lflim, lfmarg, locfit, locfit.censor,
        locfit.matrix, locfit.quasi, locfit.raw, locfit.robust, lp,
        lscv, lscv.exact, lscvplot, none, panel.locfit,

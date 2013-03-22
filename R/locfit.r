@@ -14,7 +14,7 @@ function(formula, data = sys.frame(sys.parent()), weights = 1, cens = 0, base = 
   if (nrow(frm) < 1) stop("fewer than one row in the data")
   vnames <- as.character(attributes(Terms)$variables)[-1]
   if(attr(Terms, "response")) {
-    y <- model.extract(frm, response)
+    y <- model.extract(frm, "response")
     yname <- deparse(formula[[2]])
     vnames <- vnames[-1]
   }
@@ -84,7 +84,7 @@ function(x, y, weights = 1, cens = 0, base = 0, scale = FALSE, alpha = 0.7,
     yname <- family
   }
   if(!missing(basis)) {
-    assign("basis", basis, 1)
+    ## assign("basis", basis, 1)
     deg0 <- deg <- length(basis(matrix(0, nrow = 1, ncol = d), rep(0, d)))
   }
   if(length(deg) == 1)
@@ -623,6 +623,8 @@ function(object, newdata = NULL, where, tr = NULL, what = "coef", band = "none",
     x <- object$eva$xev[2 * (1:nv) - 1]
     y <- object$eva$xev[2 * (1:nv)]
     z <- preplot.locfit.raw(object, 0, "fitp", what, band)$y
+	haveAkima <- require(akima)
+	if (! haveAkima) stop("The akima package is needed for the interp() function.  Please note its no-compercial-use license.")
     fhat <- akima::interp(x, y, z, newdata[[1]], newdata[[2]], ncp = 2)$z
   }
   else {
@@ -847,7 +849,7 @@ function(x, main = "", pv, tv, type = "level", pred.lab = x$vnames, resp.lab =
       y ~ pv1 | tv1 * tv2,
       y ~ pv1 | tv1 * tv2 * tv3)
     pl <- xyplot(formula, xlab = pred.lab[pv], ylab = resp.lab, main = main,
-      type = "l", cllo, cup = cup, wh = wh, panel = panel.xyplot.lf, data
+      type = "l", cup = cup, wh = wh, panel = panel.xyplot.lf, data
        = newdat, strip = loc.strip, ...)
   }
   if(length(pv) == 2) {
@@ -1262,14 +1264,14 @@ function(fit, data)
     frm <- eval(m, fit$frame)
     vnames <- as.character(attributes(Terms)$variables)[-1]
     if(attr(Terms, "response")) {
-      y <- model.extract(frm, response)
+      y <- model.extract(frm, "response")
       vnames <- vnames[-1]
     }
     x <- as.matrix(frm[, vnames])
     if(any(names(m) == "weights"))
       w <- model.extract(frm, weights)
     if(any(names(m) == "cens"))
-      ce <- model.extract(frm, cens)
+      ce <- model.extract(frm, "cens")
     if(any(names(m) == "base"))
       base <- model.extract(frm, base)
   }
@@ -1809,9 +1811,9 @@ function(x, fit, lower, upper, add = FALSE, style = "band", ...)
                         ylab=deparse(substitute(y)),
                         legend=FALSE, pch="", ...) {
         xl <- range(x)
-        if(legend) {
+        if (legend) {
             mar <- par()$mar
-            if(mar[4] < 6.1)
+            if (mar[4] < 6.1)
                 par(mar = c(mar[1:3], 6.1))
             on.exit(par(mar = mar))
             dlt <- diff(xl)
@@ -1821,9 +1823,11 @@ function(x, fit, lower, upper, add = FALSE, style = "band", ...)
              ylab = ylab, ...)
         nx <- length(x)
         ny <- length(y)
-        ## if(missing(v))
-        ##  v <- seq(min(z) - 0.0001, max(z), length.out = nint + 1)
-        ## else nint <- length(v) - 1
+        if (missing(v)) {
+          v <- seq(min(z) - 0.0001, max(z), length.out = nint + 1)
+	    } else {
+			nint <- length(v) - 1
+		}
         ix <- rep(1:nx, ny)
         iy <- rep(1:ny, rep(nx, ny))
         r1 <- range(z[, 1])
@@ -1839,7 +1843,7 @@ function(x, fit, lower, upper, add = FALSE, style = "band", ...)
         y <- c(2 * y[1] - y[2], y, 2 * y[ny] - y[ny - 1])
         x <- (x[1:(nx + 1)] + x[2:(nx + 2)])/2
         y <- (y[1:(ny + 1)] + y[2:(ny + 2)])/2
-        for(i in unique(col)) {
+        for (i in unique(col)) {
             u <- col == i
             if(pch == "") {
                 xx <- rbind(x[ix[u]], x[ix[u] + 1], x[ix[u] + 1], x[ix[u]], NA)
