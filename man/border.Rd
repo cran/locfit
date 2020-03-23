@@ -1,10 +1,10 @@
 \name{border}
+\alias{border}
 \title{Cricket Batting Dataset}
 \usage{data(border)}
-\alias{border}
 \format{
   A dataframe with day (decimalized); not out indicator and score.
-  The not out indicator should be used as a censoring data.
+  The not out indicator should be used as a censoring variable.
 }
 \description{
   Scores in 265 innings for Australian batsman Allan Border.
@@ -13,6 +13,6 @@
   Compiled from the Cricinfo archives.
 }
 \references{CricInfo: The Home of Cricket on the Internet.
-  \url{http://www.cricket.org}
+  \url{http://www.cricinfo.com/}
 }
 \keyword{datasets}

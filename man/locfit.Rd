@@ -4,12 +4,22 @@
 Local Regression, Likelihood and Density Estimation.
 }
 \usage{
-locfit(formula, data, weights, cens, base, subset, geth, \dots, lfproc)
+locfit(formula, data=sys.frame(sys.parent()), weights=1, cens=0, base=0,
+       subset, geth=FALSE, \dots, lfproc=locfit.raw)
+}
+\description{
+  \code{locfit} is the model formula-based interface to the Locfit
+  library for fitting local regression and likelihood models.
+
+  \code{locfit} is implemented as a front-end to \code{\link{locfit.raw}}.
+  See that function for options to control smoothing parameters,
+  fitting family and other aspects of the fit.
 }
 \arguments{
 \item{formula}{
-Model Formula; e.g. \code{y~x} for a regression model; \code{~x} for a
-density estimation model
+Model Formula; e.g. \code{y~lp(x)} for a regression model; \code{~lp(x)} for a
+density estimation model. Use of \code{lp()} on the RHS is recommended, especially
+when non-default smoothing parameters are used.
 }
 \item{data}{
 Data Frame.
@@ -44,17 +54,27 @@ A processing function to compute the local fit. Default is
 \value{
 An object with class \code{"locfit"}. A standard set of methods for printing,
 ploting, etc. these objects is provided.
-\code{locfit()} is a model-formula based front end to \code{\link{locfit.raw}()}.
 }
 \seealso{
 \code{\link{locfit.raw}}
 }
 \examples{
-data(ethanol)
-locfit(NOx~E,data=ethanol)
+# fit and plot a univariate local regression
+data(ethanol, package="locfit")
+fit <- locfit(NOx ~ E, data=ethanol)
+plot(fit, get.data=TRUE)
+
+# a bivariate local regression with smaller smoothing parameter
+fit <- locfit(NOx~lp(E,C,nn=0.5,scale=0), data=ethanol)
+plot(fit)
+
+# density estimation
+data(geyser, package="locfit")
+fit <- locfit( ~ lp(geyser, nn=0.1, h=0.8))
+plot(fit,get.data=TRUE)
 }
 \references{
-Consult the Web page \url{http://cm.bell-labs.com/stat/project/locfit/}.
+Loader, C. (1999). Local Regression and Likelihood. Springer, New York.
 }
-\keyword{locfit}
+\keyword{smooth}
 % Converted by Sd2Rd version 0.2-a5.

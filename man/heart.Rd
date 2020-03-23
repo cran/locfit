@@ -1,7 +1,7 @@
 \name{heart}
+\alias{heart}
 \title{Survival Times of Heart Transplant Recipients}
 \usage{data(heart)}
-\alias{heart}
 \format{
   Data frame with surv, cens and age variables.
 }
@@ -16,7 +16,7 @@
   of the data.
 }
 \references{
-  Miller, R. G. and Halperin, J. (1992). Regression with censored data.
+  Miller, R. G. and Halperin, J. (1982). Regression with censored data.
   Biometrika 69, 521-531.
 }
 \keyword{datasets}

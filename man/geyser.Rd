@@ -1,7 +1,7 @@
 \name{geyser}
+\alias{geyser}
 \title{Old Faithful Geyser Dataset}
 \usage{data(geyser)}
-\alias{geyser}
 \format{
   A numeric vector of length 107.
 }
@@ -10,7 +10,7 @@
 }
 \source{
   Scott (1992). Note that several different Old Faithful Geyser datasets
-  (including the faithful dataset in R's base library!) have been used
+  (including the faithful dataset in R's base library) have been used
   in various places in the statistics literature. The version provided
   here has been used in density estimation and bandwidth selection work.
 }
