@@ -26,6 +26,7 @@ lf(..., alpha=0.7, deg=2, scale=1, kern="tcub", ev=rbox(), maxk=100)
     \code{\link{locfit.raw}}.}
 }
 \examples{
+\dontrun{  
 # fit an additive semiparametric model to the ethanol data.
 stopifnot(require(gam))
 # The `gam' package must be attached _before_ `locfit', otherwise
@@ -35,6 +36,7 @@ fit <- gam(NOx ~ lf(E) + C, data=ethanol)
 op <- par(mfrow=c(2, 1))
 plot(fit)
 par(op)
+}
 }
 \seealso{
   \code{\link{locfit}},

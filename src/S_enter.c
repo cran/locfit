@@ -236,11 +236,11 @@ Sint *mi;
 }
 
 static void slocfit(x,y,c,w,b,lim,mi,dp,str,sca,xev,wdes,wtre,wpc,nvc,
-  iwk1, iwk2,lw,mg,L,kap,dv,nd,sty,bs)
+  iwk1, iwk2,lw,mg,L,kap,dv,nd,sty) /* ,bs) */
 double *x, *y, *c, *w, *b, *lim, *dp, *sca, *xev, *L, *kap, *wdes, *wtre, *wpc;
 Sint *mi, *nvc, *iwk1, *iwk2, *lw, *mg, *dv, *nd, *sty;
 char **str;
-CALL_S_FUNC *bs;
+/* CALL_S_FUNC *bs; */
 { Sint n, d, i;
 
   mi[MKER] = lfkernel(str[0]);
@@ -250,10 +250,10 @@ CALL_S_FUNC *bs;
   mi[MACRI]= lfacri(str[4]);
   mi[MKT]  = lfketype(str[5]);
 
-  if (mi[MUBAS])
+/*  if (mi[MUBAS])
   { bsfunc = bs[0];
     bsf2 = bs[1];
-  }
+  } */
   lf_error = 0;
   n = mi[MN]; d = mi[MDIM];
 
@@ -604,7 +604,7 @@ void slscv(double *x, int *n, double *h, double *z);
 
 static const R_CMethodDef CEntries[]  = {
     {"guessnv", (DL_FUNC) &guessnv, 6},
-    {"slocfit", (DL_FUNC) &slocfit, 25},
+    {"slocfit", (DL_FUNC) &slocfit, 24},
     {"sfitted", (DL_FUNC) &sfitted, 23},
     {"spreplot", (DL_FUNC) &spreplot, 20},
     {"triterm", (DL_FUNC) &triterm, 12},

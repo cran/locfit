@@ -5,7 +5,12 @@ importFrom(stats, fitted, formula, preplot, residuals)
 #import(lattice)
 importFrom(lattice, contourplot, levelplot, llines, panel.xyplot,
            strip.default, wireframe, xyplot)
-
+importFrom("graphics", "abline", "axis", "contour", "image", "legend",
+           "lines", "par", "persp", "polygon", "rug", "segments",
+           "text", "title")
+importFrom("stats", "as.formula", "delete.response", "dnorm", "median",
+           "model.extract", "model.frame", "pnorm", "predict", "terms",
+           "var", "weights")
 ## density.lf and plot.eval are not methods.
 export(aic, aicplot, ang, cp, cpar, cpplot, crit, "crit<-", dat,
        density.lf, expit, gam.lf, gam.slist, gcv, gcvplot, hatmatrix,

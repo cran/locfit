@@ -178,4 +178,7 @@ adaptive smoothing.
 \value{
 An object with class "locfit". A standard set of methods for printing, ploting, etc. these objects is provided.
 }
+\references{
+Loader, C., (1999) Local Regression and Likelihood.
+}
 \keyword{smooth}

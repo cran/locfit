@@ -19,6 +19,6 @@
 \references{
   Haupt, G. and Mansmann, U. (1995)
   CART for Survival Data.
-  Statlib Archive, \url{http://lib.stat.cmu.edu/S/survcart}.
+  Statlib Archive, \url{http://ftp.uni-bayreuth.de/math/statlib/S/survcart}.
 }
 \keyword{datasets}

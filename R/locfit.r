@@ -156,7 +156,8 @@ function(x, y, weights = 1, cens = 0, base = 0, scale = FALSE, alpha = 0.7,
     deriv = as.integer(deriv),
     nd = as.integer(length(deriv)),
     sty = as.integer(style),
-    basis = list(basis, lfbas), PACKAGE="locfit")
+    # basis = list(basis, lfbas), 
+    PACKAGE="locfit")
   nvc <- z$nvc
   names(nvc) <- c("nvm", "ncm", "vc", "nv", "nc")
   nvm <- nvc["nvm"]
@@ -276,15 +277,15 @@ function(..., alpha = 0.7, deg = 2, scale = 1, kern = "tcub", ev = rbox(), maxk
   x
 }
 
-"lfbas" <-
-function(dim, indices, tt, ...)
-{
-  indices <- indices + 1
-  # C starts at 0, S at 1
-  x <- cbind(...)[indices,  ]
-  res <- basis(x, tt)
-  as.numeric(t(res))
-}
+#"lfbas" <-
+#function(dim, indices, tt, ...)
+#{
+#  indices <- indices + 1
+#  # C starts at 0, S at 1
+#  x <- cbind(...)[indices,  ]
+#  res <- basis(x, tt)
+#  as.numeric(t(res))
+#}
 
 "left"<-
 function(x, ...)
@@ -623,9 +624,9 @@ function(object, newdata = NULL, where, tr = NULL, what = "coef", band = "none",
     x <- object$eva$xev[2 * (1:nv) - 1]
     y <- object$eva$xev[2 * (1:nv)]
     z <- preplot.locfit.raw(object, 0, "fitp", what, band)$y
-	haveAkima <- require(akima)
-	if (! haveAkima) stop("The akima package is needed for the interp() function.  Please note its no-compercial-use license.")
-    fhat <- akima::interp(x, y, z, newdata[[1]], newdata[[2]], ncp = 2)$z
+	# haveAkima <- require(akima)
+	#if (! haveAkima) stop("The akima package is needed for the interp() function.  Please note its no-compercial-use license.")
+    fhat <- interp::interp(x, y, z, newdata[[1]], newdata[[2]], ncp = 2)$z
   }
   else {
     z <- preplot.locfit.raw(object, newdata, where, what, band)
@@ -915,10 +916,11 @@ object$trans(object$fit)
 
 ## Deepayan Sarkar's patched version:
 "panel.locfit"<-
-    function(x, y, subscripts, z,
-             xyz.labs, xyz.axes, xyz.mid, xyz.minmax, xyz.range,
-             col.regions, at, drape, contour, region, groups,
-             ...)
+    function(x, y, subscripts, z, rot.mat, distance, shade, 
+             light.source, xlim, ylim, zlim, xlim.scaled, ylim.scaled, zlim.scaled, region, 
+             col, lty, lwd, alpha, col.groups, polynum, drape, at,
+             xlab, ylab, zlab, xlab.default, ylab.default, zlab.default, aspect, panel.aspect,
+             scales.3d, contour, labels, ...)
 {
     if(!missing(z)) {
         zs <- z[subscripts]
@@ -926,25 +928,31 @@ object$trans(object$fit)
         marg <- lfmarg(fit, m = 10)
         zp <- predict(fit, marg)
         if(!missing(contour)) {
-            print("contour")
-            print(range(zp))
-            lattice::render.contour.trellis(marg[[1]], marg[[2]], zp, at = at)
+            #print("contour")
+            #print(range(zp))
+            #lattice::render.contour.trellis(marg[[1]], marg[[2]], zp, at = at)
+          lattice::panel.contourplot(marg[[1]], marg[[2]], zp, 1:length(zp), at=at)
         }
         else {
-            loc.dat <-
-                cbind(as.matrix(expand.grid(x = marg[[1]],
-                                            y = marg[[1]])),
-                      z = zp)
-            lattice::render.3d.trellis(cbind(x = x, y = y, z = z[subscripts]),
-                              type = "cloud",
-                              xyz.labs = xyz.labs,
-                              xyz.axes = xyz.axes,
-                              xyz.mid = xyz.mid,
-                              xyz.minmax = xyz.minmax,
-                              xyz.range = xyz.range,
-                              col.regions = col.regions,
-                              at = at,
-                              drape = drape)
+            # loc.dat <-
+            #     cbind(as.matrix(expand.grid(x = marg[[1]],
+            #                                 y = marg[[1]])),
+            #           z = zp)
+            # lattice::render.3d.trellis(cbind(x = x, y = y, z = z[subscripts]),
+            #                   type = "cloud",
+            #                   xyz.labs = xyz.labs,
+            #                   xyz.axes = xyz.axes,
+            #                   xyz.mid = xyz.mid,
+            #                   xyz.minmax = xyz.minmax,
+            #                   xyz.range = xyz.range,
+            #                   col.regions = col.regions,
+            #                   at = at,
+            #                   drape = drape)
+            lattice::panel.wireframe(marg[[1]], marg[[2]], zp, 
+                                  rot.mat, distance, shade, 
+                                  light.source, xlim, ylim, zlim, 
+                                  xlim.scaled, ylim.scaled, zlim.scaled,
+                                  col, lty, lwd, alpha, col.groups, polynum, drape, at)
         }
     }
     else {
@@ -2005,7 +2013,7 @@ function(y)
 "store"<-
 function(data = FALSE, grand = FALSE)
 {
-  lfmod <- c("ang", "gam.lf", "gam.slist", "lf", "lfbas", "left", "right",
+  lfmod <- c("ang", "gam.lf", "gam.slist", "lf", "left", "right", #"lfbas",
     "cpar", "lp")
   lfmeth <- c("fitted.locfit", "formula.locfit", "predict.locfit",
     "lines.locfit", "points.locfit", "print.locfit", "residuals.locfit",
@@ -2031,7 +2039,7 @@ function(data = FALSE, grand = FALSE)
     "mcyc", "morths", "border", "heart", "trimod", "insect", "iris", "spencer",
     "stamp")
   lfgrand <- c("locfit.raw", "crit", "predict.locfit", "preplot.locfit",
-    "preplot.locfit.raw", "lfbas", "expit", "rv", "rv<-", "knots")
+    "preplot.locfit.raw", "expit", "rv", "rv<-", "knots") #"lfbas"
   dump(lffuns, "S/locfit.s")
   if(data)
     dump(lfdata, "S/locfit.dat")

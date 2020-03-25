@@ -1,3 +1,8 @@
+/*
+ *   Copyright (c) 1998-2001 Catherine Loader, Jiayang Sun
+ *   See README file for details.
+ *
+ */
 #include "local.h"
 static double scb_crit, *x, c[10], kap[5], kaq[5], max_p2;
 /* static int side, type; */
