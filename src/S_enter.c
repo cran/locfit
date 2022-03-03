@@ -3,11 +3,13 @@
  *   See README file for details.
  */
 
+/* All included by local.h
 #include "S.h"
 #undef WARN
 #undef ERROR
 
 #include <Rinternals.h>
+*/
 
 #include "local.h"
 extern int deitype(char *);  /* in lfstr.c */

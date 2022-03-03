@@ -156,7 +156,7 @@ function(x, y, weights = 1, cens = 0, base = 0, scale = FALSE, alpha = 0.7,
     deriv = as.integer(deriv),
     nd = as.integer(length(deriv)),
     sty = as.integer(style),
-    # basis = list(basis, lfbas), 
+    # basis = list(basis, lfbas),
     PACKAGE="locfit")
   nvc <- z$nvc
   names(nvc) <- c("nvm", "ncm", "vc", "nv", "nc")
@@ -916,8 +916,8 @@ object$trans(object$fit)
 
 ## Deepayan Sarkar's patched version:
 "panel.locfit"<-
-    function(x, y, subscripts, z, rot.mat, distance, shade, 
-             light.source, xlim, ylim, zlim, xlim.scaled, ylim.scaled, zlim.scaled, region, 
+    function(x, y, subscripts, z, rot.mat, distance, shade,
+             light.source, xlim, ylim, zlim, xlim.scaled, ylim.scaled, zlim.scaled, region,
              col, lty, lwd, alpha, col.groups, polynum, drape, at,
              xlab, ylab, zlab, xlab.default, ylab.default, zlab.default, aspect, panel.aspect,
              scales.3d, contour, labels, ...)
@@ -948,9 +948,9 @@ object$trans(object$fit)
             #                   col.regions = col.regions,
             #                   at = at,
             #                   drape = drape)
-            lattice::panel.wireframe(marg[[1]], marg[[2]], zp, 
-                                  rot.mat, distance, shade, 
-                                  light.source, xlim, ylim, zlim, 
+            lattice::panel.wireframe(marg[[1]], marg[[2]], zp,
+                                  rot.mat, distance, shade,
+                                  light.source, xlim, ylim, zlim,
                                   xlim.scaled, ylim.scaled, zlim.scaled,
                                   col, lty, lwd, alpha, col.groups, polynum, drape, at)
         }
@@ -1023,7 +1023,7 @@ object$eva
 "plot.lfeval"<-
 function(x, add = FALSE, txt = FALSE, ...)
 {
-  if(class(x) == "locfit")
+  if(inherits(x, "locfit"))
     x <- x$eva
   d <- length(x$scale)
   v <- matrix(x$xev, nrow = d)
@@ -1047,7 +1047,7 @@ function(x, add = FALSE, txt = FALSE, ...)
 "print.lfeval"<-
 function(x, ...)
 {
-  if(class(x) == "locfit")
+  if(inherits(x, "locfit"))
     x <- x$eva
   d <- length(x$scale)
   ret <- matrix(x$xev, ncol = d, byrow = TRUE)
@@ -1907,7 +1907,7 @@ function(x, ...)
 "kappa0"<-
     function(formula, cov=0.95, ev=lfgrid(20), ...)
 {
-  if(class(formula) == "locfit") {
+  if(inherits(formula, "locfit")) {
     m <- formula$call
   }
   else {

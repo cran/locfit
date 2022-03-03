@@ -62,7 +62,7 @@ double *x, *resc, *resd, *delta, *res2;
     for (k=0; k<nrc; k++) resc[k] += wt*zb*res2[k];
        
     if (fd!=NULL)
-      simp3(fd,x,d,resd,delta,wt,i0,j,mg,ct,res2);
+      simp3(fd,x,d,resd,delta,wt,i0,j,mg,ct,res2,lfindex);
   }
 }
 

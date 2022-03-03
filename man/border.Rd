@@ -13,6 +13,6 @@
   Compiled from the Cricinfo archives.
 }
 \references{CricInfo: The Home of Cricket on the Internet.
-  \url{http://www.cricinfo.com/}
+  \url{https://www.espncricinfo.com/}
 }
 \keyword{datasets}
