@@ -839,7 +839,7 @@ function(x, main = "", pv, tv, type = "level", pred.lab = x$vnames, resp.lab =
   if(length(pv) == 1) {
     clo <- cup <- numeric(0)
     if(length(x$se.fit) > 0) {
-      if((!is.null(class(crit))) && (class(crit) == "kappa"))
+      if((!is.null(class(crit))) && (inherits(crit,  "kappa")))
         crit <- crit$crit.val
       cup <- x$trans((x$fit + crit * x$se.fit))
       clo <- x$trans((x$fit - crit * x$se.fit))
@@ -1339,7 +1339,7 @@ function(formula, dc = TRUE, ...)
 function(x, y, weights, ..., iter = 3)
 {
   m <- match.call()
-  if((!is.numeric(x)) && (class(x) == "formula")) {
+  if((!is.numeric(x)) && (inherits(x, "formula"))) {
     m1 <- m[[1]]
     m[[1]] <- as.name("locfit")
     m$lfproc <- m1
@@ -1363,7 +1363,7 @@ function(x, y, weights, ..., iter = 3)
 function(x, y, cens, ..., iter = 3, km = FALSE)
 {
   m <- match.call()
-  if((!is.numeric(x)) && (class(x) == "formula")) {
+  if((!is.numeric(x)) && (inherits(x, "formula"))) {
     m1 <- m[[1]]
     m[[1]] <- as.name("locfit")
     m$lfproc <- m1
@@ -1420,7 +1420,7 @@ function(times, cens)
 function(x, y, weights, ..., iter = 3, var = abs)
 {
   m <- match.call()
-  if((!is.numeric(x)) && (class(x) == "formula")) {
+  if((!is.numeric(x)) && (inherits(x, "formula"))) {
     m1 <- m[[1]]
     m[[1]] <- as.name("locfit")
     m$lfproc <- m1
@@ -1959,7 +1959,7 @@ function(fit, value)
   if(is.numeric(value))
     fit$critval$crit.val <- value[1]
   else {
-    if(class(value) != "kappa")
+    if(!inherits(value, "kappa"))
       stop("crit<-: value must be numeric or class kappa")
     fit$critval <- value
   }

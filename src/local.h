@@ -55,7 +55,8 @@
 
 #ifdef RVERSION
 
-/* #typedef int Sint is defined in R.h */
+/* #typedef int used to be defined in R.h */
+typedef int Sint;
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>

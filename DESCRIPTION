@@ -1,7 +1,7 @@
 Package: locfit
-Version: 1.5-9.5
+Version: 1.5-9.6
 Title: Local Regression, Likelihood and Density Estimation
-Date: 2022-03-01
+Date: 2022-07-11
 Authors@R: c(person("Catherine", "Loader", role = "aut"),
              person("Jiayang", "Sun", role = "ctb"),
              person("Lucent Technologies", role = "cph"),
@@ -18,6 +18,6 @@ Imports: lattice
 Suggests: interp, gam
 License: GPL (>= 2)
 NeedsCompilation: yes
-Packaged: 2022-03-03 04:20:51 UTC; andy
+Packaged: 2022-07-11 07:07:46 UTC; ripley
 Repository: CRAN
-Date/Publication: 2022-03-03 15:50:12 UTC
+Date/Publication: 2022-07-11 08:06:27 UTC

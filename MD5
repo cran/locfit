@@ -1,8 +1,8 @@
-8b1398cdba56c3657691112c7ff0cd8a *DESCRIPTION
+d9c61d85edb4bd31afbac25eab99b049 *DESCRIPTION
 0a347c326f1f957b78b62b9b57cc783f *NAMESPACE
 cfb753adc26c57e1a349ba5a0ce83938 *NEWS
 c69fccb19975aaf5f91b8a35f5761819 *R/firstlib.r
-75ed19402ba321220223629729c4ca69 *R/locfit.r
+fa83a11ec7078b46b3c97b1999853e8c *R/locfit.r
 99484753a0890e12e6e96722d617f012 *README
 b401b88bd87bf18f03dd1bfe4cb0f544 *data/ais.rda
 0e01701b1a2baf4035fa5ee2a40a5115 *data/bad.rda
@@ -77,7 +77,7 @@ b78f066f54d8fc870e224d9a93744d24 *man/lfknots.Rd
 18ee87a3368a87547b21f48effe1f44c *man/lflim.Rd
 81f13d1921e99b376eac592a424ed893 *man/lfmarg.Rd
 845d6c03e50557254cacfd8f8aa2c8c1 *man/lines.locfit.Rd
-e68928dc5dad93767376866a82518773 *man/livmet.Rd
+f3e95d461e8822cbd9f12564d0af30b7 *man/livmet.Rd
 527c29c0873e5d783ff0d4deaca1eaa6 *man/locfit.Rd
 cc8fbf6c052275d8b3604cc70c509f9e *man/locfit.censor.Rd
 0014077c83b12dead053f70cbf50767a *man/locfit.matrix.Rd
@@ -166,7 +166,7 @@ abe1a5d3bc096d237c4b26f9ab919322 *src/lffuns.h
 879df350e0568e2c5eac74470bc089a4 *src/lfstr.c
 d0e5d8d81c29d2519013e1c43ddd966d *src/lfstruc.h
 067a41c90a1bf5bf358674fc1cee4977 *src/lfwin.h
-c64fcf7484eb8e2dcc75e2e4f6b75c55 *src/local.h
+45d5c7f996c4ea7f89008c91a1f51e4d *src/local.h
 183a9e78fd88e7bdb536fddc51ce1439 *src/locfit.c
 cb441b0bc0886034e92f57a4ae4f37c1 *src/m_chol.c
 a15fee4f2e35e48bb6553afe929f2857 *src/m_eigen.c
