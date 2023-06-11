@@ -64,12 +64,12 @@ int procv(des,lf,v)
 design *des;
 lfit *lf;
 int v;
-{ int d, p, nvm, i, k;
+{ int p, nvm, i, k;
   double trc[6], t0[1+MXDIM], vari[1+MXDIM];
   k = procvraw(des,lf,v);
   if (lf_error) return(k);
    
-  d = lf->lfd.d;
+  //d = lf->lfd.d;
   p = npar(&lf->sp);
   nvm = lf->fp.nvm;
 
@@ -158,8 +158,8 @@ int procvvord(des,lf,v)
 design *des;
 lfit *lf;
 int v;
-{ double tr[6], gcv, g0, ap, coef[4][10], t2[4], th, md=0.0;
-  int i, j, k=0, d1, i0, p1, ip;
+{ double tr[6], gcv, g0, ap, coef[4][10], th, md=0.0;
+  int i, j, k=0, d1, i0, p1;
   des->xev = evpt(&lf->fp,v);
 
   ap = pen(&lf->sp);
@@ -167,7 +167,7 @@ int v;
   d1 = deg(&lf->sp); p1 = npar(&lf->sp);
   for (i=0; i<p1; i++) coef[0][i] = coef[1][i] = coef[2][i] = coef[3][i] = 0.0;
   i0 = 0; g0 = 0;
-  ip = 1;
+  //ip = 1;
 
   for (i=deg0(&lf->sp); i<=d1; i++)
   { deg(&lf->sp) = i;
@@ -179,9 +179,9 @@ int v;
     if ((i==deg0(&lf->sp)) || (gcv<g0)) { i0 = i; g0 = gcv; md = i; }
 
     for (j=0; j<des->p; j++) coef[i][j] = des->cf[j];
-    t2[i] = tr[2];
 
-#ifdef RESEARCH
+/*#ifdef RESEARCH
+    t2[i] = tr[2];
 printf("variable order\n");
     if ((ip) && (i>deg0(&lf->sp)))
     { for (j=1; j<10; j++)
@@ -189,7 +189,7 @@ printf("variable order\n");
         if (gcv<g0) { g0 = gcv; md = i-1+j/10.0; }
       }
     }
-#endif
+    #endif */
   }
   lf->fp.h[v] = des->h;
   if (lf->fp.h[v]<=0) WARN(("zero bandwidth in procvvord"));
@@ -199,7 +199,7 @@ printf("variable order\n");
     des->p = npar(&lf->sp) = calcp(&lf->sp,lf->lfd.d);
     k = locfit(&lf->lfd,des,&lf->sp,0,0,0);
     for (i=npar(&lf->sp); i<p1; i++) des->cf[i] = 0.0;
-    i0 = md; if (i0==d1) i0--;
+    i0 = (int) md; if (i0==d1) i0--;
     th = md-i0;
     for (i=0; i<p1; i++) des->cf[i] = (1-th)*coef[i0][i]+th*coef[i0+1][i];
     deg(&lf->sp) = d1; npar(&lf->sp) = p1;

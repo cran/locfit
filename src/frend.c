@@ -144,8 +144,9 @@ double rss(lf,des,df)
 lfit *lf;
 design *des;
 double *df;
-{ double ss;
-  ss = 0;
+{
+//double ss;
+//  ss = 0;
   ressumm(lf,des);
   *df = lf->lfd.n - 2*df0(&lf->fp) + df1(&lf->fp);
   return(-2*llk(&lf->fp));

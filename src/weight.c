@@ -161,12 +161,12 @@ int d, ker, kt, sty;
 double weightdd(u,sc,d,ker,kt,h,sty,di,i0,i1)
 double *u, *sc, h, di;
 int d, ker, kt, i0, i1, *sty;
-{ double w;
+{ /* double w;
   w = 1;
   if (kt==KPROD)
   {
     w = WdW(u[i0]/(h*sc[i0]),ker)*WdW(u[i1]/(h*sc[i1]),ker)/(h*h*sc[i0]*sc[i1]);
-  }
+    } */
   return(0.0);
 }
 

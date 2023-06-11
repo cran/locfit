@@ -57,7 +57,7 @@ void cumulant(lf,des,sd)
 lfit *lf;
 design *des;
 double sd;
-{ double b2i, b3i, b3j, b4i;
+{ double b3i, b3j, b4i;
   double ss, si, sj, uii, uij, ujj, k1;
   int ii, i, j, jj;
   for (i=1; i<10; i++) c[i] = 0.0;
@@ -73,7 +73,7 @@ double sd;
  */
   for (i=0; i<lf->lfd.n; i++)
   { ii = des->ind[i];
-    b2i = b2(des->th[i],fam(&lf->sp),prwt(&lf->lfd,ii));
+    //b2i = b2(des->th[i],fam(&lf->sp),prwt(&lf->lfd,ii));
     b3i = b3(des->th[i],fam(&lf->sp),prwt(&lf->lfd,ii));
     b4i = b4(des->th[i],fam(&lf->sp),prwt(&lf->lfd,ii));
     si = covar_par(lf,des,des->xev[0],datum(&lf->lfd,0,ii));
@@ -185,7 +185,7 @@ int procvscb2(des,lf,v)
 design *des;
 lfit *lf;
 int v;
-{ double thhat, sd, *lo, *hi, u;
+{ double sd, *lo, *hi, u;
   int err, st, tmp;
   x = des->xev = evpt(&lf->fp,v);
   tmp = haspc(&lf->pc);
@@ -196,7 +196,7 @@ int v;
   else */
   { haspc(&lf->pc) = 0;
     st = procv(des,lf,v);
-    thhat = lf->fp.coef[v];
+    //thhat = lf->fp.coef[v];
     sd = lf->fp.nlx[v];
   }
   if ((type==GLM2) | (type==GLM3) | (type==GLM4))

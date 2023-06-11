@@ -178,7 +178,7 @@ lfit *lf;
   nvm = lf->fp.nvm;
   th22 = 0;
   for (i=10; i<n-10; i++)
-  { j = floor(k*datum(&lf->lfd,0,i));
+  { j = (int)floor(k*datum(&lf->lfd,0,i));
     if (j>=k) j = k-1;
     dx = datum(&lf->lfd,0,i)-evptx(&lf->fp,0,j);
     if (dg1==2)

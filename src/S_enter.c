@@ -444,14 +444,13 @@ double *x, *y, *w, *c, *ba, *fit, *xev, *coef, *sv, *wpc, *sca, *dp;
 Sint *cv, *st, *cell, *nvc, *mi, *mg, *dv, *nd, *sty;
 char **what;
 void **bs;
-{ Sint i, n;
+{ Sint i;
 
   recoef(xev,coef,cell,nvc,mi,dp);
   setsmpar(&lf.sp,dp,mi);
   setevs(&lf.evs,mi,dp[DCUT],mg,NULL);
 
   if (mi[MUBAS]) bsfunc = bs[0];
-  n = mi[MN];
   lf_error = 0;
   lf.evs.ncm = nvc[1]; lf.evs.nce = nvc[4];
 

@@ -28,13 +28,13 @@ lfdata *lfd;
 smpar *sp;
 deriv *dv;
 design *des;
-{ int i, ii, j, p, p1;
+{ int i, ii, j, p1;
   double sv, sb, *l, dp;
 
   l = des->wd;
   wdiag(lfd, sp, des,l,dv,0,1,0);
   sv = sb = 0;
-  p = npar(sp);
+  // p = npar(sp);
   for (i=0; i<des->n; i++)
   { sv += l[i]*l[i];
     ii = des->ind[i];
@@ -167,10 +167,10 @@ deriv *dv;
 design *des;
 double h0;
 { double t[6], h1, cp, tlo, tup;
-  int i, i0, d, n;
+  int i, i0, d;
 
   if (lf_debug >= 2) printf("aband3:\n");
-  d = lfd->d; n = lfd->n;
+  d = lfd->d; // n = lfd->n;
   h1 = h0;
   i0 = (acri(sp)==AKAT) ? 1 : -2;
   if (h0==hmin) i0 = 1;

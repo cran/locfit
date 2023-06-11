@@ -152,7 +152,7 @@ double *z, *coef;
   } 
 }
 
-int mmax(coef, old_coef, f1, delta, J, p, maxit, tol, err)
+void  mmax(coef, old_coef, f1, delta, J, p, maxit, tol, err)
 double *coef, *old_coef, *f1, *delta, tol;
 int p, maxit, *err;
 jacobian *J;
@@ -195,12 +195,12 @@ if (j==0) printf("init singular\n");
 /* if (fr==NR_SINGULAR) printf("singular\n"); */
       } while (((lambda>0.000000001) & (f > old_f+0.001)) /* | (fr==NR_SINGULAR) */ );
 
-      if (f>old_f+0.001) { printf("lambda prob\n"); *err = NR_NDIV; return(f); }
+      if (f>old_f+0.001) { printf("lambda prob\n"); *err = NR_NDIV; return; }
 
     }
     if (f==0.0)
     { if (sing) printf("final singular - conv\n");
-      return(f);
+      return;
     }
 
     if (debug)
@@ -208,12 +208,12 @@ if (j==0) printf("init singular\n");
       printf(" f %8.5f\n",f);
     }
 
-    if ((j>0) & (fabs(f-old_f)<tol)) return(f);
+    if ((j>0) & (fabs(f-old_f)<tol)) return;
   }
 if (sing) printf("final singular\n");
   WARN(("findab not converged"));
   *err = NR_NCON;
-  return(f);
+  return;
 }
 
 double findab(gam)

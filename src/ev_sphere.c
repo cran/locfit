@@ -21,13 +21,13 @@ int *nvm, *ncm, *vc, *mg;
 void sphere_start(des,lf)
 design *des;
 lfit *lf;
-{ int d, i, j, ct, nv, ncm, vc, *mg;
+{ int i, j, ct, nv, ncm, vc, *mg;
   double rmin, rmax, *orig, r, th, c, s;
 
   mg = mg(&lf->evs);
   sphere_guessnv(&nv,&ncm,&vc,mg);
   trchck(lf,nv,0,0);
-  d = lf->lfd.d;
+  // d = lf->lfd.d;
 
   rmin = lf->evs.fl[0];
   rmax = lf->evs.fl[1];

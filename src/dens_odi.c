@@ -44,15 +44,15 @@ double explinjtay(l0,l1,j,cf)
 /* int_l0^l1 x^j e^(a+bx+cx^2); exbctay aroud l1 */
 double l0, l1, *cf;
 int j;
-{ double tc[40], f, s;
+{ double tc[40], f;
   int k, n;
   if ((l0!=0.0) | (l1!=1.0)) WARN(("explinjtay: invalid l0, l1"));
   n = exbctay(cf[1]+2*cf[2]*l1,cf[2],20,tc);
-  s = tc[0]/(j+1);
+  // s = tc[0]/(j+1);
   f = 1/(j+1);
   for (k=1; k<=n; k++)
   { f *= -k/(j+k+1.0);
-    s += tc[k]*f;
+      // s += tc[k]*f;
   }
   return(f);
 }

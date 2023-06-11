@@ -48,7 +48,7 @@ int d, mxit;
           r = sqrt(c1*c1+s1*s1);
           if (r>0) { c1 /= r; s1 /= r; }
               else { c1 = 1.0; zer = 0;}
-          if (fabs(s1)>ms) ms = fabs(s1);
+          if (fabs(s1)>ms) ms = (int)fabs(s1);
           c2 = cm+cp;
           s2 = sp-sm;
           r = sqrt(c2*c2+s2*s2);
