@@ -870,10 +870,10 @@ function(x, main = "", pv, tv, type = "level", pred.lab = x$vnames, resp.lab =
         zlab = resp.lab, data = newdat, strip = loc.strip, ...)
   }
   if(length(tv) > 0) {
-    if(exists("is.R") && is.function(is.R) && is.R())
-      names(pl$cond) <- pred.lab[tv]
-    else names(attr(pl$glist, "endpts")) <- attr(pl$glist, "names") <- names(
-        attr(pl$glist, "index")) <- pred.lab[tv]
+##    if(exists("is.R") && is.function(is.R) && is.R())
+    names(pl$cond) <- pred.lab[tv]
+##    else names(attr(pl$glist, "endpts")) <- attr(pl$glist, "names") <- names(
+##        attr(pl$glist, "index")) <- pred.lab[tv]
   }
   pl
 }

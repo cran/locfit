@@ -1,8 +1,8 @@
-dcce045c9b7a68df1effe09b4918cffc *DESCRIPTION
+9a29e39aef8b0e5b69aa7ffd1a61a9df *DESCRIPTION
 0a347c326f1f957b78b62b9b57cc783f *NAMESPACE
 cfb753adc26c57e1a349ba5a0ce83938 *NEWS
 c69fccb19975aaf5f91b8a35f5761819 *R/firstlib.r
-fa83a11ec7078b46b3c97b1999853e8c *R/locfit.r
+a5a1fcf4582dffc3e8548feeefb86d26 *R/locfit.r
 99484753a0890e12e6e96722d617f012 *README
 b401b88bd87bf18f03dd1bfe4cb0f544 *data/ais.rda
 0e01701b1a2baf4035fa5ee2a40a5115 *data/bad.rda
