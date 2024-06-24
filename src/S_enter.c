@@ -127,14 +127,20 @@ static void basis(double *x, double *t, double *f, int dim, int p)
 }
 #endif
 
+#include "Rversion.h"
+
 static void 
 vbasis(double **x, double *t, int n, int d, int *ind, int m, int p, double *X)
 {
     SEXP call, pcall, s;
 
     /* two integer args, then 1+d double args */
+#if R_VERSION >= R_Version(4, 5, 0)
+    PROTECT(pcall = call = allocLang(d + 5));
+#else
     PROTECT(pcall = call = allocList(d + 5));
     SET_TYPEOF(call, LANGSXP);
+#endif
     SETCAR(pcall, (SEXP) bsf2);
     pcall = CDR(pcall);
     SETCAR(pcall, ScalarInteger(d));
