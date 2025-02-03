@@ -31,15 +31,14 @@ static double A[10] =
     29.686580124648361825  /* 32/105*pi^4 */
   };
 
-double area(d)
-int d;
+double area(int d)
+/* area(d) int d; */
 { if (d<10) return(A[d]);
   return(2*exp(d*LOGPI/2.0-LGAMMA(d/2.0)));
 }
 
-double tailp_uniform(c,k0,m,d,s,n)
-double c, *k0, n;
-int m, d, s;
+double tailp_uniform(double c, double *k0, int m, int d, int s, double n)
+/* tailp_uniform(c,k0,m,d,s,n) double c, *k0, n; int m, d, s; */
 { int i;
   double p;
   p = 0.0;
@@ -48,9 +47,8 @@ int m, d, s;
   return( (s==TWO_SIDED) ? 2*p : p );
 }
 
-double tailp_gaussian(c,k0,m,d,s,n)
-double c, *k0, n;
-int m, d, s;
+double tailp_gaussian(double c, double *k0, int m, int d, int s, double n)
+/* tailp_gaussian(c,k0,m,d,s,n) double c, *k0, n; int m, d, s; */
 { int i;
   double p;
   p = 0.0;
@@ -59,9 +57,8 @@ int m, d, s;
   return( (s==TWO_SIDED) ? 2*p : p );
 }
 
-double tailp_tprocess(c,k0,m,d,s,n)
-double c, *k0, n;
-int m, d, s;
+double tailp_tprocess(double c, double *k0, int m, int d, int s, double n)
+/* tailp_tprocess(c,k0,m,d,s,n) double c, *k0, n; int m, d, s; */
 { int i;
   double p;
   p = 0.0;
@@ -70,9 +67,8 @@ int m, d, s;
   return( (s==TWO_SIDED) ? 2*p : p );
 }
 
-double taild_uniform(c,k0,m,d,s,n)
-double c, *k0, n;
-int m, d, s;
+double taild_uniform(double c, double *k0, int m, int d, int s, double n)
+/* taild_uniform(c,k0,m,d,s,n) double c, *k0, n; int m, d, s; */
 { int i;
   double p;
   p = 0.0;
@@ -81,9 +77,8 @@ int m, d, s;
   return( (s==TWO_SIDED) ? 2*p : p );
 }
 
-double taild_gaussian(c,k0,m,d,s,n)
-double c, *k0, n;
-int m, d, s;
+double taild_gaussian(double c, double *k0, int m, int d, int s, double n)
+/* taild_gaussian(c,k0,m,d,s,n) double c, *k0, n; int m, d, s; */
 { int i;
   double p;
   p = 0.0;
@@ -92,9 +87,8 @@ int m, d, s;
   return( (s==TWO_SIDED) ? 2*p : p );
 }
 
-double taild_tprocess(c,k0,m,d,s,n)
-double c, *k0, n;
-int m, d, s;
+double taild_tprocess(double c, double *k0, int m, int d, int s, double n)
+/* taild_tprocess(c,k0,m,d,s,n) double c, *k0, n; int m, d, s; */
 { int i;
   double p;
   p = 0.0;
@@ -103,9 +97,8 @@ int m, d, s;
   return( (s==TWO_SIDED) ? 2*p : p );
 }
 
-double tailp(c,k0,m,d,s,nu, process)
-double c, *k0, nu;
-int m, d, s, process;
+double tailp(double c, double *k0, int m, int d, int s, double nu, int process)
+/* tailp(c,k0,m,d,s,nu,process) double c, *k0, nu; int m, d, s, process; */
 { switch(process)
   { case UNIF:  return(tailp_uniform(c,k0,m,d,s,nu));
     case GAUSS: return(tailp_gaussian(c,k0,m,d,s,nu));
@@ -115,9 +108,8 @@ int m, d, s, process;
   return(0.0);
 }
 
-double taild(c,k0,m,d,s,nu, process)
-double c, *k0, nu;
-int m, d, s, process;
+double taild(double c, double *k0, int m, int d, int s, double nu, int process)
+/* taild(c,k0,m,d,s,nu,process) double c, *k0, nu; int m, d, s, process; */
 { switch(process)
   { case UNIF:  return(taild_uniform(c,k0,m,d,s,nu));
     case GAUSS: return(taild_gaussian(c,k0,m,d,s,nu));
@@ -127,9 +119,8 @@ int m, d, s, process;
   return(0.0);
 }
 
-double critval(alpha,k0,m,d,s,nu,process)
-double alpha, *k0, nu;
-int m, d, s, process;
+double critval(double alpha, double *k0, int m, int d, int s, double nu, int process)
+/* critval(alpha,k0,m,d,s,nu,process) double alpha, *k0, nu; int m, d, s, process; */
 { double c, cn, c0, c1, tp, td;
   int j, maxit;
   double (*tpf)(), (*tdf)();

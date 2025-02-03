@@ -32,8 +32,8 @@ static smpar  *haz_sp;
  *  hrao returns 0 if integration region is empty.
  *               1 otherwise.
  */
-int haz_sph_int(dfx,cf,h,r1)
-double *dfx, *cf, h, *r1;
+int haz_sph_int(double *dfx, double *cf, double h, double *r1)
+/* double *dfx, *cf, h, *r1; */ 
 { double s, t0, t1, wt, th;
   int j, dim, p;
   s = 0; p = npar(haz_sp);
@@ -65,8 +65,8 @@ double *dfx, *cf, h, *r1;
   return(1);
 }
 
-int hazint_sph(t,resp,r1,cf,h)
-double *t, *resp, *r1, *cf, h;
+int hazint_sph(double *t, double *resp, double *r1, double *cf, double h)
+/* double *t, *resp, *r1, *cf, h; */
 { int i, j, n, p, st;
   double dfx[MXDIM], eb, sb;
   p = npar(haz_sp);
@@ -93,8 +93,8 @@ double *t, *resp, *r1, *cf, h;
   return(LF_OK);
 }
 
-int hazint_prod(t,resp,x,cf,h)
-double *t, *resp, *x, *cf, h;
+int hazint_prod(double *t, double *resp, double *x, double *cf, double h)
+/* double *t, *resp, *x, *cf, h; */ 
 { int d, p, i, j, k, st;
   double dfx[MXDIM], t_prev,
          hj, hs, ncf[MXDEG], ef, il1;
@@ -168,19 +168,16 @@ double *t, *resp, *x, *cf, h;
   return(LF_OK);
 }
 
-int hazint(t,resp,resp1,cf,h)
-double *t, *resp, *resp1, *cf, h;
+int hazint(double *t, double *resp, double *resp1, double *cf, double h)
+/* double *t, *resp, *resp1, *cf, h; */
 { if (haz_lfd->d==1) return(hazint_prod(t,resp,resp1,cf,h));
   if (kt(haz_sp)==KPROD) return(hazint_prod(t,resp,resp1,cf,h));
 
   return(hazint_sph(t,resp,resp1,cf,h));
 }
 
-void haz_init(lfd,des,sp,il)
-lfdata *lfd;
-design *des;
-smpar *sp;
-double *il;
+void haz_init(lfdata *lfd, design *des, smpar *sp, double *il)
+/* lfdata *lfd; design *des; smpar *sp; double *il; */
 { int i;
   
   haz_lfd = lfd;

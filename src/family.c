@@ -9,8 +9,8 @@
 
 extern double rs, log();
 
-int defaultlink(link,family)
-int link, family;
+int defaultlink(int link, int family)
+/* defaultlink(link,family) int link, family; */
 { if (link==LDEFAU)
     switch(family&63)
     { case TDEN:
@@ -47,8 +47,8 @@ int link, family;
   return(link);
 }
 
-int validlinks(link,family)
-int link, family;
+int validlinks(int link, int family)
+/* validlinks(link,family) int link, family; */
 { switch(family&63)
   { case TDEN:
     case TRAT:
@@ -76,9 +76,8 @@ int link, family;
   return(0);
 }
 
-int famdens(mean,th,link,res,cens,w)
-double mean, th, *res, w;
-int link, cens;
+int famdens(double mean, double th, int link, double *res, int cens, double w)
+/* famdens(mean,th,link,res,cens,w) double mean, th, *res, w; int link, cens; */
 { if (cens)
     res[ZLIK] = res[ZDLL] = res[ZDDLL] = 0.0;
   else
@@ -88,9 +87,8 @@ int link, cens;
   return(LF_OK);
 }
 
-int famgaus(y,mean,th,link,res,cens,w)
-double y, mean, th, *res, w;
-int link, cens;
+int famgaus(double y, double mean, double th, int link, double *res, int cens, double w)
+/* famgaus(y,mean,th,link,res,cens,w) double y, mean, th, *res, w; int link, cens; */
 { double z, pz, dp;
   if (link==LINIT)
   { res[ZDLL] = w*y;
@@ -130,9 +128,8 @@ int link, cens;
   return(LF_OK);
 }
 
-int famrobu(y,mean,th,link,res,cens,w,rs)
-double y, mean, th, *res, w, rs;
-int link, cens;
+int famrobu(double y, double mean, double th, int link, double *res, int cens, double w, double rs)
+/* famrobu(y,mean,th,link,res,cens,w,rs) double y, mean, th, *res, w, rs; int link, cens; */
 { double z, sw;
   if (link==LINIT)
   { res[ZDLL] = w*y;
@@ -156,9 +153,8 @@ int link, cens;
   return(LF_OK);
 }
 
-int famcauc(y,p,th,link,res,cens,w,rs)
-double y, p, th, *res, w, rs;
-int link, cens;
+int famcauc(double y, double p, double th, int link, double *res, int cens, double w, double rs)
+/* famcauc(y,p,th,link,res,cens,w,rs) double y, p, th, *res, w, rs; int link, cens; */
 { double z;
   if (link!=LIDENT)
   { ERROR(("Invalid link in famcauc"));
@@ -171,9 +167,8 @@ int link, cens;
   return(LF_OK);
 }
 
-int famrbin(y,p,th,link,res,cens,w)
-double y, p, th, *res, w;
-int link, cens;
+int famrbin(double y, double p, double th, int link, double *res, int cens, double w)
+/* famrbin(y,p,th,link,res,cens,w) double y, p, th, *res, w; int link, cens; */
 { double s2y;
   if (link==LINIT)
   { res[ZDLL] = y;
@@ -197,9 +192,8 @@ int link, cens;
   return(LF_OK);
 }
 
-int fambino(y,p,th,link,res,cens,w)
-double y, p, th, *res, w;
-int link, cens;
+int fambino(double y, double p, double th, int link, double *res, int cens, double w)
+/* fambino(y,p,th,link,res,cens,w) double y, p, th, *res, w; int link, cens; */
 { double wp;
   if (link==LINIT)
   { if (y<0) y = 0;
@@ -256,9 +250,8 @@ int link, cens;
   return(LF_LNK);
 }
 
-int fampois(y,mean,th,link,res,cens,w)
-double y, mean, th, *res, w;
-int link, cens;
+int fampois(double y, double mean, double th, int link, double *res, int cens, double w)
+/* fampois(y,mean,th,link,res,cens,w) double y, mean, th, *res, w; int link, cens; */
 { double wmu, pt, dp, dq;
   if (link==LINIT)
   { res[ZDLL] = MAX(y,0.0);
@@ -327,9 +320,8 @@ int link, cens;
   return(LF_LNK);
 }
 
-int famgamm(y,mean,th,link,res,cens,w)
-double y, mean, th, *res, w;
-int link, cens;
+int famgamm(double y, double mean, double th, int link, double *res, int cens, double w)
+/* famgamm(y,mean,th,link,res,cens,w) double y, mean, th, *res, w; int link, cens; */
 { double pt, dg;
   if (link==LINIT)
   { res[ZDLL] = MAX(y,0.0);
@@ -386,9 +378,8 @@ int link, cens;
   return(LF_LNK);
 }
 
-int famgeom(y,mean,th,link,res,cens,w)
-double y, mean, th, *res, w;
-int link, cens;
+int famgeom(double y, double mean, double th, int link, double *res, int cens, double w)
+/* famgeom(y,mean,th,link,res,cens,w) double y, mean, th, *res, w; int link, cens; */
 { double p, pt, dp, dq;
   if (link==LINIT)
   { res[ZDLL] = MAX(y,0.0);
@@ -427,9 +418,8 @@ int link, cens;
   return(LF_LNK);
 }
 
-int famweib(y,mean,th,link,res,cens,w)
-double y, mean, th, *res, w;
-int link, cens;
+int famweib(double y, double mean, double th, int link, double *res, int cens, double w)
+/* famweib(y,mean,th,link,res,cens,w) double y, mean, th, *res, w; int link, cens; */
 { double yy;
   yy = pow(y,w);
   if (link==LINIT)
@@ -448,9 +438,8 @@ int link, cens;
   return(LF_OK);
 }
 
-int famcirc(y,mean,th,link,res,cens,w)
-double y, mean, th, *res, w;
-int link, cens;
+int famcirc(double y, double mean, double th, int link, double *res, int cens, double w)
+/* famcirc(y,mean,th,link,res,cens,w) double y, mean, th, *res, w; int link, cens; */
 { if (link==LINIT)
   { res[ZDLL] = w*sin(y);
     res[ZLIK] = w*cos(y);
@@ -474,8 +463,8 @@ double *res, rs;
   res[ZLIK] = sc*sc/2-sc*z;
 }
 */
-void robustify(res,rs)
-double *res, rs;
+void robustify(double *res, double rs)
+/* robustify(res,rs) double *res, rs; */
 { double sc, z;
   sc = rs*HUBERC;
   if (res[ZLIK] > -sc*sc/2)
@@ -490,9 +479,8 @@ double *res, rs;
   res[ZLIK] = 0.5-z/sc;
 }
 
-double lf_link(y,lin)
-double y;
-int lin;
+double lf_link(double y, int lin)
+/* lf_link(y,lin) double y; int lin; */
 { switch(lin)
   { case LIDENT: return(y);
     case LLOG:   return(log(y));
@@ -505,9 +493,8 @@ int lin;
   return(0.0);
 }
 
-double invlink(th,lin)
-double th;
-int lin;
+double invlink(double th, int lin)
+/* invlink(th,lin) double th; int lin; */
 { switch(lin)
   { case LIDENT: return(th);
     case LLOG:   return(lf_exp(th));
@@ -522,9 +509,8 @@ int lin;
 }
 
 /* the link and various related functions */
-int links(th,y,fam,link,res,c,w,rs)
-double th, y, *res, w, rs;
-int fam, link, c;
+int links(double th, double y, int fam, int link, double *res, int c, double w, double rs)
+/* links(th,y,fam,link,res,c,w,rs) double th, y, *res, w, rs; int fam, link, c; */
 { double mean;
   int st;
 
@@ -566,11 +552,8 @@ int fam, link, c;
   stdlinks is a version of links when family, link, response e.t.c
   all come from the standard places.
 */
-int stdlinks(res,lfd,sp,i,th,rs)
-lfdata *lfd;
-smpar *sp;
-double th, rs, *res;
-int i;
+int stdlinks(double *res, lfdata *lfd, smpar *sp, int i, double th, double rs)
+/* stdlinks(res,lfd,sp,i,th,rs) lfdata *lfd; smpar *sp; double th, rs, *res; int i; */
 { return(links(th,resp(lfd,i),fam(sp),link(sp),res,cens(lfd,i),prwt(lfd,i),rs));
 }
 
@@ -579,9 +562,8 @@ int i;
  *  in scb corrections.
  */
 
-double b2(th,tg,w)
-double th, w;
-int tg;
+double b2(double th, int tg, double w)
+/* b2(th,tg,w) double th, w; int tg; */
 { double y;
   switch(tg&63)
   { case TGAUS: return(w);
@@ -594,9 +576,8 @@ int tg;
   return(0.0);
 }
 
-double b3(th,tg,w)
-double th, w;
-int tg;
+double b3(double th, int tg, double w)
+/* b3(th,tg,w) double th, w; int tg; */
 { double y;
   switch(tg&63)
   { case TGAUS: return(0.0);
@@ -609,9 +590,8 @@ int tg;
   return(0.0);
 }
 
-double b4(th,tg,w)
-double th, w;
-int tg;
+double b4(double th, int tg, double w)
+/* b4(th,tg,w) double th, w; int tg; */
 { double y;
   switch(tg&63)
   { case TGAUS: return(0.0);

@@ -15,17 +15,15 @@
 static double *fd, *ft;
 static int globm, (*wdf)(), use_covar, kap_terms;
 
-int k0_reqd(d,n,uc)
-int d, n, uc;
+int k0_reqd(int d, int n, int uc)
 { int m;
   m = d*(d+1)+1;
   if (uc) return(2*m*m);
      else return(2*n*m);
 }
 
-void assignk0(z,d,n) /* z should be n*(2*d*d+2*d+2); */
-double *z;
-int d, n;
+void assignk0(double *z, int d, int n)
+/* z should be n*(2*d*d+2*d+2); */
 { ft = z; z += n*(d*(d+1)+1);
   fd = z; z += n*(d*(d+1)+1);
 }
@@ -34,9 +32,7 @@ int d, n;
  * (I - A(R^TR)^{-1}A^T)y
  * R should be from the QR-decomp. of A.
  */
-void rproject(y,A,R,n,p)
-double *y, *A, *R;
-int n, p;
+void rproject(double *y, double *A, double *R, int n, int p)
 { double v[1+TUBE_MXDIM];
   int i, j;
 
@@ -47,9 +43,7 @@ int n, p;
       y[i] -= A[j*n+i]*v[j];
 }
 
-double k2c(lij,A,m,dd,d)
-double *lij, *A;
-int m, d, dd;
+double k2c(double *lij, double *A, int m, int dd, int d)
 { int i, j, k, l;
   double sum, *bk, v[TUBE_MXDIM];
 
@@ -80,9 +74,7 @@ int m, d, dd;
   return(sum*fd[0]*fd[0]);
 }
 
-double k2x(lij,A,m,d,dd)
-double *lij, *A;
-int m, d, dd;
+double k2x(double *lij, double *A, int m, int d, int dd)
 { int i, j, k;
   double s, v[1+TUBE_MXDIM], *ll;
 
@@ -113,9 +105,7 @@ int m, d, dd;
   return(s*fd[0]*fd[0]);
 }
 
-void d2c(ll,nn,li,ni,lij,nij,M,m,dd,d)
-double *ll, *nn, *li, *ni, *lij, *nij, *M;
-int m, dd, d;
+void d2c(double *ll, double *nn, double *li, double *ni, double *lij, double *nij, double *M, int m, int dd, int d)
 { int i, j, k, l, t, u, v, w;
   double z;
 
@@ -160,9 +150,7 @@ int m, dd, d;
     }
 }
 
-void d2x(li,lij,nij,M,m,dd,d)
-double *li, *lij, *nij, *M;
-int m, dd, d;
+void d2x(double *li, double *lij, double *nij, double *M, int m, int dd, int d)
 { int i, j, k, l, z;
   double t;
   for (i=0; i<dd; i++)
@@ -183,9 +171,7 @@ int m, dd, d;
     }
 }
 
-int k0x(x,d,kap,M)
-double *x, *kap, *M;
-int d;
+int k0x(double *x, int d, double *kap, double *M)
 { double det, *lij, *nij, z;
   int j, m, r;
 
@@ -215,9 +201,7 @@ int d;
   return(4);
 }
 
-void d1c(li,ni,m,d,M)
-double *li, *ni, *M;
-int m, d;
+void d1c(double *li, double *ni, int m, int d, double *M)
 { int i, j, k, l;
   double t;
 
@@ -237,9 +221,7 @@ int m, d;
   }
 }
 
-void d1x(li,ni,m,d,M)
-double *li, *ni, *M;
-int m, d;
+void d1x(double *li, double *ni, int m, int d, double *M)
 { int i, j, k;
   memmove(fd,ft,m*sizeof(double));
   setzero(ni,m*d);
@@ -249,9 +231,7 @@ int m, d;
         for (i=0; i<m; i++) ni[j*m+i] += M[j*d+k]*li[k*m+i];
 }
 
-int l1x(x,d,lap,M)
-double *x, *lap, *M;
-int d;
+int l1x(double *x, int d, double *lap, double *M)
 { double det, sumcj, *u, v[TUBE_MXDIM];
   double *ll, *li, *lij, *ni, *nij;
   int i, j, m;
@@ -312,9 +292,7 @@ int d;
   return(3);
 }
 
-int m0x(x,d,m0,M)
-double *x, *m0, *M;
-int d;
+int m0x(double *x, int d, double *m0, double *M)
 { double det, *li, *ni, *lij, *nij, *ll, *u1, *u2;
   double om, so, co, sumcj, v[TUBE_MXDIM];
   int m, i, j;
@@ -386,9 +364,7 @@ int d;
   return(2);
 }
 
-int n0x(x,d,n0,M)
-double *x, *n0, *M;
-int d;
+int n0x(double *x, int d, double *n0, double *M)
 { double det, *li, *ni, *a0, *a1, *a2;
   int j, m;
 
@@ -423,9 +399,7 @@ int d;
   return(1);
 }
 
-int kodf(ll,ur,mg,kap,lap)
-double *ll, *ur, *kap, *lap;
-int *mg;
+int kodf(double *ll, double *ur, int *mg, double *kap, double *lap)
 { double x[1], *l0, *l1, t, sum;
   int i, j, n;
 

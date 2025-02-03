@@ -26,10 +26,10 @@
 static char cb;
 double *sef, *fit, sigmahat;
 
-void predptall(lf,x,what,ev,i)
-lfit *lf;
+void predptall(lfit *lf, double *x, int what, int ev, int i)
+/* lfit *lf;
 double *x;
-int what, ev, i;
+int what, ev, i; */
 { double lik, rdf;
   fit[i] = dointpoint(lf,x,what,ev,i);
   if (cb=='n') return;
@@ -50,10 +50,10 @@ int what, ev, i;
   }
 }
 
-void prepvector(lf,x,n,what) /* interpolate a vector */
-lfit *lf;
+void prepvector(lfit *lf, double **x, int n, int what) /* interpolate a vector */
+/* lfit *lf;
 double **x;
-int n, what;
+int n, what; */
 { int i, j;
   double xx[MXDIM];
   for (i=0; i<n; i++)
@@ -63,21 +63,22 @@ int n, what;
   }
 }
 
-void prepfitp(lf,what)
-lfit *lf;
-int what;
-{ int  i;
+void prepfitp(lfit *lf, int what)
+/* lfit *lf;
+int what; */
+{ int i;
   for (i=0; i<lf->fp.nv; i++)
   { predptall(lf,evpt(&lf->fp,i),what,EFITP,i);
     if (lf_error) return;
   }
 }
 
-void prepgrid(lf,x,mg,n,what) /* interpolate a grid given margins */
-lfit *lf;
+void prepgrid(lfit *lf, double **x, Sint *mg, int n, int what) /* interpolate a grid given margins */
+/* lfit *lf;
 double **x;
 Sint *mg;
-int n, what;
+int n, what; */
+/* interpolate a grid given margins */
 { int i, ii, j, d;
   double xv[MXDIM];
   d = lf->fp.d;
@@ -92,12 +93,13 @@ int n, what;
   }
 }
 
-void preplot(lf,x,f,se,band,mg,where,what)
-lfit *lf;
+void preplot(lfit *lf, double **x, double *f, double *se, char band, Sint *mg, 
+             int where, int what)
+/* lfit *lf;
 double **x, *f, *se;
 Sint *mg;
 int where, what;
-char band;
+char band; */
 { int d, i, n=0;
   double *xx[MXDIM];
   d = lf->fp.d;

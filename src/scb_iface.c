@@ -1,3 +1,8 @@
+/*
+ *
+ *
+ */
+
 #include "local.h"
 
 static lfit *lf_scb;
@@ -5,9 +10,8 @@ static lfdata *lfd_scb;
 static smpar  *scb_sp;
 static design *des_scb;
 
-int scbfitter(x,l,reqd)
-double *x, *l;
-int reqd;
+int scbfitter(double *x, double *l, int reqd)
+/* scbfitter(x,l,reqd) double *x, *l; int reqd; */
 {
   int m;
   des_scb->xev = x;
@@ -41,9 +45,8 @@ int reqd;
 }
 */
 
-int constants(des,lf)
-design *des;
-lfit *lf;
+int constants(design *des, lfit *lf)
+/* constants(des,lf) design *des; lfit *lf; */
 {
   int d, m, nt, rw;
   evstruc *evs;

@@ -7,16 +7,16 @@
 
 extern double robscale;
 
-double vocri(lk,t0,t2,pen)
-double lk, t0, t2, pen;
+double vocri(double lk,double t0,double t2,double pen)
+/* double lk, t0, t2, pen; */
 { if (pen==0) return(-2*t0*lk/((t0-t2)*(t0-t2)));
   return((-2*lk+pen*t2)/t0);
 }
 
-int procvraw(des,lf,v)
-design *des;
+int procvraw(design *des, lfit *lf, int v)
+/*design *des;
 lfit *lf;
-int v;
+int v;*/
 { int i, lf_status;
   double coef[1+MXDIM];
 
@@ -48,9 +48,9 @@ int v;
  * has failed.
  */
 
-void set_default_like(fp,v)
-fitpt *fp;
-int v;
+void set_default_like(fitpt *fp, int v)
+/* fitpt *fp;
+int v; */
 { int i, nvm, d;
   nvm = fp->nvm;
   d = fp->d;
@@ -60,10 +60,10 @@ int v;
     fp->t0[i*nvm+v] = fp->nlx[i*nvm+v] = 0.0;
 }
 
-int procv(des,lf,v)
-design *des;
+int procv(design *des, lfit *lf, int v)
+/* design *des;
 lfit *lf;
-int v;
+int v; */
 { int p, nvm, i, k;
   double trc[6], t0[1+MXDIM], vari[1+MXDIM];
   k = procvraw(des,lf,v);
@@ -137,11 +137,11 @@ int v;
   return(k);
 }
 
-double intvo(des,lf,c0,c1,a,p,t0,t20,t21)
-design *des;
+double intvo(design *des, lfit *lf, double *c0, double *c1, double a, int p, double t0, double t20, double t21)
+/* design *des;
 lfit *lf;
 double *c0, *c1, a, t0, t20, t21;
-int p;
+int p; */
 { double th, lk, link[LLEN];
   int i;
   lk = 0;
@@ -154,10 +154,10 @@ int p;
   return(vocri(des->llk,t0,(1-a)*t20+a*t21,pen(&lf->sp)));
 }
 
-int procvvord(des,lf,v)
-design *des;
+int procvvord(design *des, lfit *lf, int v)
+/* design *des;
 lfit *lf;
-int v;
+int v; */
 { double tr[6], gcv, g0, ap, coef[4][10], th, md=0.0;
   int i, j, k=0, d1, i0, p1;
   des->xev = evpt(&lf->fp,v);
@@ -210,10 +210,10 @@ printf("variable order\n");
   return(k);
 }
 
-int procvhatm(des,lf,v)
-design *des;
+int procvhatm(design *des, lfit *lf, int v)
+/* design *des;
 lfit *lf;
-int v;
+int v; */
 { int k=0;
   double *l;
   l = &lf->fp.L[v*lf->lfd.n];

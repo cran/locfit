@@ -20,9 +20,9 @@
 
 static int debug;
 
-int exbctay(b,c,n,z) /* n-term taylor series of e^(bx+cx^2) */
-double b, c, *z;
-int n;
+int exbctay(double b, double c, int n, double *z) /* n-term taylor series of e^(bx+cx^2) */
+/* double b, c, *z;
+int n; */
 { double ec[20];
   int i, j;
   z[0] = 1;
@@ -40,10 +40,10 @@ int n;
   return(n);
 }
 
-double explinjtay(l0,l1,j,cf)
+double explinjtay(double l0, double l1, int j, double *cf)
 /* int_l0^l1 x^j e^(a+bx+cx^2); exbctay aroud l1 */
-double l0, l1, *cf;
-int j;
+/* double l0, l1, *cf;
+int j; */
 { double tc[40], f;
   int k, n;
   if ((l0!=0.0) | (l1!=1.0)) WARN(("explinjtay: invalid l0, l1"));
@@ -57,9 +57,9 @@ int j;
   return(f);
 }
 
-void explint1(l0,l1,cf,I,p) /* int x^j exp(a+bx); j=0..p-1 */
-double l0, l1, *cf, *I;
-int p;
+void explint1(double l0, double l1, double *cf, double *I, int p) /* int x^j exp(a+bx); j=0..p-1 */
+/* double l0, l1, *cf, *I;
+int p; */ /* int x^j exp(a+bx); j=0..p-1 */
 { double y0, y1, f;
   int j, k, k1;
   y0 = lf_exp(cf[0]+l0*cf[1]);
@@ -89,9 +89,9 @@ int p;
     I[j] = (I[j]-cf[1]*I[j+1])/(j+1);
 }
 
-void explintyl(l0,l1,cf,I,p) /* small c, use taylor series and explint1 */
-double l0, l1, *cf, *I;
-int p;
+void explintyl(double l0, double l1, double *cf, double *I, int p) /* small c, use taylor series and explint1 */
+/* double l0, l1, *cf, *I;
+int p; */
 { int i;
   double c;
   explint1(l0,l1,cf,I,p+8);
@@ -100,9 +100,9 @@ int p;
     I[i] = (((I[i+8]*c/4+I[i+6])*c/3+I[i+4])*c/2+I[i+2])*c+I[i];
 }
 
-void solvetrid(X,y,m)
-double *X, *y;
-int m;
+void solvetrid(double *X, double *y, int m)
+/* double *X, *y;
+int m; */
 { int i;
   double s;
   for (i=1; i<m; i++)
@@ -118,8 +118,8 @@ int m;
   for (i=0; i<m; i++) y[i] /= X[3*i+1];
 }
 
-void initi0i1(I,cf,y0,y1,l0,l1)
-double *I, *cf, y0, y1, l0, l1;
+void initi0i1(double *I, double *cf, double y0, double y1, double l0, double l1)
+/*double *I, *cf, y0, y1, l0, l1;*/
 { double a0, a1, c, d, bi;
   d = -cf[1]/(2*cf[2]); c = sqrt(2*fabs(cf[2]));
   a0 = c*(l0-d); a1 = c*(l1-d);
@@ -139,9 +139,9 @@ double *I, *cf, y0, y1, l0, l1;
   I[1] = (y1-y0)/(2*cf[2])+d*I[0];
 }
 
-void explinsid(l0,l1,cf,I,p) /* large b; don't use fwd recursion */
-double l0, l1, *cf, *I;
-int p;
+void explinsid(double l0, double l1, double *cf, double *I, int p) /* large b; don't use fwd recursion */
+/* double l0, l1, *cf, *I;
+int p; */
 { int k, k0, k1, k2;
   double y0, y1, Z[150];
 if (debug) printf("side: %8.5f %8.5f %8.5f    limt %8.5f %8.5f  p %2d\n",cf[0],cf[1],cf[2],l0,l1,p);
@@ -189,9 +189,9 @@ if (debug)
 }
 }
 
-void explinbkr(l0,l1,cf,I,p) /* small b,c; use back recursion */
-double l0, l1, *cf, *I;
-int p;
+void explinbkr(double l0, double l1, double *cf, double *I, int p) /* small b,c; use back recursion */
+/* double l0, l1, *cf, *I;
+int p; */
 { int k, km;
   double y0, y1;
   y0 = lf_exp(cf[0]+l0*(cf[1]+cf[2]*l0));
@@ -206,9 +206,9 @@ int p;
     I[k] = (I[k]-cf[1]*I[k+1]-2*cf[2]*I[k+2])/(k+1);
 }
 
-void explinfbk0(l0,l1,cf,I,p) /* fwd and bac recur; b=0; c<0 */
-double l0, l1, *cf, *I;
-int p;
+void explinfbk0(double l0, double l1, double *cf, double *I, int p) /* fwd and bac recur; b=0; c<0 */
+/* double l0, l1, *cf, *I;
+int p; */
 { double y0, y1, f1, f2, f, ml2;
   int k, ks;
 
@@ -257,9 +257,9 @@ int p;
     I[k] = (I[k]-2*cf[2]*I[k+2])/(k+1);
 }
 
-void explinfbk(l0,l1,cf,I,p) /* fwd and bac recur; b not too large */
-double l0, l1, *cf, *I;
-int p;
+void explinfbk(double l0,double l1, double *cf, double *I, int p) /* fwd and bac recur; b not too large */
+/* double l0, l1, *cf, *I;
+int p; */
 { double y0, y1;
   int k, ks, km;
 
@@ -288,9 +288,9 @@ int p;
     I[k] = (I[k]-cf[1]*I[k+1]-2*cf[2]*I[k+2])/(k+1);
 }
 
-void recent(I,resp,wt,p,s,x)
-double *I, *resp, *wt, x;
-int p, s;
+void recent(double *I, double *resp, double *wt, int p, int s, double x)
+/* double *I, *resp, *wt, x;
+int p, s; */
 { int i, j;
 
   /* first, use W taylor series I -> resp */
@@ -304,9 +304,9 @@ int p, s;
   for (j=0; j<=p; j++) for (i=p; i>j; i--) resp[i] += x*resp[i-1];
 }
 
-void recurint(l0,l2,cf,resp,p,ker)
-double l0, l2, *cf, *resp;
-int p, ker;
+void recurint(double l0, double l2, double *cf, double *resp, int p, int ker)
+/*double l0, l2, *cf, *resp;
+int p, ker; */
 { int i, s;
   double l1, d0, d1, d2, dl, z0, z1, z2, wt[20], ncf[3], I[50], r1[5], r2[5];
 if (debug) printf("\nrecurint: %8.5f %8.5f %8.5f   %8.5f %8.5f\n",cf[0],cf[1],cf[2],l0,l2);
@@ -415,9 +415,9 @@ if (debug) printf("case 8\n");
   return;
 }
 
-int onedexpl(cf,deg,resp)
-double *cf, *resp;
-int deg;
+int onedexpl(double *cf, int deg, double *resp)
+/* double *cf, *resp;
+int deg; */
 { int i;
   double f0, fr, fl;
   if (deg>=2) ERROR(("onedexpl only valid for deg=0,1"));
@@ -433,9 +433,9 @@ int deg;
   return(LF_OK);
 }
 
-int onedgaus(cf,deg,resp)
-double *cf, *resp;
-int deg;
+int onedgaus(double *cf, int deg, double *resp)
+/* double *cf, *resp;
+int deg; */
 { int i;
   double f0, mu, s2;
   if (deg==3)
@@ -460,9 +460,9 @@ int deg;
   return(LF_OK);
 }
 
-int onedint(sp,cf,l0,l1,resp) /* int W(u)u^j exp(..), j=0..2*deg */
-smpar *sp;
-double *cf, l0, l1, *resp;
+int onedint(smpar *sp, double *cf, double l0, double l1, double *resp) /* int W(u)u^j exp(..), j=0..2*deg */
+/* smpar *sp;
+double *cf, l0, l1, *resp; */
 { double u, uj, y, ncf[4], rr[5];
   int i, j;
 if (debug) printf("onedint: %f %f %f   %f %f\n",cf[0],cf[1],cf[2],l0,l1);

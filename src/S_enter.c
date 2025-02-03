@@ -161,11 +161,11 @@ vbasis(double **x, double *t, int n, int d, int *ind, int m, int p, double *X)
 }
 #endif
 
-static void setevs(evs,mi,cut,mg,flim)
-evstruc *evs;
+static void setevs(evstruc *evs, Sint *mi, double cut, int *mg, double *flim)
+/* evstruc *evs;
 int *mg;
 Sint *mi;
-double cut, *flim;
+double cut, *flim; */
 { double *ll, *ur;
   int i, d;
 
@@ -205,10 +205,10 @@ double cut, *flim;
   }
 }
 
-static void setdata(lfd,x,y,c,w,b,n,d,sca,sty)
-lfdata *lfd;
+static void setdata(lfdata *lfd, double *x, double *y, double *c, double *w, double *b, Sint n, Sint d, double *sca, Sint *sty)
+/* lfdata *lfd;
 double *x, *y, *c, *w, *b, *sca;
-Sint n, d, *sty;
+Sint n, d, *sty; */
 { int i;
   for (i=0; i<d; i++)
   { dvari(lfd,i) = &x[i*n];
@@ -224,10 +224,10 @@ Sint n, d, *sty;
   lfd->ord = 0;
 }
 
-static void setsmpar(sp,dp,mi)
-smpar *sp;
+static void setsmpar(smpar *sp, double *dp, Sint *mi)
+/* smpar *sp;
 double *dp;
-Sint *mi;
+Sint *mi; */
 { nn(sp)  = dp[DALP];
   fixh(sp)= dp[DFXH];
   pen(sp) = dp[DADP];
@@ -243,11 +243,14 @@ Sint *mi;
   lf.sp.vbasis = vbasis;
 }
 
-static void slocfit(x,y,c,w,b,lim,mi,dp,str,sca,xev,wdes,wtre,wpc,nvc,
-  iwk1, iwk2,lw,mg,L,kap,dv,nd,sty) /* ,bs) */
-double *x, *y, *c, *w, *b, *lim, *dp, *sca, *xev, *L, *kap, *wdes, *wtre, *wpc;
+static void slocfit(double *x, double *y, double *c, double *w, double *b, 
+                    double *lim, Sint *mi, double *dp, char **str, double *sca, 
+                    double *xev, double *wdes, double *wtre, double *wpc, 
+                    Sint *nvc, Sint *iwk1, Sint *iwk2, Sint *lw, Sint *mg, 
+                    double *L, double *kap, Sint *dv, Sint *nd, Sint *sty)
+/* double *x, *y, *c, *w, *b, *lim, *dp, *sca, *xev, *L, *kap, *wdes, *wtre, *wpc;
 Sint *mi, *nvc, *iwk1, *iwk2, *lw, *mg, *dv, *nd, *sty;
-char **str;
+char **str; */
 /* CALL_S_FUNC *bs; */
 { Sint n, d, i;
 
@@ -348,9 +351,10 @@ char **str;
   for(i=0; i<lw[5]; i++) kap[i] = lf.fp.kap[i];
 }
 
-static void recoef(xev,coef,cell,nvc,mi,dp)
-double *xev, *coef, *dp;
-Sint *cell, *nvc, *mi;
+static void recoef(double *xev, double *coef, Sint *cell, Sint *nvc, 
+                    Sint *mi, double *dp)
+/* double *xev, *coef, *dp;
+Sint *cell, *nvc, *mi; */
 { int d, vc=0;
 
   d = mi[MDIM];
@@ -388,12 +392,15 @@ Sint *cell, *nvc, *mi;
   lf.evs.hi = cell; cell += MAX(nvc[3],nvc[4]);
 }
 
-static void spreplot(xev,coef,sv,cell,x,res,se,wpc,sca,m,nvc,mi,dp,
-  mg,dv,nd,sty,where,what,bs)
-double *xev, *coef, *sv, *x, *res, *se, *wpc, *sca, *dp;
+static void spreplot(double *xev, double *coef, double *sv, Sint *cell, 
+                      double *x, double *res, double *se, double *wpc, 
+                      double *sca, Sint *m, Sint *nvc, Sint *mi, double *dp, 
+                      Sint *mg, Sint *dv, Sint *nd, Sint *sty, Sint *where, 
+                      char **what, void **bs)
+/* double *xev, *coef, *sv, *x, *res, *se, *wpc, *sca, *dp;
 Sint *cell, *m, *nvc, *mi, *mg, *dv, *nd, *sty, *where;
 char **what;
-void **bs;
+void **bs; */
 { Sint i, p;
   double *xx[MXDIM];
 
@@ -445,11 +452,15 @@ void **bs;
   preplot(&lf,xx,res,se,what[1][0],m,*where,ppwhat(what[0]));
 }
 
-static void sfitted(x,y,w,c,ba,fit,cv,st,xev,coef,sv,cell,wpc,sca,nvc,mi,dp,mg,dv,nd,sty,what,bs)
-double *x, *y, *w, *c, *ba, *fit, *xev, *coef, *sv, *wpc, *sca, *dp;
+static void sfitted(double *x, double *y, double *w, double *c, double *ba,
+                    double *fit, Sint *cv, Sint *st, double *xev, 
+                    double *coef, double *sv, Sint *cell, double *wpc, 
+                    double *sca, Sint *nvc, Sint *mi, double *dp, Sint *mg, 
+                    Sint *dv, Sint *nd, Sint *sty, char **what, void **bs)
+/* double *x, *y, *w, *c, *ba, *fit, *xev, *coef, *sv, *wpc, *sca, *dp;
 Sint *cv, *st, *cell, *nvc, *mi, *mg, *dv, *nd, *sty;
 char **what;
-void **bs;
+void **bs; */
 { Sint i;
 
   recoef(xev,coef,cell,nvc,mi,dp);
@@ -476,9 +487,11 @@ void **bs;
   fitted(&lf,fit,ppwhat(what[0]),*cv,*st,restyp(what[1]));
 }
 
-static void triterm(xev,h,ce,lo,hi,sca,nvc,mi,dp,nt,term,box)
-double *xev, *h, *sca, *dp, *box;
-Sint *ce, *lo, *hi, *nvc, *mi, *nt, *term;
+static void triterm(double *xev, double *h, Sint *ce, Sint *lo, Sint *hi, 
+                    double *sca, Sint *nvc, Sint *mi, double *dp, 
+                    Sint *nt, Sint *term, double *box)
+/* double *xev, *h, *sca, *dp, *box;
+Sint *ce, *lo, *hi, *nvc, *mi, *nt, *term; */
 { int i, d, vc;
   Sint mg;
 
@@ -507,10 +520,10 @@ Sint *ce, *lo, *hi, *nvc, *mi, *nt, *term;
   }
 }
 
-void guessnv(lw,evt,dp,mi,nvc,mg)
+void guessnv(int *lw, char **evt, double *dp, int *mi, int *nvc, int *mg)
+/* int *lw, *mi, *nvc, *mg;
 double *dp;
-char **evt;
-int *lw, *mi, *nvc, *mg;
+char **evt; */
 { int n, d, i, nvm, ncm, vc;
   smpar sp;
   evstruc evs;

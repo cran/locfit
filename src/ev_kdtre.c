@@ -10,13 +10,11 @@
 
 #include "local.h"
 
-void newcell();
+void newcell(int *nv, int vc, double *xev, int d, int k, double split_val, Sint *cpar, Sint *clef, Sint *crig);
 static int nterm;
 
-void kdtre_guessnv(evs,nvm,ncm,vc,n,d,alp)
-evstruc *evs;
-double alp;
-int *nvm, *ncm, *vc, n, d;
+void kdtre_guessnv(evstruc *evs, int *nvm, int *ncm, int *vc, int n, int d, double alp)
+/* kdtre_guessnv(evs,nvm,ncm,vc,n,d,alp) evstruc *evs; int *nvm, *ncm, *vc, n, d; double alp; */
 { int k;
   if (ev(evs) == EKDTR)
   { nterm = (int)(cut(evs)/4 * n * MIN(alp,1.0) );
@@ -48,10 +46,8 @@ int *nvm, *ncm, *vc, n, d;
       If l+r is even, the low set is larger by 1.
     If there are ties, all ties go in the low set.
 */      
-int ksmall(l, r, m, x, pi)
-Sint *pi;
-int l, r, m;
-double *x;
+int ksmall(int l, int r, int m, double *x, Sint *pi)
+/* ksmall(l,r,m,x,pi) Sint *pi; int l, r, m; double *x; */
 {
   int il, ir, jl, jr;
   double t;
@@ -100,11 +96,8 @@ double *x;
   return(0);
 }
 
-int terminal(lf,p,pi,fc,d,m,split_val)
-lfit *lf;
-Sint *pi;
-int p, d, fc, *m;
-double *split_val;
+int terminal(lfit *lf, int p, Sint *pi, int fc, int d, int *m, double *split_val)
+/* terminal(lf,p,pi,fc,d,m,split_val) lfit *lf; Sint *pi; int p, d, fc, *m; double *split_val; */
 { int i, k, lo, hi, split_var;
   double max, min, score, max_score, t;
 
@@ -141,9 +134,8 @@ double *split_val;
   return(split_var);
 }
 
-void kdtre_start(des,lf)
-design *des;
-lfit *lf;
+void kdtre_start(design *des, lfit *lf)
+/* kdtre_start(des,lf) design *des; lfit *lf; */
 { Sint *pi;
   int i, j, vc, d, nc, nv, ncm, nvm, k, m, n, p;
   double sv;
@@ -227,10 +219,8 @@ lfit *lf;
   return;
 }
 
-void newcell(nv,vc,xev, d, k, split_val, cpar, clef, crig)
-double *xev, split_val;
-Sint *cpar, *clef, *crig;
-int *nv, vc, d, k;
+void newcell(int *nv, int vc, double *xev, int d, int k, double split_val, Sint *cpar, Sint *clef, Sint *crig)
+/* newcell(nv,vc,xev,d,k,split_val,cpar,clef,crig) double *xev, split_val; Sint *cpar, *clef, *crig; int *nv, vc, d, k; */
 { int i, ii, j, j2, tk, match;
   tk = 1<<k;
   for (i=0; i<vc; i++)
@@ -256,11 +246,8 @@ int *nv, vc, d, k;
 
 extern void hermite2();
 
-double blend(fp,evs,s,x,ll,ur,j,nt,t,what)
-fitpt *fp;
-evstruc *evs;
-double s, *x, *ll, *ur;
-int j, nt, *t, what;
+double blend(fitpt *fp, evstruc *evs, double s, double *x, double *ll, double *ur, int j, int nt, int *t, int what)
+/* blend(fp,evs,s,x,ll,ur,j,nt,t,what) fitpt *fp; evstruc *evs; double s, *x, *ll, *ur; int j, nt, *t, what; */
 { Sint *ce;
   int k, k1, m, nc, j0, j1;
   double v0, v1, xibar, g0[3], g1[3], gg[4], gp[4], phi[4];
@@ -309,11 +296,8 @@ int j, nt, *t, what;
   return(s);
 }
 
-double kdtre_int(fp,evs,x,what)
-fitpt *fp;
-evstruc *evs;
-double *x;
-int what;
+double kdtre_int(fitpt *fp, evstruc *evs, double *x, int what)
+/* kdtre_int(fp,evs,x,what) fitpt *fp; evstruc *evs; double *x; int what; */
 { Sint *ce;
   int k, vc, t[20], nt, nc, j, d;
   double *ll, *ur, ff, vv[64][64];

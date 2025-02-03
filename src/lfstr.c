@@ -23,8 +23,8 @@
 
 #include "local.h"
 
-int ct_match(z1, z2)
-char *z1, *z2;
+int ct_match(char *z1, char *z2)
+/*char *z1, *z2;*/
 { int ct = 0;
   while (z1[ct]==z2[ct])
   { if (z1[ct]=='\0') return(ct+1);
@@ -33,9 +33,9 @@ char *z1, *z2;
   return(ct);
 }
 
-int pmatch(z, strings, vals, n, def)
-char *z, **strings;
-int *vals, n, def;
+int pmatch(char *z, char **strings, int *vals, int n, int def)
+/*char *z, **strings;
+int *vals, n, def;*/
 { int i, ct, best, best_ct;
   best = -1;
   best_ct = 0;
@@ -57,8 +57,8 @@ static int   fvals[17] =
   { TDEN,  TRAT,  THAZ,  TGAUS, TLOGT,
     TPOIS, TGAMM, TGEOM, TCIRC, TROBT, TROBT,
     TWEIB, TCAUC, TPROB, TLOGT, TGEOM, TCIRC };
-int lffamily(z)
-char *z;
+int lffamily(char *z)
+/*char *z;*/
 { int quasi, robu, f;
   quasi = robu = 0;
   while ((z[0]=='q') | (z[0]=='r'))
@@ -84,12 +84,14 @@ static char *wfuns[13] = {
 static int wvals[13] = { WRECT, WEPAN, WBISQ, WTCUB,
   WTRWT, WGAUS, WTRIA, WQUQU, W6CUB, WMINM, WEXPL, WMACL, WPARM };
 int lfkernel(char *z)
+/*char *z;*/
 { return(pmatch(z, wfuns, wvals, 13, WTCUB));
 }
 
 static char *ktype[5] = { "spherical", "product", "center", "lm", "zeon" };
 static int   kvals[5] = { KSPH, KPROD, KCE, KLM, KZEON };
 int lfketype(char *z)
+/*char *z;*/
 { return(pmatch(z, ktype, kvals, 5, KSPH));
 }
 
@@ -98,6 +100,7 @@ static char *ltype[8] = { "default", "canonical", "identity", "log",
 static int   lvals[8] = { LDEFAU, LCANON, LIDENT, LLOG,
                           LLOGIT, LINVER, LSQRT,  LASIN };
 int lflink(char *z)
+/*char *z;*/
 { return(pmatch(z, ltype, lvals, 8, LDEFAU));
 }
 
@@ -107,6 +110,7 @@ static char *etype[11]= { "tree",     "phull", "data", "grid", "kdtree",
 static int   evals[11]= { ETREE, EPHULL, EDATA, EGRID, EKDTR,
                           EKDCE, ECROS,  EPRES, EXBAR, ENONE, ESPHR };
 int lfevstr(char *z)
+/*char *z;*/
 { return(pmatch(z, etype, evals, 11, ETREE));
 }
 
@@ -114,12 +118,14 @@ static char *itype[7] = { "default", "multi", "product", "mlinear",
                           "hazard",  "sphere", "monte" };
 static int   ivals[7] = { IDEFA, IMULT, IPROD, IMLIN, IHAZD, ISPHR, IMONT };
 int deitype(char *z)
+/*char *z;*/
 { return(pmatch(z, itype, ivals, 6, IDEFA));
 }
 
 static char *atype[5] = { "none", "cp", "ici", "mindex", "ok" };
 static int   avals[5] = { ANONE, ACP, AKAT, AMDI, AOK };
 int lfacri(char *z)
+/*char *z;*/
 { return(pmatch(z, atype, avals, 5, ANONE));
 }
 
@@ -131,8 +137,8 @@ static char *whtyp[8] = { "coef", "nlx", "infl", "band",
                           "degr", "like", "rdf", "vari" };
 static int   whval[8] = { PCOEF, PNLX, PT0, PBAND, PDEGR, PLIK, PRDF, PVARI };
 
-int restyp(z)
-char *z;
+int restyp(char *z)
+/*char *z;*/
 { int val;
   
   val = pmatch(z, rtype, rvals, 8, -1);
@@ -140,8 +146,8 @@ char *z;
   return(val);
 }
 
-int ppwhat(z)
-char *z;
+int ppwhat(char *z)
+/*char *z;*/
 { int val;
   
   val = pmatch(z, whtyp, whval, 8, -1);

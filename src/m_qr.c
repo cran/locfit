@@ -10,9 +10,9 @@
 /* qr decomposition of X (n*p organized by column).
  * Take w for the ride, if not NULL.
  */
-void qr(X,n,p,w)
-double *X, *w;
-int n, p;
+void qr(double *X, int n, int p, double *w)
+/*double *X, *w;
+int n, p;*/
 { int i, j, k, mi;
   double c, s, mx, nx, t;
 
@@ -71,9 +71,9 @@ int n, p;
   }
 }
 
-void qrinvx(R,x,n,p)
-double *R, *x;
-int n, p;
+void qrinvx(double *R, double *x, int n, int p)
+/*double *R, *x;
+int n, p;*/
 { int i, j;
   for (i=p-1; i>=0; i--)
   { for (j=i+1; j<p; j++) x[i] -= R[j*n+i]*x[j];
@@ -81,9 +81,9 @@ int n, p;
   }
 }
 
-void qrtinvx(R,x,n,p)
-double *R, *x;
-int n, p;
+void qrtinvx(double *R, double *x, int n, int p)
+/*double *R, *x;
+int n, p;*/
 { int i, j;
   for (i=0; i<p; i++)
   { for (j=0; j<i; j++) x[i] -= R[i*n+j]*x[j];
@@ -91,9 +91,9 @@ int n, p;
   }
 }
 
-void qrsolv(R,x,n,p)
-double *R, *x;
-int n, p;
+void qrsolv(double *R, double *x, int n, int p)
+/*double *R, *x;
+int n, p;*/
 { qrtinvx(R,x,n,p);
   qrinvx(R,x,n,p);
 }

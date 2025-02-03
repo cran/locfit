@@ -8,8 +8,8 @@
 extern double robscale;
 
 /* special version of ressumm to estimate sigma^2, with derivative estimation */
-void ressummd(lf)
-lfit *lf;
+void ressummd(lfit *lf)
+/* ressummd(lf) lfit *lf; */
 { int i;
   double s0, s1;
   s0 = s1 = 0.0;
@@ -27,9 +27,8 @@ lfit *lf;
     rv(&lf->fp) = -2*s1/s0;
 }
 
-void ressumm(lf,des)
-lfit *lf;
-design *des;
+void ressumm(lfit *lf, design *des)
+/* ressumm(lf,des) lfit *lf; design *des; */
 { int i, j, evo, tg, orth;
   double *oy, pw, r1, r2, rdf, t0, t1, u[MXDIM], link[LLEN];
   fitpt *fp;
@@ -140,10 +139,8 @@ design *des;
   }
 }
 
-double rss(lf,des,df)
-lfit *lf;
-design *des;
-double *df;
+double rss(lfit *lf, design *des, double *df)
+/* rss(lf,des,df) lfit *lf; design *des; double *df; */
 {
 //double ss;
 //  ss = 0;

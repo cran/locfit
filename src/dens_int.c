@@ -26,10 +26,8 @@
  * At input, lset l=0 and r=length(x)-1.
  * At output, x[ind[0]] <= x[ind[1]] <= ...
  */
-void lforder(ind,x,l,r)
-Sint *ind;
-int l, r;
-double *x;
+void lforder(Sint *ind, double *x, int l, int r)
+/* Sint *ind; double *x; int l, r; */
 { double piv;
   int i, i0, i1;
   piv = (x[ind[l]]+x[ind[r]])/2;
@@ -59,9 +57,8 @@ double *x;
  *  estdiv integrates the density between fit points x0 and x1.
  *  f0, f1 are function values, d0, d1 are derivatives.
  */
-double estdiv(x0,x1,f0,f1,d0,d1,lin)
-double x0, x1, f0, f1, d0, d1;
-int lin;
+double estdiv(double x0, double x1, double f0, double f1, double d0, double d1, int lin)
+/* double x0, x1, f0, f1, d0, d1; int lin; */
 { double cf[4], I[2], dlt, e0, e1;
 
   if (x0==x1) return(0.0);
@@ -102,10 +99,8 @@ int lin;
  *   This would be severely messed up, if I ever implement parcomp
  *   for densities.
  */
-double dens_integrate(lf,des,z)
-lfit *lf;
-design *des;
-int z;
+double dens_integrate(lfit *lf, design *des, int z)
+/* lfit *lf; design *des; int z; */
 { int has_deriv, i, i0, i1, nv;
   Sint *ind;
   double *xev, *fit, *deriv=NULL, sum, term;
@@ -186,9 +181,8 @@ int z;
   return(sum);
 }
 
-void dens_renorm(lf,des)
-lfit *lf;
-design *des;
+void dens_renorm(lfit *lf, design *des)
+/* lfit *lf; design *des; */
 { int i;
   double sum;
   sum = dens_integrate(lf,des,1);
@@ -197,9 +191,8 @@ design *des;
   for (i=0; i<lf->fp.nv; i++) lf->fp.coef[i] -= sum;
 }
 
-void dens_lscv(des,lf)
-lfit *lf;
-design *des;
+void dens_lscv(design *des, lfit *lf)
+/* design *des; lfit *lf; */
 { double df, fh, fh_cv, infl, z0, z1, x[MXDIM];
   int i, n, j, evo;
   z1 = df = 0.0;

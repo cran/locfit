@@ -114,8 +114,10 @@ extern void compparcomp(), subparcomp(), subparcomp2(), pcchk();
 extern int pc_reqd(), noparcomp();
 
 /* preplot.c */
-extern void preplot(), cpreplot();
-extern int setpppoints();
+extern void preplot(lfit *lf, double **x, double *f, double *se, char band, Sint *mg, 
+             int where, int what);
+/* extern void cpreplot();*/
+/* extern int setpppoints(); */
 
 /* procv.c */
 extern int procvhatm(), procv(), procvraw(), procvvord(), calcp();

@@ -33,9 +33,9 @@ static smpar *rob_sp;
 static design *rob_des;
 static int rob_mxit;
 
-double median(x,n)
-double *x;
-int n;
+double median(double *x, int n)
+/*double *x;
+int n;*/
 { int i, j, lt, eq, gt;
   double lo, hi, s;
   lo = hi = x[0];
@@ -62,11 +62,11 @@ int n;
   return((hi+lo)/2);
 }
 
-double nrobustscale(lfd,sp,des,rs)
-lfdata *lfd;
+double nrobustscale(lfdata *lfd, smpar *sp, design *des, double rs)
+/*lfdata *lfd;
 smpar *sp;
 design *des;
-double rs;
+double rs;*/
 { int i, ii, p;
   double link[LLEN], sc, sd, sw, e;
   p = des->p; sc = sd = sw = 0.0;
@@ -87,10 +87,10 @@ double rs;
   return(rs);
 }
 
-double robustscale(lfd,sp,des)
-lfdata *lfd;
+double robustscale(lfdata *lfd, smpar *sp, design *des)
+/*lfdata *lfd;
 smpar *sp;
-design *des;
+design *des;*/
 { int i, ii, p, fam, lin;
   double rs, link[LLEN];
   p = des->p;
@@ -107,8 +107,8 @@ design *des;
   return(rs);
 }
 
-double update_rs(x)
-double x;
+double update_rs(double x)
+/*double x;*/
 { double nx;
   if (lf_status != LF_OK) return(x);
   robscale = exp(x);
@@ -120,11 +120,11 @@ double x;
   return(nx);
 }
 
-void lf_robust(lfd,sp,des,mxit)
-lfdata *lfd;
+void lf_robust(lfdata *lfd, smpar *sp, design *des, int mxit)
+/*lfdata *lfd;
 design *des;
 smpar *sp;
-int mxit;
+int mxit;*/
 { double x;
   rob_lfd = lfd;
   rob_des = des;

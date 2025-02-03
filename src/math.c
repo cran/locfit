@@ -21,18 +21,18 @@
 
 #include <math.h>
 
-double lf_exp(x)
-double x;
+double lf_exp(double x)
+/* double x; */
 { if (x>700.0) return(1.014232054735004e+304);
   return(exp(x));
 }
 
 #include "local.h"
 
-double lferfc();
+double lferfc(double);
 
-double lferf(x)
-double x;
+double lferf(double x)
+/* double x; */
 { static double val[] = { 0.0, 0.52049987781304674,
     0.84270079294971501, 0.96610514647531076, 0.99532226501895282,
     0.99959304798255499, 0.99997790950300125 };
@@ -57,15 +57,15 @@ double x;
   return(z);
 }
 
-double lferfc(x)
-double x;
+double lferfc(double x)
+/* double x; */
 { if (x<0) return(1+lferf(-x));
   if (x<2.5) return(1-lferf(x));
   return(exp(-x*x)/(x*SQRPI));
 }
 
-double lflgamma(x)
-double x;
+double lflgamma(double x)
+/* double x; */
 { double x1;
   static double ilg[] = { 0.0, 0.0, 0.69314718055994529,
     1.791759469228055, 3.1780538303479458, 4.7874917427820458, 6.5792512120101012,
@@ -86,8 +86,8 @@ double x;
   return(HL2PI+(x1+0.5)*log(x1)-x1+1/(12*x1));
 }
 
-double lfdaws(x)
-double x;
+double lfdaws(double x)
+/* double x; */
 { static double val[] = {
   0,  0.24485619356002, 0.46034428261948, 0.62399959848185, 0.72477845900708,
       0.76388186132749, 0.75213621001998, 0.70541701910853, 0.63998807456541,
@@ -131,8 +131,8 @@ double x;
   return(z);
 }
 
-double ptail(x) /* exp(x*x/2)*int_{-\infty}^x exp(-u^2/2)du for x < -6 */
-double x;
+double ptail(double x) /* exp(x*x/2)*int_{-\infty}^x exp(-u^2/2)du for x < -6 */
+/* double x; */
 { double y, z, f0;
   int j;
   y = z = -1.0/x;
@@ -145,13 +145,13 @@ double x;
   return(z);
 }
 
-double logit(x)
-double x;
+double logit(double x)
+/* double x; */
 { return(log(x/(1-x)));
 }
 
-double expit(x)
-double x;
+double expit(double x)
+/* double x; */
 { double u;
   if (x<0)
   { u = exp(x);
@@ -160,8 +160,8 @@ double x;
   return(1/(1+exp(-x)));
 }
 
-int factorial(n)
-int n;
+int factorial(int n)
+/* int n; */
 { if (n<=1) return(1.0);
   return(n*factorial(n-1));
 }

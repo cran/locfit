@@ -9,9 +9,10 @@
 
 #include "local.h"
 
-int noparcomp(sp,geth)
-smpar *sp;
-int geth;
+int noparcomp(smpar *sp, int geth)
+/* int noparcomp(sp, geth)
+   smpar *sp;
+   int geth; */
 { int tg;
   if (geth==GSMP) return(1);
   if (deg0(sp)<deg(sp)) return(1);
@@ -23,14 +24,16 @@ int geth;
   return(0);
 }
 
-int pc_reqd(d,p)
-int d, p;
+int pc_reqd(int d, int p)
+/* int pc_reqd(d, p)
+   int d, p; */
 { return(d + 2*p + jac_reqd(p));
 }
 
-void pcchk(pc,d,p,lc)
-paramcomp *pc;
-int d, p, lc;
+void pcchk(paramcomp *pc, int d, int p, int lc)
+/* void pcchk(pc, d, p, lc)
+   paramcomp *pc;
+   int d, p, lc; */
 { int rw;
   double *z;
 
@@ -49,13 +52,15 @@ int d, p, lc;
   pc->xtwx.p = p;
 }
 
-void compparcomp(des,lfd,sp,pc,geth,nopc)
-design *des;
-lfdata *lfd;
-smpar *sp;
-paramcomp *pc;
-int geth;
-int nopc;
+void compparcomp(design *des, lfdata *lfd, smpar *sp, paramcomp *pc, int geth,
+                 int nopc)
+/* void compparcomp(des, lfd, sp, pc, geth, nopc)
+   design *des;
+   lfdata *lfd;
+   smpar *sp;
+   paramcomp *pc;
+   int geth;
+   int nopc; */
 { int i, j, k, p;
   double wt, sw;
 
@@ -117,10 +122,11 @@ int nopc;
   }
 }
 
-void subparcomp(des,lf,coef)
-design *des;
-lfit *lf;
-double *coef;
+void subparcomp(design *des, lfit *lf, double *coef)
+/* void subparcomp(des, lf, coef)
+   design *des;
+   lfit *lf;
+   double *coef; */
 { int i, nd;
   deriv *dv;
   paramcomp *pc;
@@ -142,10 +148,11 @@ double *coef;
   dv->nd = nd;
 }
 
-void subparcomp2(des,lf,vr,il)
-design *des;
-lfit *lf;
-double *vr, *il;
+void subparcomp2(design *des, lfit *lf, double *vr, double *il)
+/* void subparcomp2(des, lf, vr, il)
+   design *des;
+   lfit *lf;
+   double *vr, *il; */
 { double t0, t1;
   int i, nd;
   deriv *dv;
@@ -175,10 +182,11 @@ double *vr, *il;
   dv->nd = nd;
 }
 
-double addparcomp(lf,x,c)
-lfit *lf;
-double *x;
-int c;
+double addparcomp(lfit *lf, double *x, int c)
+/* double addparcomp(lf, x, c)
+   lfit *lf;
+   double *x;
+   int c; */
 { double y;
   paramcomp *pc;
 

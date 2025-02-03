@@ -5,14 +5,14 @@
 
 #include "local.h"
 
-double linear_interp(h,d,f0,f1)
-double h, d, f0, f1;
+double linear_interp(double h, double d, double f0, double f1)
+/* linear_interp(h,d,f0,f1) double h,d,f0,f1; */
 { if (d==0) return(f0);
   return( ( (d-h)*f0 + h*f1 ) / d );
 }
 
-void hermite2(x,z,phi)
-double x, z, *phi;
+void hermite2(double x, double z, double *phi)
+/* hermite2(x,z,phi) double x,z,*phi; */
 { double h;
   if (z==0)
   { phi[0] = 1.0; phi[1] = phi[2] = phi[3] = 0.0;
@@ -35,15 +35,15 @@ double x, z, *phi;
   phi[3] = h*h*(h - 1);
 }
 
-double cubic_interp(h,f0,f1,d0,d1)
-double h, f0, f1, d0, d1;
+double cubic_interp(double h, double f0, double f1, double d0, double d1)
+/* cubic_interp(h,f0,f1,d0,d1) double h,f0,f1,d0,d1; */
 { double phi[4];
   hermite2(h,1.0,phi);
   return(phi[0]*f0+phi[1]*f1+phi[2]*d0+phi[3]*d1);
 }
 
-double cubintd(h,f0,f1,d0,d1)
-double h, f0, f1, d0, d1;
+double cubintd(double h, double f0, double f1, double d0, double d1)
+/* cubintd(h,f0,f1,d0,d1) double h,f0,f1,d0,d1; */
 { double phi[4];
   phi[1] = 6*h*(1-h);
   phi[0] = -phi[1];
@@ -61,9 +61,8 @@ double h, f0, f1, d0, d1;
     d = dimension.
     nc = no of coefficients.
 */
-double rectcell_interp(x,vv,ll,ur,d,nc)
-double *x, vv[64][64], *ll, *ur;
-int d, nc;
+double rectcell_interp(double *x, double vv[64][64], double *ll, double *ur, int d, int nc)
+/* rectcell_interp(x,vv,ll,ur,d,nc) double *x, vv[64][64], *ll, *ur; int d, nc; */
 { double phi[4];
   int i, j, k, tk;
 
@@ -111,10 +110,8 @@ int d, nc;
   return(vv[0][0]);
 }
 
-int exvval(fp,vv,nv,d,what,z)
-fitpt *fp;
-double *vv;
-int nv, d, z, what;
+int exvval(fitpt *fp, double *vv, int nv, int d, int what, int z)
+/* exvval(fp,vv,nv,d,what,z) fitpt *fp; double *vv; int nv, d, what, z; */
 { int i, k;
   double *values;
 
@@ -159,9 +156,8 @@ int nv, d, z, what;
   }
 }
 
-void exvvalpv(vv,vl,vr,d,k,dl,nc)
-double *vv, *vl, *vr, dl;
-int d, k, nc;
+void exvvalpv(double *vv, double *vl, double *vr, int d, int k, double dl, int nc)
+/* exvvalpv(vv,vl,vr,d,k,dl,nc) double *vv, *vl, *vr, dl; int d, k, nc; */
 { int i, tk, td;
   double f0, f1;
   if (nc==1)
@@ -178,11 +174,8 @@ int d, k, nc;
   }
 } 
 
-double grid_int(fp,evs,x,what)
-fitpt *fp;
-evstruc *evs;
-double *x;
-int what;
+double grid_int(fitpt *fp, evstruc *evs, double *x, int what)
+/* grid_int(fp,evs,x,what) fitpt *fp; evstruc *evs; double *x; int what; */
 { int d, i, j, jj, nc=0, sk, v[MXDIM], vc, z0, nce[1<<MXDIM], *mg;
   double *ll, *ur, vv[64][64], z;
 
@@ -212,19 +205,15 @@ int what;
   return(z);
 }
 
-double fitp_int(fp,x,what,i)
-fitpt *fp;
-double *x;
-int what, i;
+double fitp_int(fitpt *fp, double *x, int what, int i)
+/* fitp_int(fp,x,what,i) fitpt *fp; double *x; int what, i; */
 { double vv[1+MXDIM];
   exvval(fp,vv,i,fp->d,what,0);
   return(vv[0]);
 }
 
-double xbar_int(fp,x,what)
-fitpt *fp;
-double *x;
-int what;
+double xbar_int(fitpt *fp, double *x, int what)
+/* xbar_int(fp,x,what) fitpt *fp; double *x; int what; */
 { int i, nc;
   double vv[1+MXDIM], f;
   nc = exvval(fp,vv,0,fp->d,what,0);
@@ -235,10 +224,8 @@ int what;
   return(f);
 }
 
-double dointpoint(lf,x,what,ev,j)
-lfit *lf;
-double *x;
-int what, ev, j;
+double dointpoint(lfit *lf, double *x, int what, int ev, int j)
+/* dointpoint(lf,x,what,ev,j) lfit *lf; double *x; int what, ev, j; */
 { double xf, f=0.0;
   int i;
   fitpt *fp;

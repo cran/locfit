@@ -51,8 +51,7 @@ static double sferr_halves[31] = {
 0.005554733551962801371038690  /* 15.0 */
 };
 
-double stirlerr(n)
-double n;
+double stirlerr(double n)
 { double nn;
 
   if (n<15.0)
@@ -69,8 +68,7 @@ double n;
   return((S0-(S1-(S2-(S3-S4/nn)/nn)/nn)/nn)/n);
 }
 
-double bd0(x,np)
-double x, np;
+double bd0(double x,double np)
 { double ej, s, s1, v;
   int j;
   if (fabs(x-np)<0.1*(x+np))
@@ -97,9 +95,7 @@ double x, np;
   (3) Does not check for 0<=p<=1 and 0<=q<=1 or NaN's. Do this in
       the calling function.
 */
-double dbinom_raw(x,n,p,q,give_log)
-double x, n, p, q;
-int give_log;
+double dbinom_raw(double x, double n, double p, double q, int give_log)
 { double f, lc;
 
   if (p==0.0) return((x==0) ? D_1 : D_0);
@@ -124,10 +120,7 @@ int give_log;
   return( FEXP(f,lc) );
 }
 
-double dbinom(x,n,p,give_log)
-int x, n;
-double p;
-int give_log;
+double dbinom(int x, int n, double p, int give_log)
 { 
   if ((p<0) | (p>1) | (n<0)) return(INVALID_PARAMS);
   if (x<0) return( D_0 );
@@ -141,9 +134,7 @@ int give_log;
   that call dpois_raw() (i.e. dgamma) may use a fractional
   x argument.
 */
-double dpois_raw(x,lambda,give_log)
-int give_log;
-double x, lambda;
+double dpois_raw(double x, double lambda, int give_log)
 {
   if (lambda==0) return( (x==0) ? D_1 : D_0 );
   if (x==0) return( DEXP(-lambda) );
@@ -152,9 +143,7 @@ double x, lambda;
   return(FEXP( PIx2*x, -stirlerr(x)-bd0(x,lambda) ));
 }
 
-double dpois(x,lambda,give_log)
-int x, give_log;
-double lambda;
+double dpois(int x, double lambda,int give_log)
 {
   if (lambda<0) return(INVALID_PARAMS);
   if (x<0) return( D_0 );
@@ -162,9 +151,7 @@ double lambda;
   return( dpois_raw((double)x,lambda,give_log) );
 }
 
-double dbeta(x,a,b,give_log)
-double x, a, b;
-int give_log;
+double dbeta(double x, double a, double b, int give_log)
 { double f, p;
 
   if ((a<=0) | (b<=0)) return(INVALID_PARAMS);
@@ -201,9 +188,7 @@ int give_log;
  *   a second conversion. Note the division by p; this seems unavoidable
  *   for m < 2, since the F density has a singularity as x (or p) -> 0.
  */
-double df(x,m,n,give_log)
-double x, m, n;
-int give_log;
+double df(double x, double m, double n, int give_log)
 { double p, q, f, dens;
 
   if ((m<=0) | (n<=0)) return(INVALID_PARAMS);
@@ -238,9 +223,7 @@ int give_log;
 
 /* #define USE_SCALE */
 
-double dgamma(x,r,lambda,give_log)
-int give_log;
-double x, r, lambda;
+double dgamma(double x, double r, double lambda, int give_log)
 { double pr;
 
   if ((r<=0) | (lambda<0)) return(INVALID_PARAMS);
@@ -259,9 +242,7 @@ double x, r, lambda;
   return( (give_log) ? pr + log(lambda) : lambda*pr);
 }
 
-double dchisq(x, df, give_log)
-double x, df;
-int give_log;
+double dchisq(double x, double df, int give_log)
 {
  return(dgamma(x, df/2.0,
   0.5
@@ -288,8 +269,7 @@ int give_log;
  * for any p. For numerical stability, we take p=n/(r+b); with this choice,
  * the denominator is not exponentially small.
  */
-double dhyper(x,r,b,n,give_log)
-int x, r, b, n, give_log;
+double dhyper(int x, int r, int b, int n, int give_log)
 { double p, q, p1, p2, p3;
 
   if ((r<0) | (b<0) | (n<0) | (n>r+b))
@@ -312,9 +292,9 @@ int x, r, b, n, give_log;
 /*
   probability of x failures before the nth success.
 */
-double dnbinom(x,n,p,give_log)
-double n, p;
-int x, give_log;
+double dnbinom(int x, double n, double p, int give_log)
+
+
 { double prob, f;
 
   if ((p<0) | (p>1) | (n<=0)) return(INVALID_PARAMS);
@@ -327,9 +307,7 @@ int x, give_log;
   return((give_log) ? log(f) + prob : f*prob);
 }
 
-double dt(x, df, give_log)
-double x, df;
-int give_log;
+double dt(double x, double df, int give_log)
 { double t, u, f;
 
   if (df<=0.0) return(INVALID_PARAMS);

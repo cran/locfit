@@ -7,11 +7,8 @@
 
 static double pen, sig2;
 
-void goldensec(f,des,tr,eps,xm,ym,meth)
-double (*f)(), eps, *xm, *ym;
-int meth;
-design *des;
-lfit *tr;
+void goldensec(double (*f)(), design *des, lfit *tr, double eps, double *xm, double *ym, int meth)
+/* goldensec(f,des,tr,eps,xm,ym,meth) double (*f)(), eps, *xm, *ym; int meth; design *des; lfit *tr; */
 { double x[4], y[4], xx[11], yy[11];
   int i, im=0;
   xx[0] = tr->sp.fixh;
@@ -50,9 +47,8 @@ lfit *tr;
   *xm = x[im]; *ym = y[im];
 }
 
-double dnk(x,k)
-double x;
-int k;
+double dnk(double x, int k)
+/* dnk(x,k) double x; int k; */
 { double f;
   switch(k)
   { case 0: f = 1; break;
@@ -67,10 +63,8 @@ int k;
   return(f*exp(-x*x/2)/S2PI);
 }
 
-double locai(h,des,lf)
-double h;
-design *des;
-lfit *lf;
+double locai(double h, design *des, lfit *lf)
+/* locai(h,des,lf) double h; design *des; lfit *lf; */
 { double cp;
   nn(&lf->sp) = h;
   startlf(des,lf,procv,0);
@@ -79,11 +73,8 @@ lfit *lf;
   return(cp);
 }
 
-double loccp(h,des,lf,m) /* m=1: cp    m=2: gcv */
-double h;
-design *des;
-lfit *lf;
-int m;
+double loccp(double h, design *des, lfit *lf, int m) /* m=1: cp    m=2: gcv */
+/* loccp(h,des,lf,m) double h; design *des; lfit *lf; int m; */
 { double cp;
   int dg, n;
 
@@ -104,18 +95,15 @@ int m;
   return(cp);
 }
 
-double cp(des,lf,meth)
-design *des;
-lfit *lf;
-int meth;
+double cp(design *des, lfit *lf, int meth)
+/* cp(des,lf,meth) design *des; lfit *lf; int meth; */
 { double hm, ym;
   goldensec(loccp,des,lf,0.001,&hm,&ym,meth);
   return(hm);
 }
 
-double gkk(des,lf)
-design *des;
-lfit *lf;
+double gkk(design *des, lfit *lf)
+/* gkk(des,lf) design *des; lfit *lf; */
 { double h, h5, nf, th;
   int i, j, n, dg0, dg1;
   ev(&lf->evs)= EDATA;
@@ -140,9 +128,8 @@ th *= n/(n-20.0);
   return(h);
 }
 
-double rsw(des,lf)
-design *des;
-lfit *lf;
+double rsw(design *des, lfit *lf)
+/* rsw(des,lf) design *des; lfit *lf; */
 { int i, j, k, nmax, nvm, n, mk, evo, dg0, dg1;
   double rss[6], cp[6], th22, dx, d2, hh;
   nmax = 5;
@@ -190,11 +177,8 @@ lfit *lf;
   return(exp(log(hh)/(2*dg1+1)));
 }
 
-void rband(des,lf,hhat,meth,nmeth)
-design *des;
-lfit *lf;
-double *hhat;
-int *meth, nmeth;
+void rband(design *des, lfit *lf, double *hhat, int *meth, int nmeth)
+/* rband(des,lf,hhat,meth,nmeth) design *des; lfit *lf; double *hhat; int *meth; int nmeth; */
 { int i, dg;
   double h0;
 

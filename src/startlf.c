@@ -20,8 +20,8 @@
 
 #include "local.h"
 
-void evstruc_init(evs)
-evstruc *evs;
+void evstruc_init(evstruc *evs)
+/* evstruc_init(evs) evstruc *evs; */
 { int i;
   ev(evs) = ETREE;
   mk(evs) = 100;
@@ -33,16 +33,16 @@ evstruc *evs;
   evs->nce = evs->ncm = 0;
 }
 
-void fitpt_init(fp)
-fitpt *fp;
+void fitpt_init(fitpt *fp)
+/* fitpt_init(fp) fitpt *fp; */
 { 
   dc(fp) = 0;
   geth(fp) = GSTD;
   fp->nv = fp->nvm = 0;
 }
 
-void lfit_init(lf)
-lfit *lf;
+void lfit_init(lfit *lf)
+/* lfit_init(lf) lfit *lf; */
 {
   lfdata_init(&lf->lfd);
   evstruc_init(&lf->evs);
@@ -51,15 +51,14 @@ lfit *lf;
   fitpt_init(&lf->fp);
 }
 
-void fitdefault(lf)
-lfit *lf;
+void fitdefault(lfit *lf)
+/* fitdefault(lf) lfit *lf; */
 { WARN(("fitdefault deprecated -- use lfit_init()"));
   lfit_init(lf);
 }
 
-void set_flim(lfd,evs)
-lfdata *lfd;
-evstruc *evs;
+void set_flim(lfdata *lfd, evstruc *evs)
+/* set_flim(lfd,evs) lfdata *lfd; evstruc *evs; */
 { int i, j, d, n;
   double z, mx, mn, *bx;
 
@@ -88,9 +87,8 @@ evstruc *evs;
     }
 }
 
-double vecsum(v,n)
-double *v;
-int n;
+double vecsum(double *v, int n)
+/* vecsum(v,n) double *v; int n; */
 { int i;
   double sum;
   sum = 0.0;
@@ -98,9 +96,8 @@ int n;
   return(sum);
 }
  
-double vvari(v,n)
-double *v;
-int n;
+double vvari(double *v, int n)
+/* vvari(v,n) double *v; int n; */
 { int i;
   double xb, s2;
   xb = s2 = 0.0;
@@ -110,8 +107,8 @@ int n;
   return(s2/(n-1));
 }
 
-void set_scales(lfd)
-lfdata *lfd;
+void set_scales(lfdata *lfd)
+/* set_scales(lfd) lfdata *lfd; */
 { int i;
   for (i=0; i<lfd->d; i++)
     if (lfd->sca[i]<=0) /* set automatic scales */
@@ -121,10 +118,8 @@ lfdata *lfd;
     }
 }
 
-void startlf(des,lf,vfun,nopc)
-design *des;
-lfit *lf;
-int (*vfun)(), nopc;
+void startlf(design *des, lfit *lf, int (*vfun)(), int nopc)
+/* startlf(des,lf,vfun,nopc) design *des; lfit *lf; int (*vfun)(), nopc; */
 { int i, d, n;
 
   if (lf_debug>0) printf("startlf\n");

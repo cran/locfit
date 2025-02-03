@@ -13,10 +13,8 @@
   Guess the number of fitting points.
   Needs improving!
 */
-void atree_guessnv(evs,nvm,ncm,vc,d,alp)
-evstruc *evs;
-double alp;
-int *nvm, *ncm, *vc, d;
+void atree_guessnv(evstruc *evs, int *nvm, int *ncm, int *vc, int d, double alp)
+/* evstruc *evs; int *nvm, *ncm, *vc, d; double alp; */
 { double a0, cu, ifl;
   int i, nv, nc;
 
@@ -54,10 +52,8 @@ int *nvm, *ncm, *vc, d;
   If so, return the split variable (0..d-1).
   Otherwise, return -1.
 */
-int atree_split(lf,ce,le,ll,ur)
-lfit *lf;
-Sint *ce;
-double *le, *ll, *ur;
+int atree_split(lfit *lf, Sint *ce, double *le, double *ll, double *ur)
+/* lfit *lf; Sint *ce; double *le, *ll, *ur; */
 { int d, vc, i, is;
   double h, hmin, score[MXDIM];
   d = lf->fp.d; vc = 1<<d;
@@ -84,11 +80,8 @@ double *le, *ll, *ur;
 /*
   recursively grow the tree structure, begining with the parent cell.
 */
-void atree_grow(des,lf,ce,ct,term,ll,ur)
-design *des;
-lfit *lf;
-Sint *ce, *ct, *term;
-double *ll, *ur;
+void atree_grow(design *des, lfit *lf, Sint *ce, Sint *ct, Sint *term, double *ll, double *ur)
+/* design *des; lfit *lf; Sint *ce, *ct, *term; double *ll, *ur; */
 { Sint nce[1<<MXDIM];
   int i, i0, i1, d, vc, pv, tk, ns;
   double le[MXDIM], z;
@@ -130,9 +123,8 @@ double *ll, *ur;
   ll[ns] = z;
 }
 
-void atree_start(des,lf)
-design *des;
-lfit *lf;
+void atree_start(design *des, lfit *lf)
+/* design *des; lfit *lf; */
 { int d, i, j, k, vc, ncm, nvm;
   double ll[MXDIM], ur[MXDIM];
 
@@ -167,10 +159,8 @@ lfit *lf;
   lf->evs.nce = 1;
 }
 
-double atree_int(lf,x,what)
-lfit *lf;
-double *x;
-int what;
+double atree_int(lfit *lf, double *x, int what)
+/* lfit *lf; double *x; int what; */
 { double vv[64][64], *ll, *ur, h, xx[MXDIM];
   int lo, tk, ns, nv, nc=0, d, i, vc;
   Sint ce[64];

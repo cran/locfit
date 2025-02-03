@@ -19,11 +19,11 @@ static double tr0, tr1, tr2;
   M12 = (X^T W V X)^{-1} M2
   Also, for convenience, tr[0] = sum(wi) tr[1] = sum(wi^2).
 */
-void vmat(lfd, sp, des, M12, M2)
-lfdata *lfd;
+void vmat(lfdata *lfd, smpar *sp, design *des, double *M12, double *M2)
+/*lfdata *lfd;
 smpar *sp;
 design *des;
-double *M12, *M2;
+double *M12, *M2;*/
 { int i, p, nk, ok;
   double link[LLEN], h, ww;
   p = des->p;
@@ -70,10 +70,10 @@ double *M12, *M2;
     jacob_solve(&des->xtwx,&M12[i*p]);
 }
 
-void lf_vcov(lfd,sp,des)
-lfdata *lfd;
+void lf_vcov(lfdata *lfd, smpar *sp, design *des)
+/*lfdata *lfd;
 smpar *sp;
-design *des;
+design *des;*/
 { int i, j, k, p;
   double *M12, *M2;
   M12 = des->V; M2 = des->P; p = des->p;
@@ -104,11 +104,11 @@ design *des;
     multmatscal(M12,1/SQR(des->smwt),p*p);
 }
 
-void comp_vari(lfd,sp,des,tr,t0)
-lfdata *lfd;
+void comp_vari(lfdata *lfd, smpar *sp, design *des, double *tr, double *t0)
+/*lfdata *lfd;
 smpar *sp;
 design *des;
-double *tr, *t0;
+double *tr, *t0;*/
 { int i;
   lf_vcov(lfd,sp,des);
   tr[0] = tr0;
@@ -128,11 +128,11 @@ double *tr, *t0;
  *   tr[4] = trace( (M1^{-1} M2)^2 )
  *   tr[5] = var(theta-hat).
  */
-void local_df(lfd,sp,des,tr)
-lfdata *lfd;
+void local_df(lfdata *lfd, smpar *sp, design *des, double *tr)
+/*lfdata *lfd;
 smpar *sp;
 design *des;
-double *tr;
+double *tr;*/
 { int i, j, p;
   double *m2, *V, ww, link[LLEN];
 

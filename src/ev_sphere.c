@@ -11,16 +11,15 @@
 /*
  * Guess the number of fitting points.
  */
-void sphere_guessnv(nvm,ncm,vc,mg)
-int *nvm, *ncm, *vc, *mg;
+void sphere_guessnv(int *nvm, int *ncm, int *vc, int *mg)
+/* sphere_guessnv(nvm,ncm,vc,mg) int *nvm, *ncm, *vc, *mg; */
 { *nvm = mg[1]*(mg[0]+1);
   *ncm = 0;
   *vc = 0;
 }
 
-void sphere_start(des,lf)
-design *des;
-lfit *lf;
+void sphere_start(design *des, lfit *lf)
+/* sphere_start(des,lf) design *des; lfit *lf; */
 { int i, j, ct, nv, ncm, vc, *mg;
   double rmin, rmax, *orig, r, th, c, s;
 
@@ -51,10 +50,8 @@ rmin = 0; rmax = 1; orig[0] = orig[1] = 0.0;
   lf->evs.nce = 0;
 }
 
-double sphere_int(lf,x,what)
-lfit *lf;
-double *x;
-int what;
+double sphere_int(lfit *lf, double *x, int what)
+/* sphere_int(lf,x,what) lfit *lf; double *x; int what; */
 { double rmin, rmax, *orig, dx, dy, r, th, th0, th1;
   double v[64][64], c0, c1, s0, s1, r0, r1, d0, d1;
   double ll[2], ur[2], xx[2];

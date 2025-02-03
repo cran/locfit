@@ -15,23 +15,26 @@
 
 #include "mutil.h"
 
-void setzero(v,p)
-double *v;
-int p;
+void setzero(double *v, int p)
+/* void setzero(v,p)
+   double *v;
+   int p; */
 { int i;
   for (i=0; i<p; i++) v[i] = 0.0;
 }
 
-void unitvec(x,k,p)
-double *x;
-int k, p;
+void unitvec(double *x, int k, int p)
+/* void unitvec(x,k,p)
+   double *x;
+   int k, p; */
 { setzero(x,p);
   x[k] = 1.0;
 }
 
-double innerprod(v1,v2,p)
-double *v1, *v2;
-int p;
+double innerprod(double *v1, double *v2, int p)
+/* double innerprod(v1,v2,p)
+   double *v1, *v2;
+   int p; */
 { int i;
   double s;
   s = 0;
@@ -39,18 +42,20 @@ int p;
   return(s);
 }
 
-void addouter(A,v1,v2,p,c)
-double *A, *v1, *v2, c;
-int p;
+void addouter(double *A, double *v1, double *v2, int p, double c)
+/* void addouter(A,v1,v2,p,c)
+   double *A, *v1, *v2, c;
+   int p; */
 { int i, j;
   for (i=0; i<p; i++)
     for (j=0; j<p; j++)
       A[i*p+j] += c*v1[i]*v2[j];
 }
 
-void multmatscal(A,z,n)
-double *A, z;
-int n;
+void multmatscal(double *A, double z, int n)
+/* void multmatscal(A,z,n)
+   double *A, z;
+   int n; */
 { int i;
   for (i=0; i<n; i++) A[i] *= z;
 }
@@ -62,9 +67,10 @@ int n;
  *  At output, the matrix has m rows, n columns and
  *    x[0..m-1] is the first column.
  */
-void transpose(x,m,n)
-double *x;
-int m, n;
+void transpose(double *x, int m, int n)
+/* void transpose(x,m,n)
+   double *x;
+   int m, n; */
 { int t0, t, ti, tj;
   double z;
   for (t0=1; t0<m*n-2; t0++)
@@ -81,9 +87,10 @@ int m, n;
 }
 
 /* trace of an n*n square matrix. */
-double m_trace(x,n)
-double *x;
-int n;
+double m_trace(double *x, int n)
+/* double m_trace(x,n)
+   double *x;
+   int n; */
 { int i;
   double sum;
   sum = 0;

@@ -30,21 +30,42 @@ extern int  jacob_hsolve(),chol_hsolve(),eig_hsolve();
 extern double jacob_qf(),  chol_qf(),    eig_qf();
 
 /* m_max.c */
-extern double max_grid(), max_golden(), max_quad(), max_nr();
+extern double max_grid(double (*f)(), double xlo, double xhi, int n, char flag);
+extern double max_golden(double (*f)(), double xlo, double xhi, int n, double tol,
+                  int *err, char flag);
+extern double max_quad(double (*f)(), double xlo, double xhi, int n, double tol,
+                int *err, char flag);
+extern double max_nr(int (*F)(), double *coef, double *old_coef, double *f1, double *delta, 
+              jacobian *J, int p, int maxit, double tol, int *err);
 
 /* m_qr.c */
-extern void qr(), qrinvx(), qrtinvx(), qrsolv();
+extern void qr(double *X, int n, int p, double *w);
+extern void qrinvx(double *R, double *x, int n, int p);
+extern void qrtinvx(double *R, double *x, int n, int p);
+ extern void qrsolv(double *R, double *x, int n, int p);
 
 /* m_svd.c */
-extern void svd(), hsvdsolve();
-extern int svdsolve();
+extern void svd(double *x, double *p, double *q, int d, int mxit);
+extern void hsvdsolve(double *x, double *w, double *P, double *D, double *Q, int d,
+               double tol);
+extern int svdsolve(double *x, double *w, double *P, double *D, double *Q, int d, 
+             double tol);
 
 /* m_solve.c */
-extern double solve_secant(), solve_nr(), solve_fp();
+extern double solve_secant(double (*f)(), double c, double xlo, double xhi, double tol,
+                    int bd_flag, int *err);
+extern double solve_nr(double (*f)(), double (*f1)(), double c, double x0, double tol,
+                int *err);
+extern double solve_fp(double (*f)(), double x0, double tol, int maxit);
 
 /* m_vector.c */
-extern void setzero(), unitvec(), addouter(), multmatscal(), transpose();
-extern double innerprod(), m_trace();
+extern void setzero(double *v, int p);
+extern void unitvec(double *x, int k, int p);
+extern void addouter(double *A, double *v1, double *v2, int p, double c);
+extern void multmatscal(double *A, double z, int n);
+extern void transpose(double *x, int m, int n);
+extern double innerprod(double *v1, double *v2, int p);
+extern double m_trace(double *x, int n);
 
 #define BDF_NONE  0
 #define BDF_EXPLEFT  1
@@ -91,13 +112,21 @@ extern double simpson(), sptarea();
 
 #define INVALID_PARAMS 0.0
 
-extern double stirlerr(), bd0();
-extern double dbinom_raw(), dpois_raw();
-extern double dbinom(), dpois(), dnbinom(), dbeta(), dgamma(), dt(), df(), dhyper();
-extern double dchisq();
+extern double stirlerr(double), bd0(double, double);
+extern double dbinom_raw(double, double, double, double, int), 
+              dpois_raw(double, double, int);
+extern double dbinom(int, int, double, int), 
+              dpois(int, double, int), 
+              dnbinom(int, double, double, int), 
+              dbeta(double, double, double, int), 
+              dgamma(double, double, double, int), 
+              dt(double, double, int), 
+              df(double, double, double, int), 
+              dhyper(int, int, int, int, int);
+extern double dchisq(double, double, int);
 
-extern double igamma(), ibeta();
-extern double pf(), pchisq(), mut_pnorm();
+extern double igamma(double, double), ibeta(double, double, double);
+extern double pf(double, double, double), pchisq(), mut_pnorm(double, double, double);
 #define pchisq(x,df) igamma((x)/2.0,(df)/2.0)
 
 #endif  /* define I_MUT_H */

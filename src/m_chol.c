@@ -9,9 +9,9 @@
 /* A is a n*p matrix, find the cholesky decomposition
  * of the first p rows. In most applications, will want n=p.
  */
-void chol_dec(A,n,p)
-double *A;
-int n, p;
+void chol_dec(double *A, int n, int p)
+/*double *A;
+int n, p;*/
 { int i, j, k;
 
   for (j=0; j<p; j++)
@@ -32,9 +32,9 @@ int n, p;
     for (i=j+1; i<p; i++) A[n*j+i] = 0.0;
 }
 
-int chol_solve(A,v,n,p)
-double *A, *v;
-int n, p;
+int chol_solve(double *A, double *v, int n, int p)
+/*double *A, *v;
+int n, p;*/
 { int i, j;
 
   for (i=0; i<p; i++)
@@ -48,9 +48,9 @@ int n, p;
   return(p);
 }
 
-int chol_hsolve(A,v,n,p)
-double *A, *v;
-int n, p;
+int chol_hsolve(double *A, double *v, int n, int p)
+/*double *A, *v;
+int n, p;*/
 { int i, j;
 
   for (i=0; i<p; i++)
@@ -60,9 +60,9 @@ int n, p;
   return(p);
 }
 
-double chol_qf(A,v,n,p)
-double *A, *v;
-int n, p;
+double chol_qf(double *A, double *v, int n, int p)
+/*double *A, *v;
+int n, p;*/
 { int i, j;
   double sum;
  

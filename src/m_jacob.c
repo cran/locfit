@@ -13,10 +13,10 @@
 
 int jac_reqd(int p) { return(2*p*(p+1)); }
 
-double *jac_alloc(J,p,wk)
-jacobian *J;
+double *jac_alloc(jacobian *J, int p, double *wk)
+/*jacobian *J;
 int p;
-double *wk;
+double *wk;*/
 { if (wk==NULL)
     wk = (double *)calloc(2*p*(p+1),sizeof(double));
   J->Z = wk; wk += p*p;
@@ -26,9 +26,9 @@ double *wk;
   return(wk);
 }
 
-void jacob_dec(J, meth)
-jacobian *J;
-int meth;
+void jacob_dec(jacobian *J, int meth)
+/*jacobian *J;
+int meth;*/
 { int i, j, p;
 
   if (J->st != JAC_RAW) return;
@@ -55,9 +55,9 @@ int meth;
   }
 }
 
-int jacob_solve(J,v) /* (X^T W X)^{-1} v */
-jacobian *J;
-double *v;
+int jacob_solve(jacobian *J, double *v) /* (X^T W X)^{-1} v */
+/*jacobian *J;
+double *v;*/
 { int i, rank;
 
   if (J->st == JAC_RAW) jacob_dec(J,DEF_METH);
@@ -77,9 +77,9 @@ double *v;
   return(0);
 }
 
-int jacob_hsolve(J,v) /*  J^{-1/2} v */
-jacobian *J;
-double *v;
+int jacob_hsolve(jacobian *J, double *v) /*  J^{-1/2} v */
+/*jacobian *J;
+double *v;*/
 { int i;
 
   if (J->st == JAC_RAW) jacob_dec(J,DEF_METH);
@@ -97,9 +97,9 @@ double *v;
   return(0);
 }
 
-double jacob_qf(J,v)  /* vT J^{-1} v */
-jacobian *J;
-double *v;
+double jacob_qf(jacobian *J, double *v) /* vT J^{-1} v */
+/*jacobian *J;
+double *v;*/
 { int i;
 
   if (J->st == JAC_RAW) jacob_dec(J,DEF_METH);

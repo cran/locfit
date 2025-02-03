@@ -22,9 +22,8 @@
 
 #include "local.h"
 
-int calcp(sp,d)
-smpar *sp;
-int d;
+int calcp(smpar *sp, int d)
+/* calcp(sp,d) smpar *sp; int d; */
 { int i, k;
 
   if (ubas(sp))
@@ -46,9 +45,8 @@ int d;
   return(0);
 }
 
-int coefnumber(dv,kt,d,deg)
-int kt, d, deg;
-deriv *dv;
+int coefnumber(deriv *dv, int kt, int d, int deg)
+/* coefnumber(dv,kt,d,deg) deriv *dv; int kt, d, deg; */
 { int d0, d1, t;
 
   if (d==1)
@@ -73,11 +71,8 @@ deriv *dv;
   return(-1);
 }
 
-void makecfn(sp,des,dv,d)
-smpar *sp;
-design *des;
-deriv *dv;
-int d;
+void makecfn(smpar *sp, design *des, deriv *dv, int d)
+/* makecfn(sp,des,dv,d) smpar *sp; design *des; deriv *dv; int d; */
 { int i, nd;
   
   nd = dv->nd;
@@ -102,9 +97,8 @@ int d;
   des->ncoef = 1+d;
 }
 
-void fitfunangl(dx,ff,sca,cd,deg)
-double dx, *ff, sca;
-int deg, cd;
+void fitfunangl(double dx, double *ff, double sca, int cd, int deg)
+/* fitfunangl(dx,ff,sca,cd,deg) double dx, *ff, sca; int cd, deg; */
 {
   if (deg>=3) WARN(("Can't handle angular model with deg>=3"));
 
@@ -128,11 +122,8 @@ int deg, cd;
   }
 }
 
-void fitfun(lfd,sp,x,t,f,dv)
-lfdata *lfd;
-smpar *sp;
-double *x, *t, *f;
-deriv *dv;
+void fitfun(lfdata *lfd, smpar *sp, double *x, double *t, double *f, deriv *dv)
+/* fitfun(lfd,sp,x,t,f,dv) lfdata *lfd; smpar *sp; double *x, *t, *f; deriv *dv; */
 { int d, deg, nd, m, i, j, k, ct_deriv[MXDIM];
   double ff[MXDIM][1+MXDEG], dx[MXDIM], *xx[MXDIM];
 
@@ -239,10 +230,8 @@ deriv *dv;
  *  the required data points; des->n the number of points; des->xev
  *  the fitting point.
  */
-void designmatrix(lfd,sp,des)
-lfdata *lfd;
-smpar *sp;
-design *des;
+void designmatrix(lfdata *lfd, smpar *sp, design *des)
+/* designmatrix(lfd,sp,des) lfdata *lfd; smpar *sp; design *des; */
 { int i, ii, j, p;
   double *X, u[MXDIM];
 

@@ -5,9 +5,8 @@
 
 #include "local.h"
 
-void solve(A,b,d) /* this is crude! A organized by column. */
-double *A, *b;
-int d;
+void solve(double *A, double *b, int d) /* this is crude! A organized by column. */
+/* solve(A,b,d) double *A, *b; int d; */
 { int i, j, k;
   double piv;
   for (i=0; i<d; i++)
@@ -24,17 +23,16 @@ int d;
   }
 }
 
-void triang_guessnv(nvm,ncm,vc,d,mk)
-int *nvm, *ncm, *vc, d, mk;
-{ *nvm = *ncm = mk*d;
+void triang_guessnv(int *nvm, int *ncm, int *vc, int d, int mk)
+/* triang_guessnv(nvm,ncm,vc,d,mk) int *nvm, *ncm, *vc, d, mk; */
+{
+  *nvm = *ncm = mk*d;
   *vc = d+1;
   return;         
 }
 
-int triang_split(lf,ce,le)
-lfit *lf;
-double *le;
-Sint *ce;
+int triang_split(lfit *lf, Sint *ce, double *le)
+/* triang_split(lf,ce,le) lfit *lf; Sint *ce; double *le; */
 { int d, i, j, k, nts, vc;
   double di, dfx[MXDIM];
   nts = 0; d = lf->fp.d; vc = d+1;
@@ -49,9 +47,8 @@ Sint *ce;
   return(nts);
 }
 
-void resort(pv,xev,dig)
-double *xev;
-int *pv, *dig;
+void resort(int *pv, double *xev, int *dig)
+/* resort(pv,xev,dig) double *xev; int *pv, *dig; */
 { double d0, d1, d2;
   int i;
   d0 = d1 = d2 = 0;
@@ -77,10 +74,8 @@ int *pv, *dig;
   }
 }
 
-void triang_grow(des,lf,ce,ct,term)
-design *des;
-lfit *lf;
-Sint *ce, *ct, *term;
+void triang_grow(design *des, lfit *lf, Sint *ce, Sint *ct, Sint *term)
+/* triang_grow(des,lf,ce,ct,term) design *des; lfit *lf; Sint *ce, *ct, *term; */
 { double le[(1+MXDIM)*(1+MXDIM)], ml;
   int d, i, j, im=0, jm=0, vc, pv[(1+MXDIM)*(1+MXDIM)], dig[6];
   Sint nce[1+MXDIM];
@@ -128,10 +123,8 @@ Sint *ce, *ct, *term;
   }
 }
 
-void triang_descend(tr,xa,ce)
-lfit *tr;
-double *xa;
-Sint *ce;
+void triang_descend(lfit *tr, double *xa, Sint *ce)
+/* triang_descend(tr,xa,ce) lfit *tr; double *xa; Sint *ce; */
 { double le[(1+MXDIM)*(1+MXDIM)], ml;
   int d, vc, i, j, im=0, jm=0, pv[(1+MXDIM)*(1+MXDIM)];
   design *des;
@@ -202,9 +195,8 @@ Sint *ce;
     triang_descend(tr,xa,ce);
 } }
 
-void covrofdata(lfd,V,mn) /* covar of data; mean in mn */
-lfdata *lfd;
-double *V, *mn;
+void covrofdata(lfdata *lfd, double *V, double *mn) /* covar of data; mean in mn */
+/* covrofdata(lfd,V,mn) lfdata *lfd; double *V, *mn; */
 { int d, i, j, k;
   double s;
   s = 0; d = lfd->d;
@@ -218,10 +210,9 @@ double *V, *mn;
   for (i=0; i<d*d; i++) V[i] /= s;
 }
 
-int intri(x,w,xev,xa,d) /* is x in triangle bounded by xd[0..d-1]? */
-double *x, *xev, *xa;
-Sint *w;
-int d;
+int intri(double *x, Sint *w, double *xev, double *xa, int d) /* is x in triangle bounded by xd[0..d-1]? */
+/* intri(x,w,xev,xa,d) double *x, *xev, *xa; Sint *w; int d; */
+/* is x in triangle bounded by xd[0..d-1]? */
 { int i, j;
   double eps, *r, xd[MXDIM*MXDIM];
   eps = 1.0e-10;
@@ -237,9 +228,9 @@ int d;
   return(1);
 }
 
-void triang_start(des,lf) /* Triangulation with polyhedral start */
-design *des;
-lfit *lf;
+void triang_start(design *des, lfit *lf)
+/* triang_start(des,lf) design *des; lfit *lf; */
+/* Triangulation with polyhedral start */
 {
   int i, j, k, n, d, nc, nvm, ncm, vc;
   Sint *ce, ed[1+MXDIM];
@@ -302,10 +293,8 @@ lfit *lf;
   lf->evs.nce = nc;
 }
 
-double triang_cubicint(v,vv,w,d,nc,xxa)
-double *v, *vv, *xxa;
-int d, nc;
-Sint *w;
+double triang_cubicint(double *v, double *vv, Sint *w, int d, int nc, double *xxa)
+/* triang_cubicint(v,vv,w,d,nc,xxa) double *v, *vv, *xxa; int d, nc; Sint *w; */
 { double sa, lb, *vert0, *vert1, *vals0=NULL, *vals1, deriv0, deriv1;
   int i, j, k;
   if (nc==1) /* linear interpolate */
@@ -336,10 +325,8 @@ Sint *w;
   return(vals0[0]);
 }
 
-double triang_clotoch(xev,vv,ce,p,xxa)
-double *xev, *vv, *xxa;
-int p;
-Sint *ce;
+double triang_clotoch(double *xev, double *vv, Sint *ce, int p, double *xxa)
+/* triang_clotoch(xev,vv,ce,p,xxa) double *xev, *vv, *xxa; int p; Sint *ce; */
 { double cfo[3], cfe[3], cg[9], *va, *vb, *vc,
     l0, nm[3], na, nb, nc, *xl, *xr, *xz, d0, d1, lb, dlt, gam;
   int i, w[3], cfl, cfr;
@@ -421,11 +408,8 @@ Sint *ce;
   return(cubic_interp(gam,cfo[0],cfe[0],d0,d1));
 }
 
-int triang_getvertexvals(fp,evs,vv,i,what)
-fitpt *fp;
-evstruc *evs;
-double *vv;
-int i, what;
+int triang_getvertexvals(fitpt *fp, evstruc *evs, double *vv, int i, int what)
+/* triang_getvertexvals(fp,evs,vv,i,what) fitpt *fp; evstruc *evs; double *vv; int i, what; */
 { double dx, P, le, vl[1+MXDIM], vh[1+MXDIM];
   int d, il, ih, j, nc;
   d = fp->d;
@@ -449,10 +433,8 @@ int i, what;
   return(nc);
 }
 
-double triang_int(lf,x,what)
-lfit *lf;
-double *x;
-int what;
+double triang_int(lfit *lf, double *x, int what)
+/* triang_int(lf,x,what) lfit *lf; double *x; int what; */
 {
   int d, i, j, k, vc, nc;
   Sint *ce, nce[1+MXDIM];

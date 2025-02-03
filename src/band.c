@@ -5,16 +5,16 @@
 
 #include "local.h"
 
-extern void fitoptions();
+/* extern void fitoptions(); */
 
 static double hmin, gmin, sig2, pen, vr, tb;
 static lfit *blf;
 static design *bdes;
 
-int procvbind(des,lf,v)
-design *des;
+int procvbind(design *des, lfit *lf, int v)
+/*design *des;
 lfit *lf;
-int v;
+int v;*/
 { double s0, s1, bi;
   int i, ii, k;
   k = procvraw(des,lf,v);
@@ -31,9 +31,9 @@ int v;
   return(k);
 }
 
-double bcri(h,c,cri)
-double h;
-int c, cri;
+double bcri(double h, int c, int cri)
+/*double h;
+int c, cri;*/
 { double num, den;
   int (*pv)();
   if (c==DALP)
@@ -62,9 +62,9 @@ int c, cri;
   return(0.0);
 }
 
-void bsel2(h0,g0,ifact,c,cri)
-double h0, g0, ifact;
-int c, cri;
+void bsel2(double h0, double g0, double ifact, int c, int cri)
+/*double h0, g0, ifact;
+int c, cri;*/
 { int done, inc;
   double h1, g1;
   h1 = h0; g1 = g0;
@@ -85,9 +85,9 @@ int c, cri;
   }
 }
 
-void bsel3(h0,g0,ifact,c,cri)
-double h0, g0, ifact;
-int c, cri;
+void bsel3(double h0, double g0, double ifact, int c, int cri)
+/*double h0, g0, ifact;
+int c, cri;*/
 { double h1, g1;
   int i;
   hmin = h0; gmin = g0;
@@ -99,11 +99,11 @@ int c, cri;
   return;
 }
 
-void bselect(lf,des,c,cri,pn)
-lfit *lf;
+void bselect(lfit *lf, design *des, int c, int cri, double pn)
+/*lfit *lf;
 design *des;
 int c, cri;
-double pn;
+double pn;*/
 { double h0, g0, ifact;
   int i;
   pen = pn;
@@ -136,10 +136,9 @@ double pn;
   ressumm(lf,des);
 }
 
-double compsda(x,h,n)
-double *x, h;
-int n;
-/* n/(n-1) * int( fhat''(x)^2 dx ); bandwidth h */
+double compsda(double *x, double h, int n) /* n/(n-1) * int( fhat''(x)^2 dx ); bandwidth h */
+/*double *x, h;
+int n;*/
 { int i, j;
   double ik, sd, z;
   ik = wint(1,NULL,0,WGAUS);
@@ -154,9 +153,9 @@ int n;
   return(sd);
 }
 
-double widthsj(x,lambda,n)
-double *x, lambda;
-int n;
+double widthsj(double *x, double lambda, int n)
+/*double *x, lambda;
+int n;*/
 { double ik, a, b, td, sa, z, c, c1, c2, c3;
   int i, j;
   a = GFACT*0.920*lambda*exp(-log((double)n)/7)/SQRT2;
@@ -180,9 +179,9 @@ int n;
   return(c);
 }
 
-void kdecri(x,h,res,c,k,ker,n)
-double *x, h, *res, c;
-int k, ker, n;
+void kdecri(double *x, double h, double *res, double c, int k, int ker, int n)
+/*double *x, h, *res, c;
+int k, ker, n;*/
 { int i, j;
   double degfree, dfd, pen, s, r0, r1, d0, d1, ik, wij;
 
@@ -285,9 +284,9 @@ int k, ker, n;
   return;
 }
 
-double esolve(x,j,h0,h1,k,c,ker,n)
-double *x, h0, h1, c;
-int j, k, ker, n;
+double esolve(double *x, int j, double h0, double h1, int k, double c, int ker, int n)
+/*double *x, h0, h1, c;
+int j, k, ker, n;*/
 { double h[7], d[7], r[7], res[4], min, minh, fact;
   int i, nc;
   for ( i = 0; i < 7; ++i) {
@@ -332,10 +331,11 @@ int j, k, ker, n;
   return(minh);
 }
 
-void kdeselect(band,x,ind,h0,h1,meth,nm,ker,n)
-double h0, h1, *band, *x;
+void kdeselect(double *band, double *x, Sint *ind, double h0, double h1,  
+               int *meth, int nm, int ker, int n)
+/*double h0, h1, *band, *x;
 Sint *ind;
-int nm, ker, n, *meth;
+int nm, ker, n, *meth;*/
 { double scale, c;
   int i, k;
   k = n/4;

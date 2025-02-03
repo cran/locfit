@@ -9,10 +9,8 @@ static double scb_crit, *x, c[10], kap[5], kaq[5], max_p2;
 static int type;
 design *scb_des;
 
-double covar_par(lf,des,x1,x2)
-lfit *lf;
-design *des;
-double x1, x2;
+double covar_par(lfit *lf, design *des, double x1, double x2)
+/* covar_par(lf,des,x1,x2) lfit *lf; design *des; double x1, x2; */
 { double *v1, *v2, *wk;
   paramcomp *pc;
   int i, j, p, ispar;
@@ -53,10 +51,8 @@ double x1, x2;
   return(innerprod(v1,v2,p));
 }
 
-void cumulant(lf,des,sd)
-lfit *lf;
-design *des;
-double sd;
+void cumulant(lfit *lf, design *des, double sd)
+/* cumulant(lf,des,sd) lfit *lf; design *des; double sd; */
 { double b3i, b3j, b4i;
   double ss, si, sj, uii, uij, ujj, k1;
   int ii, i, j, jj;
@@ -125,22 +121,22 @@ double sd;
 }
 
 /* q2(u) := u+q2(x,u) in paper */
-double q2(u)
-double u;
+double q2(double u)
+/* q2(u) double u; */
 { return(u-u*(36.0*kaq[2] + 3*kaq[4]*(u*u-3) + c[8]*((u*u-10)*u*u+15))/72.0);
 }
 
 /*  p2(u) := p2(x,u) in paper */
-double p2(u)
-double u;
+double p2(double u)
+/* p2(u) double u; */
 { return( -u*( 36*(kap[2]-1+kap[1]*kap[1])
      + 3*(kap[4]+4*kap[1]*sqrt(kap[3]))*(u*u-3)
      + c[8]*((u*u-10)*u*u+15) ) / 72 );
 }
 
-extern int likereg();
-double gldn_like(a)
-double a;
+extern int likereg(double *, double *, double *, double *);
+double gldn_like(double a)
+/* gldn_like(a) double a; */
 { int err;
 
   scb_des->fix[0] = 1;
@@ -153,11 +149,8 @@ double a;
 }
 
 /* v1/v2 is correct for deg=0 only */
-void get_gldn(fp,des,lo,hi,v)
-fitpt *fp;
-design *des;
-double *lo, *hi;
-int v;
+void get_gldn(fitpt *fp, design *des, double *lo, double *hi, int v)
+/* get_gldn(fp,des,lo,hi,v) fitpt *fp; design *des; double *lo, *hi; int v; */
 { double v1, v2, c, tlk;
   int err;
 
@@ -181,10 +174,8 @@ printf("hi %2d\n",v);
   if (err>0) printf("solve_secant error\n");
 }
 
-int procvscb2(des,lf,v)
-design *des;
-lfit *lf;
-int v;
+int procvscb2(design *des, lfit *lf, int v)
+/* procvscb2(des,lf,v) design *des; lfit *lf; int v; */
 { double sd, *lo, *hi, u;
   int err, st, tmp;
   x = des->xev = evpt(&lf->fp,v);
@@ -230,9 +221,8 @@ int v;
   return(st);
 }
 
-void scb(des,lf)
-design *des;
-lfit *lf;
+void scb(design *des, lfit *lf)
+/* scb(des,lf) design *des; lfit *lf; */
 { double k1, k2; /* kap[10], */
   double *lo, *hi, sig, thhat, nlx;
   int i, nterms;

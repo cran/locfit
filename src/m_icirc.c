@@ -8,9 +8,9 @@
 #define PI    3.141592653589793238462643
 #endif
 
-void setM(M,r,s,c,b)
-double *M, r, s, c;
-int b;
+void setM(double *M, double r, double s, double c, int b)
+/*double *M, r, s, c;
+int b;*/
 { M[0] =-r*s; M[1] = r*c;
   M[2] = b*c; M[3] = b*s;
   M[4] =-r*c; M[5] = -s;
@@ -19,9 +19,9 @@ int b;
   M[10]=   c; M[11]= 0.0;
 }
 
-void integ_circ(f,r,orig,res,mint,b)
-int (*f)(), mint, b;
-double r, *orig, *res;
+void integ_circ(int (*f)(), double r, double *orig, double *res, int mint, int b)
+/*int (*f)(), mint, b;
+double r, *orig, *res;*/
 { double y, x[2], theta, tres[MXRESULT], M[12], c, s;
   int i, j, nr=0;
   
@@ -49,9 +49,9 @@ double r, *orig, *res;
   for (j=0; j<nr; j++) res[j] *= y;
 }
 
-void integ_disc(f,fb,fl,res,resb,mg)
-int (*f)(), (*fb)(), *mg;
-double *fl, *res, *resb;
+void integ_disc(int (*f)(), int (*fb)(), double *fl, double *res, double *resb, int *mg)
+/*int (*f)(), (*fb)(), *mg;
+double *fl, *res, *resb;*/
 { double x[2], r, tres[MXRESULT], *orig, rmin, rmax, theta, c, s, M[12];
   int ct, ctb, i, j, k, nr, nrb=0, w;
 

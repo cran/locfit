@@ -18,11 +18,8 @@
 #include "local.h"
 extern double robscale;
 
-void dercor(lfd,sp,des,coef)
-lfdata *lfd;
-smpar *sp;
-design *des;
-double *coef;
+void dercor(lfdata *lfd, smpar *sp, design *des, double *coef)
+/* dercor(lfd,sp,des,coef) lfdata *lfd; smpar *sp; design *des; double *coef; */
 { double s1, dc[MXDIM], wd, link[LLEN];
   int i, ii, j, m, d, p;
   if (fam(sp)<=THAZ) return;

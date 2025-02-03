@@ -14,9 +14,8 @@
 
 #include "local.h"
 
-double resid(y,w,th,fam,ty,res)
-int fam, ty;
-double y, w, th, *res;
+double resid(double y, double w, double th, int fam, int ty, double *res)
+/* resid(y,w,th,fam,ty,res) int fam, ty; double y, w, th, *res; */
 { double raw;
 
   fam = fam & 63;
@@ -45,9 +44,8 @@ double y, w, th, *res;
   return(0.0);
 }
 
-double studentize(res,inl,var,ty,link)
-double res, inl, var, *link;
-int ty;
+double studentize(double res, double inl, double var, int ty, double *link)
+/* studentize(res,inl,var,ty,link) double res, inl, var, *link; int ty; */
 { double den;
   inl *= link[ZDDLL];
   var = var*var*link[ZDDLL];
@@ -67,10 +65,8 @@ int ty;
   }
 }
 
-void fitted(lf,fit,what,cv,st,ty)
-lfit *lf;
-double *fit;
-int what, cv, st, ty;
+void fitted(lfit *lf, double *fit, int what, int cv, int st, int ty)
+/* fitted(lf,fit,what,cv,st,ty) lfit *lf; double *fit; int what, cv, st, ty; */
 { int i, j, d, n, evo;
   double xx[MXDIM], th, inl=0.0, var, link[LLEN];
   n = lf->lfd.n;

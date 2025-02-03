@@ -44,9 +44,11 @@
 #include <stdio.h>
 #include "mutil.h"
 
-double solve_secant(f,c,xlo,xhi,tol,bd_flag,err)
-double (*f)(), c, xhi, xlo, tol;
-int bd_flag, *err;
+double solve_secant(double (*f)(), double c, double xlo, double xhi, double tol,
+                    int bd_flag, int *err)
+/* double solve_secant(f,c,xlo,xhi,tol,bd_flag,err)
+   double (*f)(), c, xhi, xlo, tol;
+   int bd_flag, *err; */
 { double ylo, yhi, x1, x2, x, y1, y2, y;
   *err = 0;
   ylo = f(xlo)-c;
@@ -97,9 +99,11 @@ if (y2==y)
   }
 }
 
-double solve_nr(f,f1,c,x0,tol,err)
-double (*f)(), (*f1)(), c, x0, tol;
-int *err;
+double solve_nr(double (*f)(), double (*f1)(), double c, double x0, double tol,
+                int *err)
+/* double solve_nr(f,f1,c,x0,tol,err)
+   double (*f)(), (*f1)(), c, x0, tol;
+   int *err; */
 { double y;
   do
   { y = f(x0)-c;
@@ -108,9 +112,10 @@ int *err;
   return(x0);
 }
 
-double solve_fp(f,x0,tol,maxit)
-double (*f)(), x0, tol;
-int maxit;
+double solve_fp(double (*f)(), double x0, double tol, int maxit)
+/* double solve_fp(f,x0,tol,maxit)
+   double (*f)(), x0, tol;
+   int maxit; */
 { double x1=0.0;
   int i;
   for (i=0; i<maxit; i++)

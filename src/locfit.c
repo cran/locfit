@@ -17,8 +17,8 @@ int ident=0;
 int (*like)();
 extern double robscale;
 
-void lfdata_init(lfd)
-lfdata *lfd;
+void lfdata_init(lfdata *lfd)
+/*lfdata *lfd;*/
 { int i;
   for (i=0; i<MXDIM; i++)
   { lfd->sty[i] = 0;
@@ -29,9 +29,9 @@ lfdata *lfd;
   lfd->d = lfd->n = 0;
 }
 
-void smpar_init(sp,lfd)
-smpar *sp;
-lfdata *lfd;
+void smpar_init(smpar *sp, lfdata *lfd)
+/*smpar *sp;
+lfdata *lfd;*/
 { nn(sp)  = 0.7;
   fixh(sp)= 0.0;
   pen(sp) = 0.0;
@@ -45,24 +45,24 @@ lfdata *lfd;
   npar(sp) = calcp(sp,lfd->d);
 }
 
-void deriv_init(dv)
-deriv *dv;
+void deriv_init(deriv *dv)
+/*deriv *dv;*/
 { dv->nd = 0;
 }
 
-int des_reqd(n,p)
-int n, p;
+int des_reqd(int n, int p)
+/*int n, p;*/
 {
   return(n*(p+5)+2*p*p+4*p + jac_reqd(p));
 }
-int des_reqi(n,p)
-int n, p;
+int des_reqi(int n, int p)
+/*int n, p;*/
 { return(n+p);
 }
  
-void des_init(des,n,p)
-design *des;
-int n, p;
+void des_init(design *des, int n, int p)
+/*design *des;
+int n, p;*/
 { double *z;
   int k;
 
@@ -110,15 +110,15 @@ int n, p;
   des->xtwx.p = p;                                                              
 }
 
-void deschk(des,n,p)
-design *des;
-int n, p;
+void deschk(design *des, int n, int p)
+/*design *des;
+int n, p;*/
 { WARN(("deschk deprecated - use des_init()"));
   des_init(des,n,p);
 }
 
-int likereg(coef, lk0, f1, Z)
-double *coef, *lk0, *f1, *Z;
+int likereg(double *coef, double *lk0, double *f1, double *Z)
+/*double *coef, *lk0, *f1, *Z;*/
 { int i, ii, j, p;
   double lk, ww, link[LLEN], *X;
 
@@ -188,9 +188,9 @@ double *coef, *lk0, *f1, *Z;
   return(NR_OK);
 }
 
-int robustinit(lfd,des)
-lfdata *lfd;
-design *des;
+int robustinit(lfdata *lfd, design *des)
+/*lfdata *lfd;
+design *des;*/
 { int i;
   for (i=0; i<des->n; i++)
     des->res[i] = resp(lfd,(int)des->ind[i]) - base(lfd,(int)des->ind[i]);
@@ -200,9 +200,9 @@ design *des;
   return(LF_OK);
 }
 
-int circinit(lfd,des)
-lfdata *lfd;
-design *des;
+int circinit(lfdata *lfd, design *des)
+/*lfdata *lfd;
+design *des;*/
 { int i, ii;
   double s0, s1;
   s0 = s1 = 0.0;
@@ -217,9 +217,9 @@ design *des;
   return(LF_OK);
 }
 
-int reginit(lfd,des)
-lfdata *lfd;
-design *des;
+int reginit(lfdata *lfd, design *des)
+/*lfdata *lfd;
+design *des;*/
 { int i, ii;
   double sb, link[LLEN];
   s0 = s1 = sb = 0;
@@ -274,10 +274,10 @@ design *des;
   }
 }
 
-int lfinit(lfd,sp,des)
-lfdata *lfd;
+int lfinit(lfdata *lfd, smpar *sp, design *des)
+/*lfdata *lfd;
 smpar *sp;
-design *des;
+design *des;*/
 {
   des->xtwx.sm = (deg0(sp)<deg(sp)) ? JAC_CHOL : JAC_EIGD;
 
@@ -303,9 +303,9 @@ design *des;
   }
 }
 
-void lfiter(des,maxit)
-design *des;
-int maxit;
+void lfiter(design *des, int maxit)
+/*design *des;
+int maxit;*/
 { int err;
   if (lf_debug>1) printf(" lfiter: %8.5f\n",des->cf[0]);
   max_nr(like, des->cf, des->oc, des->res, des->f1,
@@ -323,16 +323,17 @@ int maxit;
 }
 
 int use_robust_scale(int tg)
+/*int tg;*/
 { if ((tg&64)==0) return(0); /* not quasi - no scale */
   if (((tg&128)==0) & (((tg&63)!=TROBT) & ((tg&63)!=TCAUC))) return(0);
   return(1);
 }
 
-int locfit(lfd,des,sp,noit,nb,cv)
-lfdata *lfd;
+int locfit(lfdata *lfd, design *des, smpar *sp, int noit, int nb, int cv)
+/*lfdata *lfd;
 design *des;
 smpar *sp;
-int noit, nb, cv;
+int noit, nb, cv;*/
 { int i;
 
   if (des->xev==NULL)

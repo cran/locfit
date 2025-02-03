@@ -19,17 +19,20 @@ static lfdata *mm_lfd;
 static design *mm_des;
 static double mm_gam;
 
-double ipower(x,n) /* use for n not too large!! */
-double x;
-int n;
+/* use for n not too large!! */
+double ipower(double x, int n)
+/* double ipower(x,n) 
+   double x;
+   int n; */
 { if (n==0) return(1.0);
   if (n<0) return(1/ipower(x,-n));
   return(x*ipower(x,n-1));
 }
 
-double setmmwt(des,a,gam)
-design *des;
-double *a, gam;
+double setmmwt(design *des, double *a, double gam)
+/* double setmmwt(des,a,gam)
+   design *des;
+   double *a, gam; */
 { double ip, w0, w1, sw, wt;
   int i;
   sw = 0.0;
@@ -46,9 +49,10 @@ double *a, gam;
 }
 
 /* compute sum_{w!=0} AA^T; e1-sum wA  */
-int mmsums(coef,f,z,J)
-double *coef, *f, *z;
-jacobian *J;
+int mmsums(double *coef, double *f, double *z, jacobian *J)
+/* int mmsums(coef,f,z,J)
+   double *coef, *f, *z;
+   jacobian *J; */
 { int i, j, p, sing;
   double *A;
 
@@ -79,10 +83,12 @@ mmsm_ct++;
   return((sing) ? NR_SINGULAR : NR_OK);
 }
 
-double updatesd(des,z,p,a,a0,sw0,gam)
-design *des;
-int p;
-double *z, *a, *a0, sw0, gam;
+double updatesd(design *des, double *z, int p, double *a, double *a0, double sw0,
+                double gam)
+/* double updatesd(des,z,p,a,a0,sw0,gam)
+   design *des;
+   int p;
+   double *z, *a, *a0, sw0, gam; */
 { double f, sw, c0, c1, tmp[10];
   int i, j, sd=0;
 
@@ -134,10 +140,11 @@ if (debug) printf("sdir: c0 %8.5f  c1 %8.5f  z %8.5f %8.5f  tmp %8.5f %8.5f\n",c
   }
 }
 
-int mm_initial(des,z,p,coef)
-design *des;
-int p;
-double *z, *coef;
+int mm_initial(design *des, double *z, int p, double *coef)
+/* int mm_initial(des,z,p,coef)
+   design *des;
+   int p;
+   double *z, *coef; */
 { int st;
   double f;
 
@@ -152,10 +159,12 @@ double *z, *coef;
   } 
 }
 
-void  mmax(coef, old_coef, f1, delta, J, p, maxit, tol, err)
-double *coef, *old_coef, *f1, *delta, tol;
-int p, maxit, *err;
-jacobian *J;
+void mmax(double *coef, double *old_coef, double *f1, double *delta, jacobian *J,
+          int p, int maxit, double tol, int *err)
+/* void mmax(coef, old_coef, f1, delta, J, p, maxit, tol, err)
+   double *coef, *old_coef, *f1, *delta, tol;
+   int p, maxit, *err;
+   jacobian *J; */
 { double f, old_f, lambda;
   int i, j, fr, sing=0;
 
@@ -216,8 +225,9 @@ if (sing) printf("final singular\n");
   return;
 }
 
-double findab(gam)
-double gam;
+double findab(double gam)
+/* double findab(gam)
+   double gam; */
 { double *coef, sl;
   int i, p, nr_stat;
 
@@ -243,8 +253,9 @@ double gam;
   return(sl-gam);
 }
 
-double weightmm(coef,di,ff,gam)
-double *coef, di, *ff, gam;
+double weightmm(double *coef, double di, double *ff, double gam)
+/* double weightmm(coef,di,ff,gam)
+   double *coef, di, *ff, gam; */
 { double y1, y2, ip;
   ip = innerprod(ff,coef,mm_des->p);
   y1 = ip-gam*di; if (y1>0) return(y1/ip);
@@ -252,10 +263,11 @@ double *coef, di, *ff, gam;
   return(0.0);
 }
 
-double minmax(lfd,des,sp)
-lfdata *lfd;
-design *des;
-smpar *sp;
+double minmax(lfdata *lfd, design *des, smpar *sp)
+/* double minmax(lfd,des,sp)
+   lfdata *lfd;
+   design *des;
+   smpar *sp; */
 { double h, u[MXDIM], gam;
   int i, j, m, d1, p1, err_flag;
 

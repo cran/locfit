@@ -11,8 +11,8 @@
 #define IGAMMA_LARGE    1.0e30
 #define DOUBLE_EP     2.2204460492503131E-16
 
-double ibeta(x, a, b)
-double x, a, b;
+double ibeta(double x, double a, double b)
+/* double x, a, b; */
 { int flipped = 0, i, k, count;
   double I = 0, temp, pn[6], ak, bk, next, prev, factor, val;
   if (x <= 0) return(0);
@@ -62,8 +62,8 @@ double x, a, b;
  * Incomplete gamma function.
  * int_0^x u^{df-1} e^{-u} du / Gamma(df).
  */
-double igamma(x, df)
-double x, df;
+double igamma(double x, double df)
+/* double x, df; */
 { double factor, term, gintegral, pn[6], rn, ak, bk;
   int i, count, k;
   if (x <= 0.0) return(0.0);
@@ -120,20 +120,20 @@ double x, df;
   return(gintegral);
 }
 
-double pf(q, df1, df2)
-double q, df1, df2;
+double pf(double q, double df1, double df2)
+/* double q, df1, df2; */
 { return(ibeta(q*df1/(df2+q*df1), df1/2, df2/2));
 }
 
 #ifdef RVERSION
 extern double Rf_pnorm5();
-double mut_pnorm(x,mu,s)
-double x, mu, s;
+double mut_pnorm(double x, double mu, double s)
+/* double x, mu, s; */
 { return(Rf_pnorm5(x, mu, s, 1L, 0L));
 }
 #else
-double mut_pnorm(x,mu,s)
-double x, mu, s;
+double mut_pnorm(double x, double mu, double s)
+/* double x, mu, s; */
 { if(x == mu)
     return(0.5);
   x = (x-mu)/s;

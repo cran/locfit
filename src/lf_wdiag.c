@@ -13,12 +13,13 @@
 
 static double *wd;
 extern double robscale;
-void nnresproj(lfd,sp,des,u,m,p)
-lfdata *lfd;
+
+void nnresproj(lfdata *lfd, smpar *sp, design *des, double *u, int m, int p)
+/*lfdata *lfd;
 smpar *sp;
 design *des;
 double *u;
-int m, p;
+int m, p;*/
 { int i, j;
   double link[LLEN];
   setzero(des->f1,p);
@@ -31,10 +32,10 @@ int m, p;
     u[i] -= innerprod(des->f1,d_xi(des,i),p)*des->w[i];
 }
 
-void wdexpand(l,n,ind,m)
-double *l;
+void wdexpand(double *l, int n, Sint *ind, int m)
+/*double *l;
 Sint *ind;
-int n, m;
+int n, m;*/
 { int i, j, t;
   double z;
   for (j=m; j<n; j++) { l[j] = 0.0; ind[j] = -1; }
@@ -53,14 +54,14 @@ int n, m;
   { l[i] = ((j>=0) && (ind[j]==i)) ? l[j--] : 0.0; } */
 }
 
-int wdiagp(lfd,sp,des,lx,pc,dv,deg,ty,exp)
-lfdata *lfd;
+int wdiagp(lfdata *lfd, smpar *sp, design *des, double *lx, paramcomp *pc, deriv *dv, int deg, int ty, int exp)
+/*lfdata *lfd;
 smpar *sp;
 design *des;
 paramcomp *pc;
 deriv *dv;
 double *lx;
-int deg, ty, exp;
+int deg, ty, exp;*/
 { int i, j, p, nd;
   double *l1;
 
@@ -100,19 +101,13 @@ int deg, ty, exp;
   return(p);
 }
 
-int wdiag(lfd,sp,des,lx,dv,deg,ty,exp)
-lfdata *lfd;
+int wdiag(lfdata *lfd, smpar *sp, design *des, double *lx, deriv *dv, int deg, int ty, int exp)
+/*lfdata *lfd;
 smpar *sp;
 design *des;
 deriv *dv;
 double *lx;
-int deg, ty, exp;
-/* deg=0: l(x) only.
-   deg=1: l(x), l'(x)
-   deg=2: l(x), l'(x), l''(x)
-   ty = 1: e1 (X^T WVX)^{-1} X^T W        -- hat matrix
-   ty = 2: e1 (X^T WVX)^{-1} X^T WV^{1/2} -- scb's
-*/
+int deg, ty, exp;*/
 { double w, *X, *lxd=NULL, *lxdd=NULL, wdd, wdw, *ulx, link[LLEN], h;
   double dfx[MXDIM], hs[MXDIM];
   int i, ii, j, k, l, m, d, p, nd;

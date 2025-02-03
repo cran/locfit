@@ -9,10 +9,10 @@
  */
 
 #include "local.h"
-
-double rho(x,sc,d,kt,sty) /* ||x|| for appropriate distance metric */
-double *x, *sc;
-int d, kt, *sty;
+/* ||x|| for appropriate distance metric */
+double rho(double *x, double *sc, int d, int kt, int *sty)
+/*double *x, *sc;
+int d, kt, *sty;*/
 { double rhoi[MXDIM], s;
   int i;
   for (i=0; i<d; i++)
@@ -46,10 +46,10 @@ int d, kt, *sty;
   return(0.0);
 }
 
-double kordstat(x,k,n,ind)
-double *x;
+double kordstat(double *x, int k, int n, Sint *ind)
+/*double *x;
 int k, n;
-Sint *ind;
+Sint *ind;*/
 { int i, i0, i1, l, r;
   double piv;
   if (k<1) return(0.0);
@@ -74,9 +74,9 @@ Sint *ind;
 }
 
 /* check if i'th data point is in limits */
-int inlim(lfd,i)
-lfdata *lfd;
-int i;
+int inlim(lfdata *lfd, int i)
+/*lfdata *lfd;
+int i;*/
 { int d, j, k;
   double *xlim;
 
@@ -90,10 +90,10 @@ int i;
   return(k);
 }
 
-double compbandwid(di,ind,x,n,d,nn,fxh)
-double *di, *x, fxh;
+double compbandwid(double *di, Sint *ind, double *x, int n, int d, int nn, double fxh)
+/*double *di, *x, fxh;
 Sint *ind;
-int n, d, nn;
+int n, d, nn;*/
 { int i;
   double nnh;
 
@@ -112,11 +112,11 @@ int n, d, nn;
 /*
   fast version of nbhd for ordered 1-d data
 */
-void nbhd1(lfd,sp,des,k)
-lfdata *lfd;
+void nbhd1(lfdata *lfd, smpar *sp, design *des, int k)
+/*lfdata *lfd;
 smpar *sp;
 design *des;
-int k;
+int k;*/
 { double x, h, *xd, sc;
   int i, l, r, m, n, z;
 
@@ -186,9 +186,9 @@ int k;
   des->h = h;
 }
 
-void nbhd_zeon(lfd,des)
-lfdata *lfd;
-design *des;
+void nbhd_zeon(lfdata *lfd, design *des)
+/*lfdata *lfd;
+design *des;*/
 { int i, j, m, eq;
 
   m = 0;
@@ -205,11 +205,11 @@ design *des;
   des->h = 1.0;
 }
 
-void nbhd(lfd,des,nn,redo,sp)
-lfdata *lfd;
+void nbhd(lfdata *lfd, design *des, int nn, int redo, smpar *sp)
+/*lfdata *lfd;
 design *des;
 int redo, nn;
-smpar *sp;
+smpar *sp;*/
 { int d, i, j, m, n;
   double h, u[MXDIM];
 

@@ -15,11 +15,12 @@ int de_mint  = 20;
 int de_itype = IDEFA;
 int de_renorm= 0;
 
-int multint(), prodint(), gausint(), mlinint();
+int multint(double *t, double *resp1, double *resp2, double *cf, double h);
+int prodint(double *t, double *resp, double *resp2, double *coef, double h);
+int gausint(double *t, double *resp, double *C, double *cf, double h, double *sca);
+int mlinint(double *t, double *resp1, double *resp2, double *cf, double h);
 
-void prresp(coef,resp,p)
-double *coef, *resp;
-int p;
+void prresp(double *coef, double *resp, int p)
 { int i, j;
   printf("Coefficients:\n");
   for (i=0; i<p; i++) printf("%8.5f ",coef[i]);
@@ -31,9 +32,7 @@ int p;
   }
 }
 
-int mif(u,d,resp,M)
-double *u, *resp, *M;
-int d;
+int mif(double *u, int d, double *resp, double *M)
 { double wt;
   int i, j, p;
 
@@ -53,8 +52,7 @@ int d;
   return(p*p);
 }
 
-int multint(t,resp1,resp2,cf,h)
-double *t, *resp1, *resp2, *cf, h;
+int multint(double *t, double *resp1, double *resp2, double *cf, double h)
 { int d, i, mg[MXDIM];
 
   if (ker(den_sp)==WGAUS) return(gausint(t,resp1,resp2,cf,h,den_lfd->sca));
@@ -68,8 +66,7 @@ double *t, *resp1, *resp2, *cf, h;
   return(LF_OK);
 }
 
-int mlinint(t,resp1,resp2,cf,h)
-double *t, *resp1, *resp2, *cf, h;
+int mlinint(double *t, double *resp1, double *resp2, double *cf, double h)
 {
   double hd, nb, wt, wu, g[4], w0, w1, v, *sca;
   int d, p, i, j, jmax, k, l, z, jj[2];
@@ -162,9 +159,7 @@ double *t, *resp1, *resp2, *cf, h;
   return(LF_ERR);
 }
 
-void prodintresp(resp,prod_wk,dim,deg,p)
-double *resp, prod_wk[MXDIM][2*MXDEG+1];
-int dim, deg, p;
+void prodintresp(double *resp, double prod_wk[MXDIM][2*MXDEG+1], int dim, int deg, int p)
 { double prod;
   int i, j, k, j1, k1;
 
@@ -194,8 +189,7 @@ int dim, deg, p;
     }
 }
 
-int prodint(t,resp,resp2,coef,h)
-double *t, *resp, *resp2, *coef, h;
+int prodint(double *t, double *resp, double *resp2, double *coef, double h)
 { int dim, p, i, j, k, st=0;
   double cf[MXDEG+1], hj, hs, prod_wk[MXDIM][2*MXDEG+1];
 
@@ -235,8 +229,7 @@ double *t, *resp, *resp2, *coef, h;
   return(st);
 }
 
-int gausint(t,resp,C,cf,h,sca)
-double *t, *resp, *C, *cf, h, *sca;
+int gausint(double *t, double *resp, double *C, double *cf, double h, double *sca)
 { double nb, det, z, *P;
   int d, p, i, j, k, l, m1, m2, f;
   d = den_lfd->d; p = den_des->p;
@@ -286,8 +279,7 @@ double *t, *resp, *C, *cf, h, *sca;
   return(LF_OK);
 }
 
-int likeden(coef, lk0, f1, A)
-double *coef, *lk0, *f1, *A;
+int likeden(double *coef, double *lk0, double *f1, double *A)
 { double lk=0.0, r;
   int i, j, p, rstat;
 
@@ -335,9 +327,7 @@ double *coef, *lk0, *f1, *A;
   return(rstat);
 }
 
-int inre(x,bound,d)
-double *x, *bound;
-int d;
+int inre(double *x, double *bound, int d)
 { int i, z;
   z = 1;
   for (i=0; i<d; i++)
@@ -346,10 +336,7 @@ int d;
   return(z);
 }
 
-int setintlimits(lfd, x, h, ang, lset)
-lfdata *lfd;
-int *ang, *lset;
-double *x, h;
+int setintlimits(lfdata *lfd, double *x, double h, int *ang, int *lset)
 { int d, i;
   d = lfd->d;
   *ang = *lset = 0;
@@ -378,8 +365,7 @@ double *x, h;
   return(LF_OK);
 }
 
-int selectintmeth(itype,lset,ang)
-int itype, lset, ang;
+int selectintmeth(int itype, int lset, int ang)
 {
   if (itype==IDEFA) /* select the default method */
   { if (fam(den_sp)==THAZ)
@@ -432,11 +418,7 @@ int itype, lset, ang;
   return(INVLD);
 }
 
-int densinit(lfd,des,sp,cf)
-lfdata *lfd;
-design *des;
-smpar *sp;
-double *cf;
+int densinit(lfdata *lfd, design *des, smpar *sp, double *cf)
 { int p, i, ii, j, nnz, rnz, ang, lset, status;
   double w;
 

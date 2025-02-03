@@ -11,9 +11,8 @@
 
 
 /* The weight functions themselves.  Used everywhere. */
-double W(u,ker)
-double u;
-int ker;
+double W(double u, int ker)
+/* W(u,ker) double u; int ker; */
 { u = fabs(u);
   switch(ker)
   { case WRECT: return((u>1) ? 0.0 : 1.0);
@@ -41,16 +40,14 @@ int ker;
   return(1.0);
 }
 
-int iscompact(ker)
-int ker;
+int iscompact(int ker)
+/* iscompact(ker) int ker; */
 { if ((ker==WEXPL) | (ker==WGAUS) | (ker==WMACL) | (ker==WPARM)) return(0);
   return(1);
 }
 
-double weightprod(lfd,u,h,ker)
-lfdata *lfd;
-double *u, h;
-int ker;
+double weightprod(lfdata *lfd, double *u, double h, int ker)
+/* weightprod(lfd,u,h,ker) lfdata *lfd; double *u, h; int ker; */
 { int i;
   double sc, w;
   w = 1.0;
@@ -78,10 +75,8 @@ int ker;
   return(w);
 }
 
-double weightsph(lfd,u,h,ker, hasdi,di)
-lfdata *lfd;
-double *u, h, di;
-int ker, hasdi;
+double weightsph(lfdata *lfd, double *u, double h, int ker, int hasdi, double di)
+/* weightsph(lfd,u,h,ker,hasdi,di) lfdata *lfd; double *u, h, di; int ker, hasdi; */
 { int i;
 
   if (!hasdi) di = rho(u,lfd->sca,lfd->d,KSPH,lfd->sty);
@@ -95,11 +90,8 @@ int ker, hasdi;
   return(W(di/h,ker));
 }
 
-double weight(lfd,sp,x,t,h, hasdi,di)
-lfdata *lfd;
-smpar *sp;
-double *x, *t, h, di;
-int hasdi;
+double weight(lfdata *lfd, smpar *sp, double *x, double *t, double h, int hasdi, double di)
+/* weight(lfd,sp,x,t,h,hasdi,di) lfdata *lfd; smpar *sp; double *x, *t, h, di; int hasdi; */
 { double u[MXDIM];
   int i;
   for (i=0; i<lfd->d; i++) u[i] = (t==NULL) ? x[i] : x[i]-t[i];
@@ -111,16 +103,15 @@ int hasdi;
   return(1.0);
 }
 
-double sgn(x)
-double x;
+double sgn(double x)
+/* sgn(x) double x; */
 { if (x>0) return(1.0);
   if (x<0) return(-1.0);
   return(0.0);
 }
 
-double WdW(u,ker) /* W'(u)/W(u) */
-double u;
-int ker;
+double WdW(double u, int ker) /* W'(u)/W(u) */
+/* WdW(u,ker) double u; int ker; */
 { double eps=1.0e-10;
   if (ker==WGAUS) return(-GFACT*GFACT*u);
   if (ker==WPARM) return(0.0);
@@ -142,9 +133,8 @@ int ker;
    u, sc, sty needed only in relevant direction
    Acutally, returns (d/dx W(||x||/h) ) / W(.)
 */
-double weightd(u,sc,d,ker,kt,h,sty,di)
-double u, sc, h, di;
-int d, ker, kt, sty;
+double weightd(double u, double sc, int d, int ker, int kt, double h, int sty, double di)
+/* weightd(u,sc,d,ker,kt,h,sty,di) double u, sc, h, di; int d, ker, kt, sty; */
 { if (sty==STANGL)
   { if (kt==KPROD)
       return(-WdW(2*sin(u/(2*sc)),ker)*cos(u/(2*sc))/(h*sc));
@@ -158,9 +148,8 @@ int d, ker, kt, sty;
   return(-WdW(di/h,ker)*u/(h*di*sc*sc));
 }
 
-double weightdd(u,sc,d,ker,kt,h,sty,di,i0,i1)
-double *u, *sc, h, di;
-int d, ker, kt, i0, i1, *sty;
+double weightdd(double *u, double *sc, int d, int ker, int kt, double h, int *sty, double di, int i0, int i1)
+/* weightdd(u,sc,d,ker,kt,h,sty,di,i0,i1) double *u, *sc, h, di; int d, ker, kt, i0, i1, *sty; */
 { /* double w;
   w = 1;
   if (kt==KPROD)
@@ -173,9 +162,8 @@ int d, ker, kt, i0, i1, *sty;
 /* Derivatives W'(u)/u.
    Used in simult. conf. band computations,
    and kernel density bandwidth selectors. */
-double Wd(u,ker)
-double u;
-int ker;
+double Wd(double u, int ker)
+/* Wd(u,ker) double u; int ker; */
 { double v;
   if (ker==WGAUS) return(-SQR(GFACT)*exp(-SQR(GFACT*u)/2));
   if (ker==WPARM) return(0.0);
@@ -194,9 +182,8 @@ int ker;
 
 /* Second derivatives W''(u)-W'(u)/u.
    used in simult. conf. band computations in >1 dimension. */
-double Wdd(u,ker)
-double u;
-int ker;
+double Wdd(double u, int ker)
+/* Wdd(u,ker) double u; int ker; */
 { double v;
   if (ker==WGAUS) return(SQR(u*GFACT*GFACT)*exp(-SQR(u*GFACT)/2));
   if (ker==WPARM) return(0.0);
@@ -216,21 +203,22 @@ int ker;
    Assume all j_i are even.
    Also in some bandwidth selection.
 */
-double wint(d,j,nj,ker)
-int d, *j, nj, ker;
-{ double I=0.0, z;
+double wint(int d, int *j, int nj, int ker)
+/* wint(d,j,nj,ker) int d, *j, nj, ker; */
+{ double I=0.0, z, dj_d;
   int k, dj;
   dj = d;
   for (k=0; k<nj; k++) dj += j[k];
+  dj_d = (double) dj;
   switch(ker) /* int_0^1 u^(dj-1) W(u)du  */
-  { case WRECT: I = 1.0/dj; break;
-    case WEPAN: I = 2.0/(dj*(dj+2)); break;
-    case WBISQ: I = 8.0/(dj*(dj+2)*(dj+4)); break;
-    case WTCUB: I = 162.0/(dj*(dj+3)*(dj+6)*(dj+9)); break;
-    case WTRWT: I = 48.0/(dj*(dj+2)*(dj+4)*(dj+6)); break;
-    case WTRIA: I = 1.0/(dj*(dj+1)); break;
-    case WQUQU: I = 384.0/(dj*(dj+2)*(dj+4)*(dj+6)*(dj+8)); break;
-    case W6CUB: I = 524880.0/(dj*(dj+3)*(dj+6)*(dj+9)*(dj+12)*(dj+15)*(dj+18)); break;
+  { case WRECT: I = 1.0/dj_d; break;
+    case WEPAN: I = 2.0/(dj_d*(dj_d+2)); break;
+    case WBISQ: I = 8.0/(dj_d*(dj_d+2)*(dj_d+4)); break;
+    case WTCUB: I = 162.0/(dj_d*(dj_d+3)*(dj_d+6)*(dj_d+9)); break;
+    case WTRWT: I = 48.0/(dj_d*(dj_d+2)*(dj_d+4)*(dj_d+6)); break;
+    case WTRIA: I = 1.0/(dj_d*(dj_d+1)); break;
+    case WQUQU: I = 384.0/(dj_d*(dj_d+2)*(dj_d+4)*(dj_d+6)*(dj_d+8)); break;
+    case W6CUB: I = 524880.0/(dj_d*(dj_d+3)*(dj_d+6)*(dj_d+9)*(dj_d+12)*(dj_d+15)*(dj_d+18)); break;
     case WGAUS: switch(d)
                 { case 1: I = S2PI/GFACT; break;
                   case 2: I = 2*PI/(GFACT*GFACT); break;
@@ -256,9 +244,8 @@ int d, *j, nj, ker;
    as special cases.
    Used in density estimation.
 */
-int wtaylor(f,x,ker)
-double *f, x;
-int ker;
+int wtaylor(double *f, double x, int ker)
+/* wtaylor(f,x,ker) double *f, x; int ker; */
 { double v;
   switch(ker)
   { case WRECT:
@@ -329,9 +316,8 @@ int ker;
 /* convolution int W(x)W(x+v)dx.
    used in kde bandwidth selection.
 */
-double Wconv(v,ker)
-double v;
-int ker;
+double Wconv(double v, int ker)
+/* Wconv(v,ker) double v; int ker; */
 { double v2;
   switch(ker)
   { case WGAUS: return(SQRPI/GFACT*exp(-SQR(GFACT*v)/4));
@@ -357,9 +343,8 @@ int ker;
    1/v d/dv int W(x)W(x+v)dx
    used in kde bandwidth selection.
 */
-double Wconv1(v,ker)
-double v;
-int ker;
+double Wconv1(double v, int ker)
+/* Wconv1(v,ker) double v; int ker; */
 { double v2;
   v = fabs(v);
   switch(ker)
@@ -382,9 +367,8 @@ int ker;
 /* 4th derivative of Wconv.
    used in kde bandwidth selection (BCV, SJPI, GKK)
 */
-double Wconv4(v,ker)
-double v;
-int ker;
+double Wconv4(double v, int ker)
+/* Wconv4(v,ker) double v; int ker; */
 { double gv;
   switch(ker)
   { case WGAUS:
@@ -398,9 +382,8 @@ int ker;
 /* 5th derivative of Wconv.
    used in kde bandwidth selection (BCV method only)
 */
-double Wconv5(v,ker) /* (d/dv)^5 int W(x)W(x+v)dx */
-double v;
-int ker;
+double Wconv5(double v, int ker)
+/* Wconv5(v,ker) double v; int ker; */
 { double gv;
   switch(ker)
   { case WGAUS:
@@ -414,9 +397,8 @@ int ker;
 /* 6th derivative of Wconv.
    used in kde bandwidth selection (SJPI)
 */
-double Wconv6(v,ker)
-double v;
-int ker;
+double Wconv6(double v, int ker)
+/* Wconv6(v,ker) double v; int ker; */
 { double gv, z;
   switch(ker)
   { case WGAUS:
@@ -433,8 +415,8 @@ int ker;
 /* int W(v)^2 dv / (int v^2 W(v) dv)^2
    used in some bandwidth selectors
 */
-double Wikk(ker,deg)
-int ker, deg;
+double Wikk(int ker, int deg)
+/* Wikk(ker,deg) int ker, deg; */
 { switch(deg)
   { case 0:
     case 1: /* int W(v)^2 dv / (int v^2 W(v) dv)^2 */

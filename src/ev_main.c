@@ -9,25 +9,24 @@
  * trchck checks the working space on the lfit structure 
  * has space for nvm vertices and ncm cells.
  */
-void lfit_alloc(lf)
-lfit *lf;
+void lfit_alloc(lfit *lf)
+/* lfit_alloc(lf) lfit *lf; */
 { lf->fp.lwk = lf->fp.lev = lf->fp.ll = lf->evs.liw = lf->pc.lwk = 0;
   lf->lf_init_id = LF_INIT_ID;
 }
-int lfit_reqd(d,nvm,ncm,geth)
-int d, nvm, ncm, geth;
+int lfit_reqd(int d, int nvm, int ncm, int geth)
+/* lfit_reqd(d,nvm,ncm,geth) int d, nvm, ncm, geth; */
 { int z;
   z = (geth==GSMP) ? d+3 : 3*d+8;
   return(nvm*z+ncm);
 }
-int lfit_reqi(nvm,ncm,vc)
-int nvm, ncm, vc;
+int lfit_reqi(int nvm, int ncm, int vc)
+/* lfit_reqi(nvm,ncm,vc) int nvm, ncm, vc; */
 { return(ncm*vc+3*MAX(ncm,nvm));
 }
 
-void trchck(lf,nvm,ncm,vc)
-lfit *lf;
-int nvm, ncm, vc;
+void trchck(lfit *lf, int nvm, int ncm, int vc)
+/* trchck(lf,nvm,ncm,vc) lfit *lf; int nvm, ncm, vc; */
 { int rw, d;
   Sint *k;
   double *z;
@@ -72,15 +71,14 @@ int nvm, ncm, vc;
   lf->fp.nvm = nvm; lf->evs.ncm = ncm;
 }
 
-void data_guessnv(nvm,ncm,vc,n)
-int *nvm, *ncm, *vc, n;
+void data_guessnv(int *nvm, int *ncm, int *vc, int n)
+/* data_guessnv(nvm,ncm,vc,n) int *nvm, *ncm, *vc, n; */
 { *nvm = n;
   *ncm = *vc = 0;
 }
 
-void dataf(des,lf)
-design *des;
-lfit *lf;
+void dataf(design *des, lfit *lf)
+/* dataf(des,lf) design *des; lfit *lf; */
 {
   int d, i, j, ncm, nv, vc;
 
@@ -97,16 +95,15 @@ lfit *lf;
   lf->fp.nv = lf->fp.nvm = nv; lf->evs.nce = 0;
 }
 
-void xbar_guessnv(nvm,ncm,vc)
-int *nvm, *ncm, *vc;
+void xbar_guessnv(int *nvm, int *ncm, int *vc)
+/* xbar_guessnv(nvm,ncm,vc) int *nvm, *ncm, *vc; */
 { *nvm = 1;
   *ncm = *vc = 0;
   return;
 }
 
-void xbarf(des,lf)
-design *des;
-lfit *lf;
+void xbarf(design *des, lfit *lf)
+/* xbarf(des,lf) design *des; lfit *lf; */
 { int i, d, nvm, ncm, vc;
   d = lf->lfd.d;
   xbar_guessnv(&nvm,&ncm,&vc);
@@ -117,9 +114,8 @@ lfit *lf;
   lf->fp.nv = 1; lf->evs.nce = 0;
 }
 
-void preset(des,lf)
-design *des;
-lfit *lf;
+void preset(design *des, lfit *lf)
+/* preset(des,lf) design *des; lfit *lf; */
 { int i, nv;
 
   nv = lf->fp.nvm;
@@ -132,9 +128,8 @@ lfit *lf;
   lf->fp.nv = nv; lf->evs.nce = 0;
 }
 
-void crossf(des,lf)
-design *des;
-lfit *lf;
+void crossf(design *des, lfit *lf)
+/* crossf(des,lf) design *des; lfit *lf; */
 { int d, i, j, n, nv, ncm, vc;
   double w;
 
@@ -155,9 +150,8 @@ lfit *lf;
   lf->fp.nv = n; lf->evs.nce = 0;
 }
 
-void gridf(des,lf)
-design *des;
-lfit *lf;
+void gridf(design *des, lfit *lf)
+/* gridf(des,lf) design *des; lfit *lf; */
 { int d, i, j, nv, u0, u1, z;
   nv = 1; d = lf->lfd.d;
   for (i=0; i<d; i++)
@@ -181,10 +175,8 @@ lfit *lf;
   lf->fp.nv = nv; lf->evs.nce = 0;
 }
 
-int findpt(fp,evs,i0,i1)
-fitpt *fp;
-evstruc *evs;
-int i0, i1;
+int findpt(fitpt *fp, evstruc *evs, int i0, int i1)
+/* findpt(fp,evs,i0,i1) fitpt *fp; evstruc *evs; int i0, i1; */
 { int i;
   if (i0>i1) ISWAP(i0,i1);
   for (i=i1+1; i<fp->nv; i++)
@@ -196,10 +188,8 @@ int i0, i1;
   add a new vertex at the midpoint of (x[i0],x[i1]).
   return the vertex number.
 */
-int newsplit(des,lf,i0,i1,pv)
-design *des;
-lfit *lf;
-int i0, i1, pv;
+int newsplit(design *des, lfit *lf, int i0, int i1, int pv)
+/* newsplit(des,lf,i0,i1,pv) design *des; lfit *lf; int i0, i1, pv; */
 { int i, nv;
 
   i = findpt(&lf->fp,&lf->evs,i0,i1);

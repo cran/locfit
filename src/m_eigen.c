@@ -12,9 +12,9 @@
 #define E_TOL 1.0e-8
 #define SQR(x) ((x)*(x))
 
-double e_tol(D,p)
-double *D;
-int p;
+double e_tol(double *D, int p)
+/*double *D;
+int p;*/
 { double mx;
   int i;
   if (E_TOL <= 0.0) return(0.0);
@@ -23,9 +23,9 @@ int p;
   return(E_TOL*mx);
 }
 
-void eig_dec(X,P,d)
-double *X, *P;
-int d;
+void eig_dec(double *X, double *P, int d)
+/*double *X, *P;
+int d;*/
 { int i, j, k, iter, ms;
   double c, s, r, u, v;
 
@@ -66,9 +66,9 @@ int d;
   Rprintf("eig_dec not converged\n");
 }
 
-int eig_solve(J,x)
-jacobian *J;
-double *x;
+int eig_solve(jacobian *J, double *x)
+/*jacobian *J;
+double *x;*/
 { int d, i, j, rank;
   double *D, *P, *Q, *w;
   double tol;
@@ -97,9 +97,9 @@ double *x;
   return(rank);
 }
 
-int eig_hsolve(J,v)
-jacobian *J;
-double *v;
+int eig_hsolve(jacobian *J, double *v)
+/*jacobian *J;
+double *v;*/
 { int i, j, p, rank;
   double *D, *Q, *w;
   double tol;
@@ -126,9 +126,9 @@ double *v;
   return(rank);
 }
 
-double eig_qf(J,v)
-jacobian *J;
-double *v;
+double eig_qf(jacobian *J, double *v)
+/*jacobian *J;
+double *v;*/
 { int i, j, p;
   double sum, tol;
 

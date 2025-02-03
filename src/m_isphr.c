@@ -4,8 +4,8 @@
 static double *res, *resb, *orig, rmin, rmax;
 static int ct0;
 
-void sphM(M,r,u)
-double *M, r, *u;
+void sphM(double *M, double r, double *u)
+/*double *M, r, *u;*/
 { double h, u1[3], u2[3];
 
   /* set the orthogonal unit vectors. */
@@ -48,20 +48,20 @@ double *M, r, *u;
 
 }
 
-double ip3(a,b)
-double *a, *b;
+double ip3(double *a, double *b)
+/*double *a, *b;*/
 { return(a[0]*b[0] + a[1]*b[1] + a[2]*b[2]);
 }
 
-void rn3(a)
-double *a;
+void rn3(double *a)
+/*double *a;*/
 { double s;
   s = sqrt(ip3(a,a));
   a[0] /= s; a[1] /= s; a[2] /= s;
 }
 
-double sptarea(a,b,c)
-double *a, *b, *c;
+double sptarea(double *a, double *b, double *c)
+/*double *a, *b, *c;*/
 { double ea, eb, ec, yab, yac, ybc, sab, sac, sbc;
   double ab[3], ac[3], bc[3], x1[3], x2[3];
 
@@ -95,9 +95,9 @@ double *a, *b, *c;
   return(ea+ec-eb);
 }
 
-void li(x,f,fb,mint,ar)
-double *x, ar;
-int (*f)(), (*fb)(), mint;
+void li(double *x, int (*f)(), int (*fb)(), int mint, double ar)
+/*double *x, ar;
+int (*f)(), (*fb)(), mint;*/
 { int i, j, nr=0, nrb, ct1, w;
   double u[3], r, M[36];
   double sres[MXRESULT], tres[MXRESULT];
@@ -138,9 +138,9 @@ int (*f)(), (*fb)(), mint;
     res[j] += sres[j] * ar * (rmax-rmin)/(3*mint);
 }
 
-void sphint(f,fb,a,b,c,lev,mint,cent)
-double *a, *b, *c;
-int (*f)(), (*fb)(), lev, mint, cent;
+void sphint(int (*f)(), int (*fb)(), double *a, double *b, double *c, int lev, int mint, int cent)
+/*double *a, *b, *c;
+int (*f)(), (*fb)(), lev, mint, cent;*/
 { double x[3], ab[3], ac[3], bc[3], ar;
   int i;
 
@@ -188,9 +188,9 @@ int (*f)(), (*fb)(), lev, mint, cent;
   }
 }
 
-void integ_sphere(f,fb,fl,Res,Resb,mg)
-double *fl, *Res, *Resb;
-int (*f)(), (*fb)(), *mg;
+void integ_sphere(int (*f)(), int (*fb)(), double *fl, double *Res, double *Resb, int *mg)
+/*double *fl, *Res, *Resb;
+int (*f)(), (*fb)(), *mg;*/
 { double a[3], b[3], c[3];
 
   a[0] = 1; a[1] = a[2] = 0;

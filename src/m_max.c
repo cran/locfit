@@ -39,10 +39,10 @@
 #define gold_rat 0.6180339887498948482045870
 #define max_val(a,b) ((flag=='x') ? a : b)
 
-double max_grid(f,xlo,xhi,n,flag)
-double (*f)(), xlo, xhi;
+double max_grid(double (*f)(), double xlo, double xhi, int n, char flag)
+/*double (*f)(), xlo, xhi;
 int n;
-char flag;
+char flag;*/
 { int i, mi=0;
   double x, y, mx=0.0, my=0.0;
   for (i=0; i<=n; i++)
@@ -59,10 +59,11 @@ char flag;
   return(max_val(mx,my));
 }
 
-double max_golden(f,xlo,xhi,n,tol,err,flag)
-double (*f)(), xhi, xlo, tol;
+double max_golden(double (*f)(), double xlo, double xhi, int n, double tol,
+                  int *err, char flag)
+/*double (*f)(), xhi, xlo, tol;
 int n, *err;
-char flag;
+char flag;*/
 { double dlt, x0, x1, x2, x3, y0, y1, y2, y3;
   *err = 0;
 
@@ -101,10 +102,11 @@ char flag;
   return((y1>y2) ? max_val(x1,y1) : max_val(x2,y2));
 }
 
-double max_quad(f,xlo,xhi,n,tol,err,flag)
-double (*f)(), xhi, xlo, tol;
+double max_quad(double (*f)(), double xlo, double xhi, int n, double tol,
+                int *err, char flag)
+/*double (*f)(), xhi, xlo, tol;
 int n, *err;
-char flag;
+char flag;*/
 { double x0, x1, x2, xnew, y0, y1, y2, ynew, a, b;
   *err = 0;
 
@@ -166,10 +168,11 @@ char flag;
   return(max_val(x1,y1));
 }
 
-double max_nr(F, coef, old_coef, f1, delta, J, p, maxit, tol, err)
-double *coef, *old_coef, *f1, *delta, tol;
+double max_nr(int (*F)(), double *coef, double *old_coef, double *f1, double *delta, 
+              jacobian *J, int p, int maxit, double tol, int *err)
+/*double *coef, *old_coef, *f1, *delta, tol;
 int (*F)(), p, maxit, *err;
-jacobian *J;
+jacobian *J;*/
 { double old_f, f, lambda;
   int i, j, fr;
   double nc, nd, cut;

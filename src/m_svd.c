@@ -7,9 +7,11 @@
 #include "local.h"
 #include "mutil.h"
 
-void svd(x,p,q,d,mxit)  /* svd of square matrix */
-double *x, *p, *q;
-int d, mxit;
+/* svd of square matrix */
+void svd(double *x, double *p, double *q, int d, int mxit)
+/* void svd(x,p,q,d,mxit)
+   double *x, *p, *q;
+   int d, mxit; */
 { int i, j, k, iter, ms, zer;
   double r, u, v, cp, cm, sp, sm, c1, c2, s1, s2, mx;
   for (i=0; i<d; i++)
@@ -84,9 +86,12 @@ int d, mxit;
     }
 }
 
-int svdsolve(x,w,P,D,Q,d,tol) /* original X = PDQ^T; comp. QD^{-1}P^T x */
-double *x, *w, *P, *D, *Q, tol;
-int d;
+int svdsolve(double *x, double *w, double *P, double *D, double *Q, int d, 
+             double tol)
+/* int svdsolve(x,w,P,D,Q,d,tol)
+   double *x, *w, *P, *D, *Q, tol;
+   int d; */
+/* original X = PDQ^T; comp. QD^{-1}P^T x */
 { int i, j, rank;
   double mx;
   if (tol>0)
@@ -111,9 +116,12 @@ int d;
   return(rank);
 }
 
-void hsvdsolve(x,w,P,D,Q,d,tol) /* original X = PDQ^T; comp. D^{-1/2}P^T x */
-double *x, *w, *P, *D, *Q, tol;
-int d;
+void hsvdsolve(double *x, double *w, double *P, double *D, double *Q, int d,
+               double tol)
+/* void hsvdsolve(x,w,P,D,Q,d,tol)
+   double *x, *w, *P, *D, *Q, tol;
+   int d; */
+/* original X = PDQ^T; comp. D^{-1/2}P^T x */
 { int i, j;
   double mx;
   if (tol>0)

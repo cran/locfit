@@ -14,8 +14,8 @@
 
 static double hmin;
 
-double adcri(lk,t0,t2,pen)
-double lk, t0, t2, pen;
+double adcri(double lk, double t0, double t2, double pen)
+/* adcri(lk,t0,t2,pen) double lk, t0, t2, pen; */
 { double y;
 /* return(-2*lk/(t0*exp(pen*log(1-t2/t0)))); */
   /* return((-2*lk+pen*t2)/t0); */
@@ -23,11 +23,8 @@ double lk, t0, t2, pen;
   return(y);
 }
 
-double mmse(lfd,sp,dv,des)
-lfdata *lfd;
-smpar *sp;
-deriv *dv;
-design *des;
+double mmse(lfdata *lfd, smpar *sp, deriv *dv, design *des)
+/* mmse(lfd,sp,dv,des) lfdata *lfd; smpar *sp; deriv *dv; design *des; */
 { int i, ii, j, p1;
   double sv, sb, *l, dp;
 
@@ -54,11 +51,8 @@ static double mcp, clo, cup;
   get defined estimate (unless user provided nonzero nn or fix-h components)
 */
 
-int ainitband(lfd,sp,dv,des)
-lfdata *lfd;
-smpar *sp;
-deriv *dv;
-design *des;
+int ainitband(lfdata *lfd, smpar *sp, deriv *dv, design *des)
+/* ainitband(lfd,sp,dv,des) lfdata *lfd; smpar *sp; deriv *dv; design *des; */
 { int lf_status=0, p, z, cri, noit, redo;
   double ho, t[6];
 
@@ -104,12 +98,8 @@ design *des;
   each iteration.
 */
 
-double aband2(lfd,sp,dv,des,h0)
-lfdata *lfd;
-smpar *sp;
-deriv *dv;
-design *des;
-double h0;
+double aband2(lfdata *lfd, smpar *sp, deriv *dv, design *des, double h0)
+/* aband2(lfd,sp,dv,des,h0) lfdata *lfd; smpar *sp; deriv *dv; design *des; double h0; */
 { double t[6], h1, nu1, cp, ncp, tlo, tup;
   int d, inc, n, p, done;
 
@@ -160,12 +150,8 @@ double h0;
   aband3 does a finer search around best h so far. Try
   h*(1-0.2/d), h/(1-0.1/d), h*(1+0.1/d), h*(1+0.2/d)
 */
-double aband3(lfd,sp,dv,des,h0)
-lfdata *lfd;
-smpar *sp;
-deriv *dv;
-design *des;
-double h0;
+double aband3(lfdata *lfd, smpar *sp, deriv *dv, design *des, double h0)
+/* aband3(lfd,sp,dv,des,h0) lfdata *lfd; smpar *sp; deriv *dv; design *des; double h0; */
 { double t[6], h1, cp, tlo, tup;
   int i, i0, d;
 
@@ -209,11 +195,8 @@ double h0;
   return(h1);
 }
 
-int alocfit(lfd,sp,dv,des)
-lfdata *lfd;
-smpar *sp;
-deriv *dv;
-design *des;
+int alocfit(lfdata *lfd, smpar *sp, deriv *dv, design *des)
+/* alocfit(lfd,sp,dv,des) lfdata *lfd; smpar *sp; deriv *dv; design *des; */
 { int lf_status;
   double h0;
 

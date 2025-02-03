@@ -15,9 +15,9 @@ extern void setzero();
 static double M[(1+MXIDIM)*MXIDIM*MXIDIM];
 
 /* third order corners */
-void simp3(fd,x,d,resd,delta,wt,i0,i1,mg,ct,res2,lfindex)
-int (*fd)(), d, wt, i0, i1, *mg, ct, *lfindex;
-double *x, *resd, *delta, *res2;
+void simp3(int (*fd)(), double *x, int d, double *resd, double *delta, int wt, int i0, int i1, int *mg, int ct, double *res2, int *lfindex)
+/*int (*fd)(), d, wt, i0, i1, *mg, ct, *lfindex;
+double *x, *resd, *delta, *res2;*/
 { int k, l, m, nrd;
   double zb;
 
@@ -42,9 +42,9 @@ double *x, *resd, *delta, *res2;
 }
 
 /* second order corners */
-void simp2(fc,fd,x,d,resc,resd,delta,wt,i0,mg,ct,res2,lfindex)
-int (*fc)(), (*fd)(), d, wt, i0, *mg, ct, *lfindex;
-double *x, *resc, *resd, *delta, *res2;
+void simp2(int (*fc)(), int (*fd)(), double *x, int d, double *resc, double *resd, double *delta, int wt, int i0, int *mg, int ct, double *res2, int *lfindex)
+/*int (*fc)(), (*fd)(), d, wt, i0, *mg, ct, *lfindex;
+double *x, *resc, *resd, *delta, *res2;*/
 { int j, k, l, nrc;
   double zb;
   for (j=i0+1; j<d; j++) if ((lfindex[j]==0) | (lfindex[j]==mg[j]))
@@ -67,9 +67,9 @@ double *x, *resc, *resd, *delta, *res2;
 }
 
 /* first order boundary */
-void simp1(fb,fc,fd,x,d,resb,resc,resd,delta,wt,mg,ct,res2,lfindex)
-int (*fb)(), (*fc)(), (*fd)(), d, wt, *mg, ct, *lfindex;
-double *x, *resb, *resc, *resd, *delta, *res2;
+void simp1(int (*fb)(), int (*fc)(), int (*fd)(), double *x, int d, double *resb, double *resc, double *resd, double *delta, int wt, int *mg, int ct, double *res2, int *lfindex)
+/*int (*fb)(), (*fc)(), (*fd)(), d, wt, *mg, ct, *lfindex;
+double *x, *resb, *resc, *resd, *delta, *res2;*/
 { int i, j, k, nrb;
   double zb;
   for (i=0; i<d; i++) if ((lfindex[i]==0) | (lfindex[i]==mg[i]))
@@ -92,9 +92,9 @@ double *x, *resb, *resc, *resd, *delta, *res2;
   }
 }
 
-void simpson4(f,fb,fc,fd,ll,ur,d,res,resb,resc,resd,mg,res2)
-int (*f)(), (*fb)(), (*fc)(), (*fd)(), d, *mg;
-double *ll, *ur, *res, *resb, *resc, *resd, *res2;
+void simpson4(int (*f)(), int (*fb)(), int (*fc)(), int (*fd)(), double *ll, double *ur, int d, double *res, double *resb, double *resc, double *resd, int *mg, double *res2)
+/*int (*f)(), (*fb)(), (*fc)(), (*fd)(), d, *mg;
+double *ll, *ur, *res, *resb, *resc, *resd, *res2;*/
 { int ct, i, j, nr, wt, lfindex[MXIDIM];
   double x[MXIDIM], delta[MXIDIM], z;
 
@@ -139,15 +139,15 @@ double *ll, *ur, *res, *resb, *resc, *resd, *res2;
   }
 }
 
-void simpsonm(f,ll,ur,d,res,mg,res2)
-int (*f)(), d, *mg;
-double *ll, *ur, *res, *res2;
+void simpsonm(int (*f)(), double *ll, double *ur, int d, double *res, int *mg, double *res2)
+/*int (*f)(), d, *mg;
+double *ll, *ur, *res, *res2;*/
 { simpson4(f,NULL,NULL,NULL,ll,ur,d,res,NULL,NULL,NULL,mg,res2);
 }
 
-double simpson(f,l0,l1,m)
-double (*f)(), l0, l1;
-int m;
+double simpson(double (*f)(), double l0, double l1, int m)
+/*double (*f)(), l0, l1;
+int m;*/
 { double x, sum;
   int i;
   sum = 0;
