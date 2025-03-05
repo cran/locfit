@@ -15,11 +15,6 @@ int de_mint  = 20;
 int de_itype = IDEFA;
 int de_renorm= 0;
 
-int multint(double *t, double *resp1, double *resp2, double *cf, double h);
-int prodint(double *t, double *resp, double *resp2, double *coef, double h);
-int gausint(double *t, double *resp, double *C, double *cf, double h, double *sca);
-int mlinint(double *t, double *resp1, double *resp2, double *cf, double h);
-
 void prresp(double *coef, double *resp, int p)
 { int i, j;
   printf("Coefficients:\n");

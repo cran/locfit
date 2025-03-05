@@ -8,6 +8,10 @@
 #define PI    3.141592653589793238462643
 #endif
 
+void setM(double *M, double r, double s, double c, int b);
+void integ_circ(int (*f)(), double r, double *orig, double *res, int mint, int b);
+void integ_disc(int (*f)(), int (*fb)(), double *fl, double *res, double *resb, int *mg);
+
 void setM(double *M, double r, double s, double c, int b)
 /*double *M, r, s, c;
 int b;*/

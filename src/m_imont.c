@@ -14,6 +14,8 @@
 #include "mutil.h"
 extern void setzero();
 
+void monte(int (*f)(), double *ll, double *ur, int d, double *res, int n);
+
 /* static int lfindex[MXIDIM];
    static double M[(1+MXIDIM)*MXIDIM*MXIDIM]; */
 

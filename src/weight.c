@@ -9,7 +9,6 @@
 
 #include "local.h"
 
-
 /* The weight functions themselves.  Used everywhere. */
 double W(double u, int ker)
 /* W(u,ker) double u; int ker; */

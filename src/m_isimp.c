@@ -14,6 +14,13 @@ extern void setzero();
 
 static double M[(1+MXIDIM)*MXIDIM*MXIDIM];
 
+void simp3(int (*fd)(), double *x, int d, double *resd, double *delta, int wt, int i0, int i1, int *mg, int ct, double *res2, int *lfindex);
+void simp2(int (*fc)(), int (*fd)(), double *x, int d, double *resc, double *resd, double *delta, int wt, int i0, int *mg, int ct, double *res2, int *lfindex);
+void simp1(int (*fb)(), int (*fc)(), int (*fd)(), double *x, int d, double *resb, double *resc, double *resd, double *delta, int wt, int *mg, int ct, double *res2, int *lfindex);
+void simpson4(int (*f)(), int (*fb)(), int (*fc)(), int (*fd)(), double *ll, double *ur, int d, double *res, double *resb, double *resc, double *resd, int *mg, double *res2);
+void simpsonm(int (*f)(), double *ll, double *ur, int d, double *res, int *mg, double *res2);
+double simpson(double (*f)(), double l0, double l1, int m);
+
 /* third order corners */
 void simp3(int (*fd)(), double *x, int d, double *resd, double *delta, int wt, int i0, int i1, int *mg, int ct, double *res2, int *lfindex)
 /*int (*fd)(), d, wt, i0, i1, *mg, ct, *lfindex;

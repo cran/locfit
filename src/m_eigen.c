@@ -12,6 +12,8 @@
 #define E_TOL 1.0e-8
 #define SQR(x) ((x)*(x))
 
+double e_tol(double *D, int p);
+
 double e_tol(double *D, int p)
 /*double *D;
 int p;*/

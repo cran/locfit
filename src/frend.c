@@ -61,7 +61,7 @@ void ressumm(lfit *lf, design *des)
   if ((tg==TROBT+64) | (tg==TCAUC+64)) /* global robust scale */
   { oy = lf->lfd.y; lf->lfd.y = des->wd;
     des->xev = lf->pc.xbar;
-    locfit(&lf->lfd,des,&lf->sp,1,0);
+    locfit(&lf->lfd,des,&lf->sp,1,0,0);
     lf->lfd.y = oy;
     rsc(fp) = robscale;
   }
@@ -74,7 +74,7 @@ void ressumm(lfit *lf, design *des)
     npar(&lf->sp) = des->p = 1+lf->lfd.d;
     oy = lf->lfd.y; lf->lfd.y = des->wd;
     des->xev = lf->pc.xbar;
-    locfit(&lf->lfd,des,&lf->sp,1,0);
+    locfit(&lf->lfd,des,&lf->sp,1,0,0);
     for (i=0; i<lf->lfd.n; i++) oy[i] = resp(&lf->lfd,i) - des->th[i];
     lf->lfd.y = oy;
     deg(&lf->sp) = od; npar(&lf->sp) = op;

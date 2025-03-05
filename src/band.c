@@ -4,6 +4,7 @@
  */
 
 #include "local.h"
+#include "lffuns.h"
 
 /* extern void fitoptions(); */
 
@@ -227,15 +228,6 @@ int k, ker, n;*/
         { s = (x[i]-x[j])/h;
           wij = W(s,ker);
           dfd += wij;
-/* 
- *  r0 = \int fhat * fhat = sum_{i,j} W*W( (Xi-Xj)/h ) / n^2 h.
- *  d0 is it's derivative wrt h.
- *
- *  r1 = 1/n sum( f_{-i}(X_i) ).
- *  d1 is  it's derivative wrt h.
- *
- *  degfree = sum_i ( W_0 / sum_j W( (Xi-Xj)/h ) ) is fitted d.f.
- */
           r0 += Wconv(s,ker);
           d0 += -s*s*Wconv1(s,ker);
           if (i != j)

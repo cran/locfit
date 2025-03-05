@@ -9,6 +9,7 @@ static double scb_crit, *x, c[10], kap[5], kaq[5], max_p2;
 static int type;
 design *scb_des;
 
+
 double covar_par(lfit *lf, design *des, double x1, double x2)
 /* covar_par(lf,des,x1,x2) lfit *lf; design *des; double x1, x2; */
 { double *v1, *v2, *wk;

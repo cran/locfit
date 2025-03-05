@@ -29,8 +29,6 @@ double lf_exp(double x)
 
 #include "local.h"
 
-double lferfc(double);
-
 double lferf(double x)
 /* double x; */
 { static double val[] = { 0.0, 0.52049987781304674,

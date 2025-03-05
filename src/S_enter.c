@@ -14,6 +14,17 @@
 #include "local.h"
 extern int deitype(char *);  /* in lfstr.c */
 
+void basis(double *x, double *t, double *f, Sint dim, Sint p);
+static void vbasis(double **x, double *t, int n, int d, int *ind, int m, int p, double *X);
+static void setevs(evstruc *evs, Sint *mi, double cut, int *mg, double *flim);
+static void setdata(lfdata *lfd, double *x, double *y, double *c, double *w, double *b, Sint n, Sint d, double *sca, Sint *sty);
+static void setsmpar(smpar *sp, double *dp, Sint *mi);
+static void slocfit(double *x, double *y, double *c, double *w, double *b, double *lim, Sint *mi, double *dp, char **str, double *sca, double *xev, double *wdes, double *wtre, double *wpc, Sint *nvc, Sint *iwk1, Sint *iwk2, Sint *lw, Sint *mg, double *L, double *kap, Sint *dv, Sint *nd, Sint *sty);
+static void recoef(double *xev, double *coef, Sint *cell, Sint *nvc, Sint *mi, double *dp);
+static void spreplot(double *xev, double *coef, double *sv, Sint *cell, double *x, double *res, double *se, double *wpc, double *sca, Sint *m, Sint *nvc, Sint *mi, double *dp, Sint *mg, Sint *dv, Sint *nd, Sint *sty, Sint *where, char **what, void **bs);
+static void sfitted(double *x, double *y, double *w, double *c, double *ba, double *fit, Sint *cv, Sint *st, double *xev, double *coef, double *sv, Sint *cell, double *wpc, double *sca, Sint *nvc, Sint *mi, double *dp, Sint *mg, Sint *dv, Sint *nd, Sint *sty, char **what, void **bs);
+static void triterm(double *xev, double *h, Sint *ce, Sint *lo, Sint *hi, double *sca, Sint *nvc, Sint *mi, double *dp, Sint *nt, Sint *term, double *box);
+void guessnv(int *lw, char **evt, double *dp, int *mi, int *nvc, int *mg);
 
 static design des;
 static lfit lf;
@@ -476,7 +487,8 @@ void **bs; */
   lf.evs.sv = sv;
 
   lf.pc.wk = wpc;
-  lf.pc.lwk= pc_reqd(mi[MDIM],mi[MP],0);
+  /* lf.pc.lwk= pc_reqd(mi[MDIM],mi[MP],0); */
+  lf.pc.lwk= pc_reqd(mi[MDIM],mi[MP]);
   pcchk(&lf.pc,mi[MDIM],mi[MP],0);
   haspc(&lf.pc) = mi[MPC];
   lf.pc.xtwx.st = JAC_EIGD;

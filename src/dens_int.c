@@ -19,7 +19,6 @@
  */
 
 #include "local.h"
-
 /*
  * Finds the order of observations in the array x, and
  * stores in integer array ind.

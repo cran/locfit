@@ -33,4 +33,4 @@ typedef struct {
 #define is_fixed(des,i) ((des)->fix[i]==1)
 #define DES_INIT_ID 34988372
 
-extern int des_reqd(), des_reqi();
+/* extern int des_reqd(), des_reqi(); */

@@ -69,11 +69,14 @@ struct lfcol {
 /* FILES IN THE src-c DIRECTORY */
 
 /* arith.c */
+/*
 extern int arvect(), intitem();
 extern double areval(), arith(), darith(), dareval();
 extern vari *varith(), *saveresult(), *arbuild();
+*/
 
 /* c_args.c */
+/*
 #define argused(v,i) (((carg *)viptr(v,i))->used)
 #define setused(v,i) { ((carg *)viptr(v,i))->used = 1; }
 #define setunused(v,i) { ((carg *)viptr(v,i))->used = 0; }
@@ -81,54 +84,73 @@ extern vari *varith(), *saveresult(), *arbuild();
 #define argvalis(v,i,z) (strcmp(argval(v,i),z)==0)
 extern char *argval(), *getargval();
 extern int getarg(), readilist(), getlogic();
+*/
 
 /* cmd.c */
+/*
 extern int dispatch();
 extern void setuplf(), recondat(), cmdint();
 extern double backtr(), docrit();
+*/
 
 /* c_lf.c */
+/*
 extern vari *vfitted();
 extern void cfitted(), cwdiag();
+*/
 
 /* c_plot.c */
+/*
 extern void plotdata(), plotfit(), plottrack(), plotopt(), setplot();
+*/
 
 /* help.c */
+/*
 extern void example();
+*/
 
 /* lfd.c */
+/* 
 extern void doreaddata(), dosavedata(), dosavefit();
 extern int  setfilename();
+*/
 
 /* main.c */
-extern void SetWinDev();
+/* extern void SetWinDev(); */
 
 /* makecmd.c */
+/*
 extern vari *getcmd();
 extern void makecmd(), del_lines(), inc_forvar(), dec_forvar();
+*/
 
 /* post.c */
-extern void SetPSDev();
+/* extern void SetPSDev(); */
 
 /* pout.c */
+/*
 extern int pretty();
 extern void displayplot();
 extern void plotmaple(), plotmathe(), plotmatlb(), plotgnup(), plotxwin();
+*/
 
 /* random.c */
+/*
 extern double rnorm(), rexp(), runif(), rpois();
 extern void rseed();
+*/
 
 /* readfile.c */
-extern void readfile();
+/* extern void readfile(); */
 
 /* scbmax.c */
-extern void cscbmax();
+/* extern void cscbmax(); */
 
 /* vari.c */
+/*
 extern int vbytes();
 extern vari *createvar(), *findvar(), *growvar();
 extern void initdb(), deletevar(), deletename(), deleteifhidden(), setvarname();
 extern void *viptr(), vassn();
 extern double *vdptr(), vitem();
+*/

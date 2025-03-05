@@ -10,7 +10,6 @@
 
 #include "local.h"
 
-void newcell(int *nv, int vc, double *xev, int d, int k, double split_val, Sint *cpar, Sint *clef, Sint *crig);
 static int nterm;
 
 void kdtre_guessnv(evstruc *evs, int *nvm, int *ncm, int *vc, int n, int d, double alp)

@@ -7,6 +7,10 @@
 
 #include "local.h"
 
+void scritval(double *k0, Sint *d, double *cov, Sint *m, double *rdf, double *z, Sint *k);
+void slscv(double *x, int *n, double *h, double *z);
+void kdeb(double *x, Sint *mi, double *band, Sint *ind, double *h0, double *h1, Sint *meth, Sint *nmeth, Sint *ker);
+
 void scritval(double *k0, Sint *d, double *cov, Sint *m, double *rdf, double *z, Sint *k)
 /* scritval(k0,z,cov,m,d,rdf,k) double *k0, *z, *cov, *rdf; Sint *d, *m, *k; */
 { int i;

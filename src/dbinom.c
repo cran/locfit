@@ -6,6 +6,21 @@
 #include <math.h>
 #include "mutil.h"
 
+/* Function prototypes */
+double stirlerr(double n);
+double bd0(double x, double np);
+double dbinom_raw(double x, double n, double p, double q, int give_log);
+double dbinom(int x, int n, double p, int give_log);
+double dpois_raw(double x, double lambda, int give_log);
+double dpois(int x, double lambda, int give_log);
+double dbeta(double x, double a, double b, int give_log);
+double df(double x, double m, double n, int give_log);
+double dgamma(double x, double r, double lambda, int give_log);
+double dchisq(double x, double df, int give_log);
+double dhyper(int x, int r, int b, int n, int give_log);
+double dnbinom(int x, double n, double p, int give_log);
+double dt(double x, double df, int give_log);
+
 /* stirlerr(n) = log(n!) - log( sqrt(2*pi*n)*(n/e)^n ) */
 
 #define S0 0.083333333333333333333       /* 1/12 */

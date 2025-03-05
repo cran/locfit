@@ -16,7 +16,7 @@ int scbfitter(double *x, double *l, int reqd)
   int m;
   des_scb->xev = x;
   if ((ker(scb_sp)!=WPARM) | (!haspc(&lf_scb->pc)))
-  { locfit(lfd_scb,des_scb,&lf_scb->sp,1,1);
+  { locfit(lfd_scb,des_scb,&lf_scb->sp,1,1,0);
     m = wdiag(lfd_scb, scb_sp, des_scb,l,&lf_scb->dv,reqd,2,0);
   }
   else

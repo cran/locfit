@@ -9,6 +9,7 @@
  */
 
 #include "local.h"
+
 /* ||x|| for appropriate distance metric */
 double rho(double *x, double *sc, int d, int kt, int *sty)
 /*double *x, *sc;

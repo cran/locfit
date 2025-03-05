@@ -5,6 +5,20 @@
 
 #include "local.h"
 
+void solve(double *A, double *b, int d);
+void triang_guessnv(int *nvm, int *ncm, int *vc, int d, int mk);
+int triang_split(lfit *lf, Sint *ce, double *le);
+void resort(int *pv, double *xev, int *dig);
+void triang_grow(design *des, lfit *lf, Sint *ce, Sint *ct, Sint *term);
+void triang_descend(lfit *tr, double *xa, Sint *ce);
+void covrofdata(lfdata *lfd, double *V, double *mn);
+int intri(double *x, Sint *w, double *xev, double *xa, int d);
+void triang_start(design *des, lfit *lf);
+double triang_cubicint(double *v, double *vv, Sint *w, int d, int nc, double *xxa);
+double triang_clotoch(double *xev, double *vv, Sint *ce, int p, double *xxa);
+int triang_getvertexvals(fitpt *fp, evstruc *evs, double *vv, int i, int what);
+double triang_int(lfit *lf, double *x, int what);
+
 void solve(double *A, double *b, int d) /* this is crude! A organized by column. */
 /* solve(A,b,d) double *A, *b; int d; */
 { int i, j, k;

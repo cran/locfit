@@ -11,6 +11,11 @@
 #define IGAMMA_LARGE    1.0e30
 #define DOUBLE_EP     2.2204460492503131E-16
 
+double ibeta(double x, double a, double b);
+double igamma(double x, double df);
+double pf(double q, double df1, double df2);
+double mut_pnorm(double x, double mu, double s);
+
 double ibeta(double x, double a, double b)
 /* double x, a, b; */
 { int flipped = 0, i, k, count;

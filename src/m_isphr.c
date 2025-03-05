@@ -4,6 +4,14 @@
 static double *res, *resb, *orig, rmin, rmax;
 static int ct0;
 
+void sphM(double *M, double r, double *u);
+double ip3(double *a, double *b);
+void rn3(double *a);
+double sptarea(double *a, double *b, double *c);
+void li(double *x, int (*f)(), int (*fb)(), int mint, double ar);
+void sphint(int (*f)(), int (*fb)(), double *a, double *b, double *c, int lev, int mint, int cent);
+void integ_sphere(int (*f)(), int (*fb)(), double *fl, double *Res, double *Resb, int *mg);
+
 void sphM(double *M, double r, double *u)
 /*double *M, r, *u;*/
 { double h, u1[3], u2[3];

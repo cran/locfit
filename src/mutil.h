@@ -22,12 +22,20 @@ typedef struct {
 } jacobian;
 
 /* m_jacob.c */
-extern int jac_reqd();
-extern double *jac_alloc();
-extern void jacob_dec(),   chol_dec(),   eig_dec();
-extern int  jacob_solve(), chol_solve(), eig_solve();
-extern int  jacob_hsolve(),chol_hsolve(),eig_hsolve();
-extern double jacob_qf(),  chol_qf(),    eig_qf();
+extern int jac_reqd(int p);
+extern double *jac_alloc(jacobian *J, int p, double *wk);
+extern void jacob_dec(jacobian *J, int meth);
+extern int jacob_solve(jacobian *J, double *v);
+extern int jacob_hsolve(jacobian *J, double *v);
+extern double jacob_qf(jacobian *J, double *v);
+extern void chol_dec(double *A, int n, int p);
+extern int chol_solve(double *A, double *v, int n, int p);
+extern int chol_hsolve(double *A, double *v, int n, int p);
+extern double chol_qf(double *A, double *v, int n, int p);
+extern void eig_dec(double *X, double *P, int d);
+extern int eig_solve(jacobian *J, double *x);
+extern int eig_hsolve(jacobian *J, double *v);
+extern double eig_qf(jacobian *J, double *v);
 
 /* m_max.c */
 extern double max_grid(double (*f)(), double xlo, double xhi, int n, char flag);
@@ -42,7 +50,7 @@ extern double max_nr(int (*F)(), double *coef, double *old_coef, double *f1, dou
 extern void qr(double *X, int n, int p, double *w);
 extern void qrinvx(double *R, double *x, int n, int p);
 extern void qrtinvx(double *R, double *x, int n, int p);
- extern void qrsolv(double *R, double *x, int n, int p);
+extern void qrsolv(double *R, double *x, int n, int p);
 
 /* m_svd.c */
 extern void svd(double *x, double *p, double *q, int d, int mxit);
